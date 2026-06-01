@@ -1,0 +1,13 @@
+KV CompLens PCE Audit Log
+DEMO MODE ONLY - Local synthetic evidence. Analyst review required.
+
+Subject: 12345 109 St NW, Edmonton, AB
+Generated at: 2026-06-01T12:13:35.443Z
+Point estimate: $648,000
+Confidence: 74% Medium
+
+[2026-06-01T12:13:35.443Z] SOURCE_SCAN | CONFIRMED | PCE-V2 deterministic pipeline | 125 demo records scanned across 5 source buckets.
+[2026-06-01T12:13:35.443Z] RANKING | CONFIRMED | rankComparables | 80 candidates ranked; 75 remain outside selected set.
+[2026-06-01T12:13:35.443Z] SELECTION | CONFIRMED | PCE selectedComparableIds | 5 comparables selected for valuation.
+[2026-06-01T12:13:35.443Z] VALUATION | READY | estimateValuationRange | Point estimate 648000; confidence 74%.
+[2026-06-01T12:13:35.443Z] MEMO | READY | generateUnderwritingMemo | Facts-only underwriting memo generated from snapshot evidence.

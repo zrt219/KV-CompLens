@@ -1,0 +1,112 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Count 2 /Kids [4 0 R 6 0 R] >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 4962 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 744 Tm (KV CompLens - Underwriting Memo) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 728 Tm (DEMO MODE ONLY - Local synthetic evidence. Analyst review required.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 712 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 696 Tm (Generated: 2026-06-01T12:13:35.443Z) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 680 Tm (Subject: 12345 109 St NW, Edmonton, AB) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 664 Tm (Property: Detached | 4 bed | 3 bath | 2180 sq ft) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 648 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 632 Tm (Estimated value range: $582,000 to $715,000) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 616 Tm (Point estimate: $648,000) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 600 Tm (Confidence: 74% Medium) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 584 Tm (Effective sample size: 2.1) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 568 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 552 Tm (Selected comparables:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 536 Tm (1. 12310 108 St NW | sale $530,000 | adjusted $619,000 | 0.3 km | match 82) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 520 Tm (Evidence weight 64% | probability 92%) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 504 Tm (2. 236 Larch Drive | sale $626,000 | adjusted $677,000 | 2.4 km | match 71) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 488 Tm (Evidence weight 22% | probability 89%) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 472 Tm (3. 253 Juniper Drive | sale $538,000 | adjusted $607,000 | 0.3 km | match 67) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 456 Tm (Evidence weight 13% | probability 82%) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 440 Tm (4. 253 Prairie Drive | sale $727,000 | adjusted $726,000 | 12.9 km | match 58) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 424 Tm (Evidence weight 0% | probability 80%) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 408 Tm (5. 236 Prairie Drive | sale $708,000 | adjusted $714,000 | 13.2 km | match 55) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 392 Tm (Evidence weight 0% | probability 77%) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 376 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 360 Tm (Underwriting memo:) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 344 Tm (Subject Property Summary) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 328 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 312 Tm (12345 109 St NW, Edmonton, AB is analyzed as a Detached property with 4 beds, 3 baths, 2,180 sqft, 5,800 sqft lot, good condition, and 2 parking stalls.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 296 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 280 Tm (Source Scan Summary) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 264 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 248 Tm (125 local demo records scanned; 80 candidate comps ranked; 5 selected for valuation. Synthetic sales / public assessment context. Not live MLS. Analyst review required.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 232 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 216 Tm (Selected Comparable Sales) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 200 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 184 Tm (1. 12310 108 St NW, Edmonton: score 81.8/100; comparable probability 92%; energy quality 54%; source reliability 98%; normalized evidence weight 64%; sale $530,000; adjusted observation $619,000; Same property type: Detached. Inside preferred radius at 0.3 km. Living area inside size tolerance. Recent sale within 49 days. PCE-V2 probability 92%, energy quality 54%, source reliability 98%..) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 168 Tm (2. 236 Larch Drive, Edmonton: score 71.4/100; comparable probability 89%; energy quality 39%; source reliability 74%; normalized evidence weight 22%; sale $626,000; adjusted observation $677,000; Same property type: Detached. Inside preferred radius at 2.4 km. Living area inside size tolerance. Recent sale within 41 days. PCE-V2 probability 89%, energy quality 39%, source reliability 74%..) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 152 Tm (3. 253 Juniper Drive, Edmonton: score 66.5/100; comparable probability 82%; energy quality 26%; source reliability 74%; normalized evidence weight 13%; sale $538,000; adjusted observation $607,000; Property type differs: SemiDetached. Inside preferred radius at 0.3 km. 27% living-area variance. Recent sale within 130 days. PCE-V2 probability 82%, energy quality 26%, source reliability 74%..) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 136 Tm (4. 253 Prairie Drive, Sherwood Park: score 57.5/100; comparable probability 80%; energy quality 0%; source reliability 74%; normalized evidence weight 0%; sale $727,000; adjusted observation $726,000; Same property type: Detached. 12.9 km from subject. Living area inside size tolerance. Sale age is 314 days. PCE-V2 probability 80%, energy quality 0%, source reliability 74%..) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 120 Tm (5. 236 Prairie Drive, St. Albert: score 55.1/100; comparable probability 77%; energy quality 0%; source reliability 74%; normalized evidence weight 0%; sale $708,000; adjusted observation $714,000; Same property type: Detached. 13.2 km from subject. Living area inside size tolerance. Sale age is 284 days. PCE-V2 probability 77%, energy quality 0%, source reliability 74%..) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 104 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 88 Tm (Excluded / Lower-Ranked Candidates) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 2891 >>
+stream
+BT /F1 11 Tf 1 0 0 1 48 744 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 728 Tm (- 117 Summit Drive: ranked lower because Stale sale date.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 712 Tm (- 100 Summit Drive: ranked lower because Stale sale date.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 696 Tm (- 11022 104 St NW: ranked lower because Stale sale date.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 680 Tm (- 10715 124 St NW: ranked lower because Older sale.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 664 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 648 Tm (Adjustment Summary) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 632 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 616 Tm (Adjustments include square footage, beds/baths, age, condition, parking, and lot size. Average total adjustment across selected comps is $42,800.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 600 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 584 Tm (PCE-V2 Evidence Reconciliation) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 568 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 552 Tm (PCE-V2 treats subject value as a latent variable and each adjusted comparable sale as uncertain evidence. The valuation path uses comparable probability, evidence energy quality, Bayesian-style source reliability, robust price-per-square-foot outlier checks, precision weighting, effective sample size \(2.1\), evidence balance \(56%\), and a conformal-style residual buffer \($21,000\). Weighted adjusted mean is $630,000, posterior midpoint is $648,000, and diagnostic model-fusion estimate is $661,000.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 536 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 520 Tm (Indicated Value Range) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 504 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 488 Tm (Residual-buffered posterior range: $582,000 to $715,000, with point estimate $648,000.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 472 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 456 Tm (Confidence and Risk Flags) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 440 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 424 Tm (74% Medium confidence. 5 comps used; effective sample size 2.1; average comparable probability 84%; adjusted value spread 20.5%; 9 risk flags across selected comps. Risk flags: Age or condition mismatch; Different property type; Older sale; Size mismatch; Stale sale date; Wide adjusted-value spread; Stale sale dates in selected set) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 408 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 392 Tm (Analyst Review Notes) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 376 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 360 Tm (This is deterministic underwriting support only. It is not an appraisal, not an automated credit decision, and not live MLS analysis.) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 344 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 328 Tm (Recommended Next Steps) Tj ET
+BT /F1 11 Tf 1 0 0 1 48 312 Tm () Tj ET
+BT /F1 11 Tf 1 0 0 1 48 296 Tm (Review the selected comps, confirm adjustment assumptions, verify any real-world source documents, and require analyst approval before relying on the memo in a lending file.) Tj ET
+endstream
+endobj
+xref
+0 8
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000121 00000 n 
+0000000191 00000 n 
+0000000317 00000 n 
+0000005331 00000 n 
+0000005457 00000 n 
+trailer
+<< /Size 8 /Root 1 0 R >>
+startxref
+8400
+%%EOF

@@ -1,0 +1,23 @@
+[
+  {
+    "name": "City of Edmonton Property Assessment Data",
+    "jurisdiction": "Edmonton, Alberta",
+    "url": "https://data.edmonton.ca/City-Administration/Property-Assessment-Data-Current-Calendar-Year-/q7d6-ambg",
+    "useInDemo": "Public assessment context and field calibration only. Not used as MLS sold-data evidence.",
+    "caveat": "Assessment data is not a licensed comparable-sales feed and does not verify sale prices in this demo."
+  },
+  {
+    "name": "City of Calgary Historical Property Assessments",
+    "jurisdiction": "Calgary, Alberta",
+    "url": "https://data.calgary.ca/Government/Historical-Property-Assessments-Parcel-/4ur7-wsgc/data",
+    "useInDemo": "Public assessment context and Alberta municipal data provenance reference.",
+    "caveat": "Assessment records are distinct from MLS sold-data and are not treated as live sale comparables."
+  },
+  {
+    "name": "City of Calgary Residential Property Assessments Explanation",
+    "jurisdiction": "Calgary, Alberta",
+    "url": "https://www.calgary.ca/PDA/Assessment/Pages/Residential-property-assessments.aspx?master=nav",
+    "useInDemo": "Methodology context for residential assessment concepts.",
+    "caveat": "Used for product research context only, not for automated appraisal or credit decisioning."
+  }
+]

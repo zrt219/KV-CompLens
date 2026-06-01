@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+coverage/
+dist/
+artifacts/
+.omx/
+.vercel/
+.env*
+!.env.example
+*.log
+*.tsbuildinfo
+ChatGPT Image*.png
+Starminer.v*.zip
+*.mp4

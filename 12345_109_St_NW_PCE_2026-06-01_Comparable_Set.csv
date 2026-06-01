@@ -1,0 +1,6 @@
+Comparable ID,Address,Neighbourhood,City,Sale Date,Sale Price,Adjusted Value,Distance Km,Match Score,Comparable Probability,Evidence Weight,Risk Flags
+AB-001,12310 108 St NW,Central McDougall,Edmonton,2026-04-12,530000,619000,0.3,82,92%,64%,Age or condition mismatch
+AB-009,236 Larch Drive,Glenora,Edmonton,2026-04-20,626000,677000,2.4,71,89%,22%,Age or condition mismatch
+AB-010,253 Juniper Drive,Windermere,Edmonton,2026-01-21,538000,607000,0.3,67,82%,13%,Different property type; Older sale; Size mismatch
+AB-058,253 Prairie Drive,Summerwood,Sherwood Park,2025-07-21,727000,726000,12.9,58,80%,0%,Stale sale date; Older sale
+AB-073,236 Prairie Drive,Lacombe Park,St. Albert,2025-08-20,708000,714000,13.2,55,77%,0%,Stale sale date; Older sale
