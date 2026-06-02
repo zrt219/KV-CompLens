@@ -63,6 +63,8 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - [x] Tests pass.
 - [x] README updated.
 - [x] Browser smoke checks captured.
+- [x] GitHub repository published at `https://github.com/zrt219/KV-CompLens`.
+- [x] Vercel production deployment completed at `https://kv-complens.vercel.app`.
 
 ## Verification Evidence
 
@@ -91,6 +93,9 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - 2026-06-01 PCE-V2 gate: `npm run build` passed with static `/` route generation.
 - 2026-06-01 PCE-V2 runtime gate: HTTP 200 smoke check passed at `http://localhost:3000/`.
 - PCE-V2 screenshots captured: `artifacts/kv-complens-pce-v2-1366.png` and `artifacts/kv-complens-pce-v2-1440.png`.
+- 2026-06-01 publication gate: `npm run lint`, `npm test` (46 tests across 17 files), and `npm run build` passed before GitHub push.
+- 2026-06-01 GitHub publication: `main` pushed to `https://github.com/zrt219/KV-CompLens` with commit `8f77cdc`.
+- 2026-06-01 Vercel deployment: project `kv-complens` deployed successfully with remote `npm run build`, deployment state `READY`, and production alias `https://kv-complens.vercel.app`.
 
 ## Known Limitations
 
@@ -266,3 +271,13 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - Browser evidence: `.brand-mark` rendered inside `.brand-icon`, the icon measured `34 x 34` on the tested desktop viewport, and all eight pages retained a single active nav item after the logo refresh.
 - Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `.ralphplan/final-verification.md`.
 - Resume-safe bullet: Replaced a placeholder shell logo with a custom SVG brand mark and browser-verified the updated underwriting workspace identity across the full navigation flow.
+
+## 2026-06-01 -- GitHub And Vercel Publication
+
+- User direction: deploy KV CompLens to Vercel and push the source to `zrt219/KV-CompLens`.
+- Release hygiene applied: added `.vercelignore`, excluded `.vercel/`, `.next/`, `node_modules/`, local screenshots, the 4 GB `Starminer.v0.33.1.0.zip`, MP4 media, and generated artifacts from source/deploy packaging.
+- GitHub result: initial source baseline and deployment evidence commits pushed to `main` at `https://github.com/zrt219/KV-CompLens`.
+- Vercel result: created project `kv-complens`, linked the local repository, deployed successfully, and received production alias `https://kv-complens.vercel.app`.
+- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`, and remote Vercel `npm run build` completed successfully with deployment state `READY`.
+- Evidence/files: `.gitignore`, `.vercelignore`, `ai-engineering/daily-engineering-log.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
+- Resume-safe bullet: Published and deployed a deterministic Next.js underwriting-support prototype with verified lint/test/build gates, GitHub source control evidence, Vercel production build evidence, and clean deployment packaging.
