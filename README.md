@@ -1,38 +1,79 @@
 # KV CompLens
 
-KV CompLens is a deterministic underwriting-support prototype for Alberta residential comparable-property analysis. It is built as a reviewer-facing product surface for the KV Capital AI Engineer Hackathon, not as a generic real-estate chatbot and not as an automated appraisal engine.
+KV CompLens is a deterministic underwriting-support prototype for Alberta residential comparable-property analysis, built for the KV Capital AI Engineer Hackathon.
 
-KV CompLens separates deterministic valuation logic from AI-style explanation. The PCE-V2 engine ranks comparable sales from structured inputs and evidence reliability, while the product layer turns computed facts into an analyst-readable comp packet, underwriting memo, and audit trail.
+It is not a real-estate chatbot, appraisal engine, credit decision system, MLS ingestion product, or production underwriting platform. It is a reviewer-facing AI product surface that demonstrates how comparable evidence can be retrieved, scored, adjusted, reconciled, documented, and exported with transparent deterministic logic.
 
-## Featured Project Metadata
+## Live Project
 
-- Project: `KV CompLens`
+- Public app: [kv-complens.vercel.app](https://kv-complens.vercel.app)
 - Repository: [zrt219/KV-CompLens](https://github.com/zrt219/KV-CompLens)
+- Hackathon build log: [ai-engineering/hackathon/kv-complens-build-log.md](ai-engineering/hackathon/kv-complens-build-log.md)
+- Engineering source of truth: [ai-engineering/source-of-truth.md](ai-engineering/source-of-truth.md)
 - Stack: `Next.js`, `React`, `TypeScript`, `Vitest`, deterministic domain modules
-- Role: product engineering, workflow architecture, explainable AI systems design
-- Verified locally: `npm run lint`, `npm test`, `npm run build`
-- Public deployment: https://kv-complens.vercel.app
+- Verified gates: `npm run lint`, `npm test`, `npm run build`, Browser-verified Vercel deployment
+
+## Reviewer Summary
+
+KV CompLens separates deterministic valuation logic from AI-style explanation. The PCE-V2 engine ranks comparable sales from structured inputs and evidence reliability, while the product layer turns computed facts into an analyst-readable comp packet, memo, audit trail, and export workflow.
+
+The project is designed to show:
+
+- product engineering under a tight hackathon scope
+- deterministic comparable ranking and evidence fusion
+- transparent adjustment and value reconciliation logic
+- human-in-the-loop underwriting workflow design
+- accessibility-aware product UI and truthful demo-state labeling
+- evidence-driven verification and release documentation
+
+## Hackathon Build Log
+
+The full execution record lives in [ai-engineering/hackathon/kv-complens-build-log.md](ai-engineering/hackathon/kv-complens-build-log.md).
+
+That log records:
+
+- the original hackathon prompt and constraints
+- Ralphplan three-lane operating model
+- product, data, core logic, frontend, UI/UX, and QA workstreams
+- PCE-V1 and PCE-V2 implementation milestones
+- Browser-driven UI repair passes
+- export artifact verification
+- GitHub publication evidence
+- Vercel 404/protection repair and final Browser verification
+- resume-safe bullets grounded in verified work
+
+Key verified outcomes from the log:
+
+- deterministic PCE-V2 snapshot pipeline
+- reducer-driven UI state and selector-backed view models
+- Evidence Board comparable-analysis surface
+- source reliability and provenance boundaries
+- adjustment review and value reconciliation flows
+- facts-only memo/report surface
+- persisted multi-format export artifacts
+- public deployment repaired and Browser-verified at [kv-complens.vercel.app](https://kv-complens.vercel.app)
 
 ## What It Is
 
 - A local comparable-analysis workspace for human underwriters
-- A deterministic PCE-V2 evidence-fusion engine
-- A multi-step workflow covering subject intake, source scan, ranking, adjustment review, value reconciliation, memo/report, and export review
-- A demo that makes business values inspectable instead of hiding them behind opaque AI output
+- A deterministic probabilistic comparable-evidence engine
+- A multi-step review flow from subject intake to memo/export
+- A product proof layer for explainable AI underwriting support
+- A demo with explicit synthetic-data and public-source boundaries
 
 ## What It Is Not
 
 - Not a live appraisal
 - Not a credit decision
-- Not an MLS ingestion product
 - Not a production underwriting platform
-- Not a map-rendering exercise
+- Not an MLS, land-title, permit, or appraisal-feed connector
+- Not an opaque LLM valuation workflow
 
-This is an underwriting-support prototype. It is not a live appraisal, not a credit decision, and uses synthetic/public-style demonstration data. Analyst review is required.
+Analyst review is required. All sale records are synthetic demo data.
 
-## Problem Understanding
+## Problem
 
-KV Capital underwriters need a fast, defensible way to:
+Underwriters need a fast, defensible way to:
 
 1. identify plausible comparable sales
 2. rank them transparently
@@ -40,28 +81,28 @@ KV Capital underwriters need a fast, defensible way to:
 4. reconcile a reasonable value range
 5. produce a reviewable memo and audit trail
 
-The prototype focuses on the reasoning path, not on external integrations. That means deterministic scoring, explicit evidence quality, transparent adjustments, and a human-readable output packet.
+KV CompLens focuses on the reasoning path rather than external integrations. The prototype makes the business logic inspectable through deterministic code, evidence labels, risk flags, and review screens.
 
-## Why This Scope
+## Scope Decisions
 
 The project intentionally avoids:
 
 - paid APIs
 - live MLS sold-data feeds
-- auth and user management
+- authentication and user management
 - database infrastructure
 - hidden LLM valuation logic
-- production claims that cannot be verified
+- unverified production claims
 
-That constraint is a product decision, not a missing feature. The goal is to show a credible underwriting workflow that can be inspected line by line during technical review.
+This is a deliberate hackathon architecture choice. The goal is to show a credible underwriting workflow that can be reviewed line by line.
 
-## End-to-End Workflow
+## End-To-End Workflow
 
 ```txt
 Subject Intake
 -> Source Scan
 -> Candidate Ranking
--> Comparable Analysis (Evidence Board)
+-> Comparable Analysis / Evidence Board
 -> Comp Discovery / Find More Comparables
 -> Adjustment Review
 -> Value Reconciliation
@@ -86,8 +127,10 @@ subject + candidates
 ```txt
 src/app/page.tsx                    Main underwriting workspace
 src/app/globals.css                 Product styling and responsive layout
+src/app/api/export/route.ts         Server-backed export route
 hooks/usePceAnalysis.ts             Reducer-driven UI state and selectors
 lib/pce/runPcePipeline.ts           Canonical UI-facing PCE-V2 snapshot pipeline
+lib/pce/exportPackage.ts            PDF/CSV/MD/TXT/ZIP export generation
 lib/*                               UI-facing domain re-exports
 packages/core/scoring.ts            Deterministic comparable scoring
 packages/core/probability.ts        Probability utilities
@@ -105,7 +148,7 @@ tests/*.test.ts                     UI state and pipeline tests
 packages/core/*.test.ts             Core deterministic model tests
 ```
 
-## PCE-V2 Deterministic Engine
+## PCE-V2 Engine
 
 PCE-V2 treats each comparable as uncertain evidence about a hidden subject value. It remains deterministic code throughout the ranking and valuation path.
 
@@ -115,19 +158,10 @@ Core ingredients:
 - bounded comparable probability
 - MAD-based price-per-square-foot outlier detection
 - source reliability priors
-- uncertainty-aware evidence weights
-- weighted value reconciliation
+- evidence energy and uncertainty-aware weights
+- residual-buffered value reconciliation
 - confidence scoring from spread, risk, sample quality, and effective evidence count
 - marginal information gain for candidate surfacing
-
-The pipeline organizes existing deterministic core functions:
-
-- `runSourceScan`
-- `rankComparables`
-- `adjustComparableValue`
-- `estimateValuationRange`
-- `generateUnderwritingMemo`
-- `previewCandidateImpact`
 
 The UI-facing snapshot includes:
 
@@ -143,89 +177,46 @@ The UI-facing snapshot includes:
 - `activeComparableId`
 - `generatedAt`
 
-## Source Scan Simulation
+## Product Surfaces
 
-The source-scan screen simulates a multi-source underwriting evidence pass using structured demo data. It summarizes:
+### Source Scan
 
-- sources scanned
-- records found
-- normalized records
-- unique candidates
-- reliability bands
-- matched-field coverage
-- deduplication results
+The source-scan screen simulates a multi-source underwriting evidence pass using structured demo data. It summarizes source count, records found, normalized records, reliability bands, matched-field coverage, and deduplication.
 
-The boundary is explicit: this is a local synthetic/public-style simulation, not a live MLS or land-title ingestion service.
+Boundary: this is a local synthetic/public-style simulation, not live MLS or land-title ingestion.
 
-## Candidate Ranking
+### Candidate Ranking
 
-Candidates are scored deterministically on:
+Candidates are scored deterministically on location proximity, property type, size similarity, bed/bath similarity, recency, condition, price-per-square-foot consistency, risk penalties, and source quality.
 
-- location proximity
-- property type compatibility
-- size similarity
-- bed/bath similarity
-- sale recency
-- age/condition similarity
-- price-per-square-foot consistency
-- risk penalties
-- source quality
+Ranking outputs include match score, comparable probability, risk flags, evidence weights, selected sets, remaining candidates, and lower-ranked explanations.
 
-Ranking outputs include:
+### Evidence Board
 
-- match score
-- comparable probability
-- risk flags
-- evidence weight inputs
-- selected vs remaining candidate sets
-- lower-ranked / rejected explanations
+The default comparable-analysis screen uses an Evidence Board rather than a map because the workflow is about comparable evidence, not cartography.
 
-## Evidence Board Decision
+The board includes:
 
-The default Comparable Analysis screen uses an Evidence Board instead of a map because the workflow is about comparable evidence, not cartography.
+- centered subject card
+- selected comparable cards
+- active evidence links
+- source/risk labels
+- right-rail valuation and comparable details
+- searchable selected comparable surface
 
-The shipped default view is intentionally:
+### Adjustment Review
 
-- a blank calm canvas
-- a centered subject card
-- up to five selected comparables
-- one active evidence link at a time
-- right-rail evidence facts driven from selector output
+The adjustment review flow shows deterministic line-level adjustments for location, living area, lot size, age/condition, beds/baths, amenities, and risk penalties.
 
-Distance and spatial logic still exist in the deterministic model. They are expressed through computed metrics and evidence quality, not through decorative geography.
+The goal is not appraisal-grade coefficient calibration. The goal is reviewable adjustment logic.
 
-## Adjustment Review
+### Value Reconciliation
 
-The adjustment review flow compares the subject against selected comparables and shows reviewable deterministic adjustments such as:
+Value reconciliation aggregates adjusted comparable evidence into a low estimate, point estimate, high estimate, confidence score, comparable contribution, and scenario framing.
 
-- location
-- living area
-- lot size
-- age / condition
-- beds / baths
-- amenities
-- penalties / credits
+### Memo / Report / Export
 
-The purpose is not to imply appraisal-grade coefficient calibration. The purpose is to keep the adjustment logic explicit enough that an analyst can inspect the path from raw sale price to adjusted indication.
-
-## Value Reconciliation
-
-Value reconciliation aggregates adjusted comparable evidence into:
-
-- low estimate
-- point estimate
-- high estimate
-- confidence score
-- weighted contribution by comparable
-- scenario framing
-
-The reconciliation view exists to show why the range moved, not just what the final number is.
-
-## Memo / Report / Export
-
-KV CompLens turns computed facts into an analyst-readable output surface. The memo/report flow is facts-constrained and derived from snapshot state.
-
-Memo content is structured around:
+The memo/report flow turns snapshot facts into structured analyst-readable sections:
 
 1. executive summary
 2. subject summary
@@ -236,21 +227,22 @@ Memo content is structured around:
 7. confidence / risk
 8. limitations
 
-The export package modal is part of the review workflow. It should be described as a demo package-generation surface unless a full file-generation path is explicitly verified.
+The export workflow has verified package generation for PDF, CSV, Markdown, TXT, and ZIP outputs from the deterministic snapshot.
 
-## Audit / Provenance
+## Audit And Provenance
 
-The app maintains a deterministic audit-oriented state through:
+The app maintains an audit-oriented state through:
 
 - source-scan summaries
-- selected / rejected comparable sets
+- selected and rejected comparable sets
 - generated memo facts
-- structured audit events from the PCE snapshot
+- deterministic audit events
 - explicit demo-data and public-source boundaries
+- verified export artifacts
 
 Public-source provenance is reference-only and does not claim direct sold-data provenance for synthetic records.
 
-## Public Data Calibration References
+## Public Data References
 
 Public assessment and municipal references used for context:
 
@@ -258,19 +250,19 @@ Public assessment and municipal references used for context:
 - [City of Calgary Historical Property Assessments](https://data.calgary.ca/Government/Historical-Property-Assessments-Parcel-/4ur7-wsgc/data)
 - [City of Calgary Residential Assessment Explanation](https://www.calgary.ca/PDA/Assessment/Pages/Residential-property-assessments.aspx?master=nav)
 
-These are methodology/provenance references only. They are not treated as transaction-level source records for synthetic comparable sales.
+These are methodology/provenance references only. They are not transaction-level source records for synthetic comparable sales.
 
-## Data Limitations
+## Deployment Guardrail
 
-- Sale records are synthetic demo records
-- No licensed MLS sold-data feed is ingested
-- No live land-title, appraisal, or permit connector is active
-- Adjustment coefficients are deterministic heuristics
-- Export/document generation is not described as production-grade unless separately verified
+The permanent deployment rule is stored in [ai-engineering/source-of-truth.md](ai-engineering/source-of-truth.md).
 
-## Analyst Review Disclaimer
+For this Next.js app:
 
-This is an underwriting-support prototype. It is not a live appraisal, not a credit decision, and uses synthetic/public-style demonstration data. Analyst review is required.
+- keep `vercel.json` configured with `framework: "nextjs"`
+- do not create a generic Vercel `Other/public` project
+- do not claim deployment success from Vercel `READY` alone
+- verify the live public URL with Browser
+- the page must render `KV CompLens` and must not show `404: NOT_FOUND` or Vercel login
 
 ## How To Run
 
@@ -289,7 +281,7 @@ npm test
 npm run build
 ```
 
-Current local verification covers:
+Latest verified coverage includes:
 
 - deterministic scoring
 - probability utilities
@@ -299,50 +291,71 @@ Current local verification covers:
 - marginal information gain
 - PCE snapshot behavior
 - reducer/selectors
+- export package generation
 - UI-facing integration contracts
+
+## Verified Status
+
+- `npm run lint` passed
+- `npm test` passed with 46 tests across 17 files
+- `npm run build` passed
+- Vercel production deployment is Browser-verified at [kv-complens.vercel.app](https://kv-complens.vercel.app)
+- GitHub source is published at [zrt219/KV-CompLens](https://github.com/zrt219/KV-CompLens)
 
 ## Known Limitations
 
-- Public Vercel deployment is Browser-verified at https://kv-complens.vercel.app
-- Export is positioned as a demo workflow unless end-to-end file generation is verified
+- Sale records are synthetic demo records
+- No licensed MLS sold-data feed is ingested
+- No live land-title, appraisal, or permit connector is active
+- Adjustment coefficients are deterministic heuristics
 - No analyst authentication, team review workflow, or persistent storage
-- No calibration against licensed sold-data outcomes
 - No production credit-decision capability
+- Public OpenStreetMap tiles are acceptable for demo screenshots, but production use should use an appropriate tile provider or self-hosted tiles
 
 ## What I Would Build Next
 
 - licensed or internal sold-data connectors with provenance controls
 - analyst approval states and saved review packets
-- stronger exception handling for large adjustments
-- scenario exports with verified document-generation paths
+- exception handling for large adjustments
+- scenario exports with richer document templates
 - reviewer collaboration and audit-note persistence
+- persistent case storage and role-based access control
 
-## Loom Demo Script
+## Demo Script
 
-1. Start at Subject Intake and show the seeded subject facts.
+1. Start at Subject Intake and show seeded subject facts.
 2. Move to Source Scan and show structured evidence counts.
-3. Open Candidate Ranking and explain deterministic scoring.
-4. Open Comparable Analysis and show the Evidence Board default.
-5. Click `Find More Comparables`.
-6. Review the surfaced candidate and add it into the selected set.
-7. Show the updated selected comparable, valuation range, and toast state.
-8. Move to Adjustment Review and explain line-level adjustments.
-9. Move to Value Reconciliation and explain weighted contribution.
-10. Move to Memo / Report and show the analyst-readable packet.
-11. Open Export Package and explain the package options and current demo boundary.
+3. Open Comparable Analysis and explain the Evidence Board.
+4. Click `Find More Comparables`.
+5. Review the surfaced candidate and add it into the selected set.
+6. Show the updated selected comparables, valuation range, and audit event.
+7. Move to Adjustment Review and explain line-level adjustments.
+8. Move to Value Reconciliation and explain weighted contribution.
+9. Move to Memo / Report and show the structured memo packet.
+10. Open Export Package and explain the verified package outputs.
 
 ## IP / Usage Note
 
 Based on the public hackathon terms, KV Capital receives a non-exclusive right to reference and demo this work, while the code remains mine. No proprietary UMATTR, Ralphplan AI, employer, client, or private production code is included.
 
-## Verification Snapshot
-
-Latest verified local checks during this workspace session:
-
-- `npm run lint` - passed
-- `npm test` - passed (`41` tests across `16` files)
-- `npm run build` - passed
-
 ## Resume-Safe Summary
 
-- Built a deterministic underwriting-support prototype that ranks synthetic comparable sales, recalculates selected-comparable evidence through a PCE-V2 snapshot pipeline, and turns computed facts into an analyst-readable review packet.
+Built and Browser-verified a deterministic Next.js underwriting-support prototype that ranks synthetic comparable sales, models evidence reliability through a PCE-V2 snapshot pipeline, reconciles adjusted value ranges, produces a structured analyst memo, exports review artifacts, and documents the build through a hackathon engineering log.
+
+## Deployment
+
+This project is deployed on Vercel.
+
+Current live URL:
+
+- [https://kv-complens.vercel.app](https://kv-complens.vercel.app)
+
+GitHub repository:
+
+- [https://github.com/zrt219/KV-CompLens](https://github.com/zrt219/KV-CompLens)
+
+## Notes
+
+- The repo includes synthetic demo data, generated property placeholder images, exported evidence artifacts, and engineering logs so reviewers can inspect the full build record.
+- The canonical hackathon execution record is [ai-engineering/hackathon/kv-complens-build-log.md](ai-engineering/hackathon/kv-complens-build-log.md).
+- Vercel deployment claims must follow [ai-engineering/source-of-truth.md](ai-engineering/source-of-truth.md): use explicit Next.js configuration and Browser-verify the public URL.

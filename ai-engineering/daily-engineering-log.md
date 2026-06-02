@@ -186,3 +186,12 @@
 - Verification performed: content search for source-of-truth and Vercel deployment rules; README deployment copy updated to the Browser-verified public URL.
 - Evidence/files: `ai-engineering/source-of-truth.md`, `ai-engineering/daily-engineering-log.md`, `README.md`, `vercel.json`.
 - Resume-safe bullet: Converted a verified Vercel deployment failure into permanent engineering guardrails that require explicit Next.js project config and Browser-verified public deployment evidence.
+
+## 2026-06-01 — Verified Engineering Work
+
+- Built/changed: Reworked the README into a reviewer-facing project brief with live app/repository links, canonical hackathon build-log linkage, architecture summary, PCE-V2 workflow explanation, deployment guardrails, verification status, limitations, resume-safe summary, and a footer matching the existing repository README convention.
+- Systems involved: README portfolio documentation, hackathon build-log evidence, AI engineering source-of-truth, Vercel deployment evidence, deterministic PCE-V2 underwriting workspace.
+- Technical skills demonstrated: Technical documentation architecture, employer-facing evidence curation, scope-bound claim writing, deployment evidence integration, hackathon proof packaging.
+- Verification performed: README content checks for hackathon log link, public deployment link, source-of-truth link, verified test count, Vercel guardrail wording, and matching `Deployment`/`Notes` footer pattern; local lint/test/build gate rerun for repository integrity.
+- Evidence/files: `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `ai-engineering/source-of-truth.md`, `ai-engineering/daily-engineering-log.md`.
+- Resume-safe bullet: Rebuilt the project README as a reviewer-facing AI engineering brief that links the canonical hackathon build log, documents deterministic PCE-V2 architecture, and grounds deployment claims in Browser-verified evidence.
