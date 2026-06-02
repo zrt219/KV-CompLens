@@ -177,3 +177,12 @@
 - Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`; Browser confirmed the initial Vercel URL returned `404: NOT_FOUND`, then confirmed `https://kv-complens.vercel.app` rendered `KV CompLens` after redeploy `dpl_J4HfWmMeZFXyQoq27XobLQNPpTdM`.
 - Evidence/files: `.gitignore`, `.vercelignore`, `vercel.json`, `package.json`, `src/app/page.tsx`, `packages/core/*.ts`, `tests/*.test.ts`, `ai-engineering/daily-engineering-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
 - Resume-safe bullet: Published and Browser-verified a deterministic Next.js underwriting-support prototype with clean package ignore rules, GitHub source control evidence, Vercel production build evidence, and public deployment debugging.
+
+## 2026-06-01 — Verified Engineering Work
+
+- Built/changed: Added a permanent AI engineering source-of-truth memory that forbids generic Vercel `Other/public` setup for this Next.js app and requires Browser verification before deployment claims.
+- Systems involved: AI engineering documentation, Vercel deployment guardrails, README public deployment evidence.
+- Technical skills demonstrated: Root-cause documentation, deployment process hardening, evidence governance, release-quality checklist design.
+- Verification performed: content search for source-of-truth and Vercel deployment rules; README deployment copy updated to the Browser-verified public URL.
+- Evidence/files: `ai-engineering/source-of-truth.md`, `ai-engineering/daily-engineering-log.md`, `README.md`, `vercel.json`.
+- Resume-safe bullet: Converted a verified Vercel deployment failure into permanent engineering guardrails that require explicit Next.js project config and Browser-verified public deployment evidence.

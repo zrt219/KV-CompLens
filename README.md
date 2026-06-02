@@ -11,7 +11,7 @@ KV CompLens separates deterministic valuation logic from AI-style explanation. T
 - Stack: `Next.js`, `React`, `TypeScript`, `Vitest`, deterministic domain modules
 - Role: product engineering, workflow architecture, explainable AI systems design
 - Verified locally: `npm run lint`, `npm test`, `npm run build`
-- Public deployment: not yet claimed in this README until a public Vercel URL is verified
+- Public deployment: https://kv-complens.vercel.app
 
 ## What It Is
 
@@ -303,7 +303,7 @@ Current local verification covers:
 
 ## Known Limitations
 
-- No public Vercel deployment URL is claimed in this README until verified
+- Public Vercel deployment is Browser-verified at https://kv-complens.vercel.app
 - Export is positioned as a demo workflow unless end-to-end file generation is verified
 - No analyst authentication, team review workflow, or persistent storage
 - No calibration against licensed sold-data outcomes
