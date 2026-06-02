@@ -95,7 +95,7 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - PCE-V2 screenshots captured: `artifacts/kv-complens-pce-v2-1366.png` and `artifacts/kv-complens-pce-v2-1440.png`.
 - 2026-06-01 publication gate: `npm run lint`, `npm test` (46 tests across 17 files), and `npm run build` passed before GitHub push.
 - 2026-06-01 GitHub publication: `main` pushed to `https://github.com/zrt219/KV-CompLens` with commit `8f77cdc`.
-- 2026-06-01 Vercel deployment: project `kv-complens` deployed successfully with remote `npm run build`, deployment state `READY`, and production alias `https://kv-complens.vercel.app`.
+- 2026-06-01 Vercel deployment repair: Browser found `404: NOT_FOUND` on `https://kv-complens.vercel.app`; SSO protection was disabled, explicit Next.js config was added in `vercel.json`, project `kv-complens` was redeployed, and Browser verified `https://kv-complens.vercel.app` rendered `KV CompLens`.
 
 ## Known Limitations
 
@@ -277,7 +277,16 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - User direction: deploy KV CompLens to Vercel and push the source to `zrt219/KV-CompLens`.
 - Release hygiene applied: added `.vercelignore`, excluded `.vercel/`, `.next/`, `node_modules/`, local screenshots, the 4 GB `Starminer.v0.33.1.0.zip`, MP4 media, and generated artifacts from source/deploy packaging.
 - GitHub result: initial source baseline and deployment evidence commits pushed to `main` at `https://github.com/zrt219/KV-CompLens`.
-- Vercel result: created project `kv-complens`, linked the local repository, deployed successfully, and received production alias `https://kv-complens.vercel.app`.
-- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`, and remote Vercel `npm run build` completed successfully with deployment state `READY`.
-- Evidence/files: `.gitignore`, `.vercelignore`, `ai-engineering/daily-engineering-log.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
-- Resume-safe bullet: Published and deployed a deterministic Next.js underwriting-support prototype with verified lint/test/build gates, GitHub source control evidence, Vercel production build evidence, and clean deployment packaging.
+- Vercel result: created project `kv-complens`, found and fixed a public `404: NOT_FOUND` / protection issue, added explicit Next.js deployment config, redeployed successfully, and Browser-verified production alias `https://kv-complens.vercel.app`.
+- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`, remote Vercel `npm run build`, and Browser verification that both the production alias and deployment URL rendered `KV CompLens` without 404/login.
+- Evidence/files: `.gitignore`, `.vercelignore`, `vercel.json`, `ai-engineering/daily-engineering-log.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
+- Resume-safe bullet: Published and Browser-verified a deterministic Next.js underwriting-support prototype with lint/test/build gates, GitHub source control evidence, Vercel production build evidence, and corrected public deployment access.
+
+## 2026-06-01 -- Vercel 404 Repair
+
+- Verified failure: Browser showed `404: NOT_FOUND` for `https://kv-complens.vercel.app` and a Vercel login redirect on the deployment-specific URL.
+- Root cause: Vercel project protection required SSO for `.vercel.app` deployments, and the project was initially created with a generic framework/output configuration instead of an explicit Next.js app config.
+- Fix applied: disabled SSO deployment protection for `kv-complens`, added `vercel.json` with `framework: "nextjs"` and `buildCommand: "npm run build"`, and redeployed production.
+- Verification performed: local `npm run build` passed; Vercel production deployment `dpl_J4HfWmMeZFXyQoq27XobLQNPpTdM` completed with `READY`; Browser verified `https://kv-complens.vercel.app` and `https://kv-complens-24u7tlusz-zrt219s-projects.vercel.app` both render `KV CompLens` and no longer show 404 or login.
+- Evidence/files: `vercel.json`, `ai-engineering/hackathon/kv-complens-build-log.md`, `ai-engineering/daily-engineering-log.md`, `https://kv-complens.vercel.app`.
+- Resume-safe bullet: Diagnosed and repaired a Vercel public deployment failure by correcting project protection/configuration and Browser-verifying the live Next.js underwriting-support app.

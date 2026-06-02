@@ -171,9 +171,9 @@
 
 ## 2026-06-01 — Verified Engineering Work
 
-- Built/changed: Published KV CompLens to GitHub and deployed the verified Next.js app to Vercel, while adding deploy/package ignore rules that exclude large non-source local media artifacts.
-- Systems involved: GitHub source publication, Vercel production deployment, Vercel packaging rules, Next.js app router, TypeScript/Vitest validation, deterministic PCE underwriting workspace.
-- Technical skills demonstrated: Release preparation, deployment hygiene, large-artifact exclusion, validation-first publishing, Vercel project setup, production build verification.
-- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`; Vercel production deployment completed with `READY` state after remote `npm run build`.
-- Evidence/files: `.gitignore`, `.vercelignore`, `package.json`, `src/app/page.tsx`, `packages/core/*.ts`, `tests/*.test.ts`, `ai-engineering/daily-engineering-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
-- Resume-safe bullet: Published and deployed a deterministic Next.js underwriting-support prototype with clean package ignore rules, passing lint/tests/build, GitHub source control, and Vercel production build evidence.
+- Built/changed: Published KV CompLens to GitHub, fixed a Vercel 404/protection deployment issue by adding explicit Next.js project config, disabled SSO deployment protection, and redeployed the app to a Browser-verified public URL.
+- Systems involved: GitHub source publication, Vercel production deployment, Vercel project protection/settings, Next.js app router, TypeScript/Vitest validation, deterministic PCE underwriting workspace.
+- Technical skills demonstrated: Release preparation, deployment debugging, public URL verification, large-artifact exclusion, validation-first publishing, Vercel project setup, production build verification.
+- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`; Browser confirmed the initial Vercel URL returned `404: NOT_FOUND`, then confirmed `https://kv-complens.vercel.app` rendered `KV CompLens` after redeploy `dpl_J4HfWmMeZFXyQoq27XobLQNPpTdM`.
+- Evidence/files: `.gitignore`, `.vercelignore`, `vercel.json`, `package.json`, `src/app/page.tsx`, `packages/core/*.ts`, `tests/*.test.ts`, `ai-engineering/daily-engineering-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
+- Resume-safe bullet: Published and Browser-verified a deterministic Next.js underwriting-support prototype with clean package ignore rules, GitHub source control evidence, Vercel production build evidence, and public deployment debugging.
