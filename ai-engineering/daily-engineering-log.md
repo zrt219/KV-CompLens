@@ -171,9 +171,9 @@
 
 ## 2026-06-01 — Verified Engineering Work
 
-- Built/changed: Prepared KV CompLens for repository publication by adding deploy/package ignore rules, excluding large non-source local media artifacts, and validating the Next.js app before first GitHub push.
-- Systems involved: Git source control hygiene, Vercel packaging rules, Next.js app router, TypeScript/Vitest validation, deterministic PCE underwriting workspace.
-- Technical skills demonstrated: Release preparation, deployment hygiene, large-artifact exclusion, validation-first publishing, factual blocker documentation.
-- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`; Vercel CLI deploy attempted and blocked by invalid local token, fallback deploy attempted and stopped after stalling during package creation.
-- Evidence/files: `.gitignore`, `.vercelignore`, `package.json`, `src/app/page.tsx`, `packages/core/*.ts`, `tests/*.test.ts`, `ai-engineering/daily-engineering-log.md`.
-- Resume-safe bullet: Prepared and verified a deterministic Next.js underwriting-support prototype for source publication with clean package ignore rules, passing lint/tests/build, and documented deployment credential blockers.
+- Built/changed: Published KV CompLens to GitHub and deployed the verified Next.js app to Vercel, while adding deploy/package ignore rules that exclude large non-source local media artifacts.
+- Systems involved: GitHub source publication, Vercel production deployment, Vercel packaging rules, Next.js app router, TypeScript/Vitest validation, deterministic PCE underwriting workspace.
+- Technical skills demonstrated: Release preparation, deployment hygiene, large-artifact exclusion, validation-first publishing, Vercel project setup, production build verification.
+- Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`; Vercel production deployment completed with `READY` state after remote `npm run build`.
+- Evidence/files: `.gitignore`, `.vercelignore`, `package.json`, `src/app/page.tsx`, `packages/core/*.ts`, `tests/*.test.ts`, `ai-engineering/daily-engineering-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
+- Resume-safe bullet: Published and deployed a deterministic Next.js underwriting-support prototype with clean package ignore rules, passing lint/tests/build, GitHub source control, and Vercel production build evidence.
