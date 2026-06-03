@@ -1637,9 +1637,22 @@ function ActivityTimeline({ items, emptyMessage = "No activity yet." }: { items:
 
 function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
   return (
-    <motion.div className={clsx("toast", toast.tone)} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
-      <CheckCircle2 size={24} />
-      <div><strong>{toast.title}</strong><p>{toast.detail}</p></div>
+    <motion.div className={clsx("toast", toast.tone, toast.delta && "gameplay-toast")} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
+      {!toast.delta && <CheckCircle2 size={24} />}
+      <div>
+        <strong>{toast.title}</strong>
+        {toast.delta ? (
+          <div className="gameplay-stats">
+            <p>Information gain: {(toast.delta.marginalInformationGain ?? 0) > 0 ? "+" : ""}{(toast.delta.marginalInformationGain ?? 0).toFixed(1)}</p>
+            <p>Confidence: {(toast.delta.confidenceDelta ?? 0) > 0 ? "+" : ""}{toast.delta.confidenceDelta ?? 0} pts</p>
+            <p>Effective comps: {(toast.delta.effectiveSampleSizeDelta ?? 0) > 0 ? "+" : ""}{toast.delta.effectiveSampleSizeDelta ?? 0}</p>
+            <p>Range width: {(toast.delta.rangeWidthDelta ?? 0) < 0 ? "-" : "+"}${Math.abs(toast.delta.rangeWidthDelta ?? 0).toLocaleString()}</p>
+            <p>Risk: {(toast.delta.riskSeverityDelta ?? 0) === 0 ? "unchanged" : ((toast.delta.riskSeverityDelta ?? 0) > 0 ? "+" : "") + (toast.delta.riskSeverityDelta ?? 0)}</p>
+          </div>
+        ) : (
+          <p>{toast.detail}</p>
+        )}
+      </div>
       <button aria-label="Dismiss notification" type="button" onClick={onClose}><X size={18} /></button>
     </motion.div>
   );

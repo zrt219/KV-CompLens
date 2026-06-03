@@ -9,7 +9,8 @@ import type { AdjustedComparable, ComparableProperty, SubjectProperty } from "..
 import { findHighestPositiveCandidate, formatSigned } from "../lib/selectors/pceSelectors";
 
 export type PceViewMode = "network" | "discovery" | "table" | "adjustments" | "valuation" | "report" | "memo";
-export type PceToast = { title: string; detail: string; tone: "success" | "review" };
+import type { ValuationDelta } from "../packages/core/types";
+export type PceToast = { title: string; detail: string; tone: "success" | "review"; delta?: ValuationDelta };
 
 export type PceAnalysisState = {
   subject: SubjectProperty;
@@ -300,9 +301,10 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         snapshot,
         activeView: "network",
         toast: {
-          title: "Home added",
-          detail: `${added?.address ?? "Home"} included. Confidence ${formatSigned(confidence)} pts.`,
-          tone: "success"
+          title: "New comparable found",
+          detail: `${added?.address ?? "Home"} included.`,
+          tone: "success",
+          delta: snapshot.valuationDelta
         }
       };
     }

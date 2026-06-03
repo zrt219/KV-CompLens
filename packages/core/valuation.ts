@@ -160,9 +160,21 @@ export function estimateValuationRange(subject: SubjectProperty, selectedCompara
 export function compareValuationBeforeAfter(before: ValuationRange, after: ValuationRange): ValuationDelta {
   const beforeWidth = before.highEstimate - before.lowEstimate;
   const afterWidth = after.highEstimate - after.lowEstimate;
-  const marginalInformationGain = before.posteriorVariance > 0 && after.posteriorVariance > 0
+  const varianceGain = before.posteriorVariance > 0 && after.posteriorVariance > 0
     ? Math.max(0, 0.5 * Math.log(before.posteriorVariance / after.posteriorVariance))
     : 0;
+  
+  const lambdaN = 5.0;
+  const lambdaR = 15.0;
+  const lambdaV = 100.0;
+  
+  const nEffGain = after.effectiveSampleSize - before.effectiveSampleSize;
+  const riskGain = after.normalizedRiskSeverity - before.normalizedRiskSeverity;
+  const valueShift = before.pointEstimate > 0 
+    ? Math.abs(after.pointEstimate - before.pointEstimate) / before.pointEstimate 
+    : 0;
+
+  const marginalInformationGain = varianceGain + (lambdaN * nEffGain) - (lambdaR * riskGain) - (lambdaV * valueShift);
   return {
     lowDelta: after.lowEstimate - before.lowEstimate,
     pointDelta: after.pointEstimate - before.pointEstimate,
