@@ -107,14 +107,6 @@ export default function Home() {
     reportPrepared,
     workflowStep
   });
-  const actionHint = getActionHint({
-    analysisStarted: state.analysisStarted,
-    canRunAnalysis,
-    subjectDirty,
-    adjustmentsLocked,
-    workflowStep,
-    reportPrepared
-  });
   const StatusIcon = workflowStatus.icon;
 
   useEffect(() => () => {
@@ -309,7 +301,6 @@ export default function Home() {
               {state.analysisStarted ? "Next Step" : "Run Analysis"}
             </button>
           </div>
-          <p className="action-hint" aria-live="polite">{actionHint}</p>
         </header>
 
         <WorkflowProgress viewModel={civicGrid.workflow} workflowStep={workflowStep} analysisStarted={state.analysisStarted} />
@@ -415,47 +406,7 @@ function workflowStepToView(step: WorkflowStepId): ViewMode {
   return mapping[step];
 }
 
-function getActionHint({
-  analysisStarted,
-  canRunAnalysis,
-  subjectDirty,
-  adjustmentsLocked,
-  workflowStep,
-  reportPrepared
-}: {
-  analysisStarted: boolean;
-  canRunAnalysis: boolean;
-  subjectDirty: boolean;
-  adjustmentsLocked: boolean;
-  workflowStep: WorkflowStepId;
-  reportPrepared: boolean;
-}) {
-  if (!analysisStarted) {
-    return canRunAnalysis
-      ? "Run the analysis to move from intake into the source scan."
-      : "Fill in the property details to unlock the source scan.";
-  }
-  if (subjectDirty) {
-    return "You changed the property details. Rerun the analysis before moving forward.";
-  }
-  switch (workflowStep) {
-    case "sources":
-      return "Review the source scan, then move into homes.";
-    case "review":
-      return "Review the homes, surface a stronger comp if needed, then confirm the adjustments.";
-    case "adjust":
-      return adjustmentsLocked
-        ? "The current review set is locked and ready for export."
-        : "Confirm the adjustments before opening export.";
-    case "export":
-      return reportPrepared
-        ? "The export package is ready. Generate the files or download the prepared bundle."
-        : "Generate the final package from the current review set.";
-    case "intake":
-    default:
-      return "Edit the property details, then run the analysis.";
-  }
-}
+
 
 function getWorkflowStatus({
   analysisStarted,
