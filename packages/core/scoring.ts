@@ -137,14 +137,14 @@ export function evaluateEligibility(subject: SubjectProperty, comp: ComparablePr
 
 function weightedCoreScore(breakdown: ScoreBreakdown) {
   return (
-    breakdown.locationScore * 0.3 +
-    breakdown.propertyTypeScore * 0.2 +
+    breakdown.locationScore * 0.30 +
+    breakdown.propertyTypeScore * 0.20 +
     breakdown.sizeScore * 0.15 +
-    breakdown.bedroomBathroomScore * 0.1 +
-    breakdown.saleRecencyScore * 0.1 +
-    breakdown.ageConditionScore * 0.1 +
+    breakdown.bedroomBathroomScore * 0.10 +
+    breakdown.saleRecencyScore * 0.10 +
+    breakdown.ageConditionScore * 0.10 +
     breakdown.pricePerSqftScore * 0.05
-  ) * 0.96 + breakdown.sourceReliabilityScore * 0.04;
+  );
 }
 
 export function calculateRiskSeverity(riskFlags: string[], eligibility: GateResult, outlierProbability: number) {
@@ -250,7 +250,11 @@ export function scoreComparableProperty(subject: SubjectProperty, comp: Comparab
   const uncertaintyVariance = calculateComparableUncertainty(distanceKm, daysSinceSale, sourceReliability, outlier.outlierProbability, riskSeverity);
   const precision = uncertaintyVariance > 0 ? 1 / uncertaintyVariance : 0;
   const evidenceWeight = comparableProbability * energy.energyQuality * sourceReliability * precision;
-  const totalScore = clampScore(rawScore * 0.72 + comparableProbability * 18 + energy.energyQuality * 10 - eligibility.penalty - outlier.scorePenalty);
+  
+  const riskPenalty = riskSeverity * 100;
+  const missingPenaltyScaled = missingPenalty * 100;
+  const outlierPenalty = outlier.scorePenalty;
+  const totalScore = clampScore(Math.max(0, rawScore - riskPenalty - missingPenaltyScaled - outlierPenalty));
 
   const reasonParts = [
     subject.propertyType === comp.propertyType ? `Same property type: ${comp.propertyType}.` : `Property type differs: ${comp.propertyType}.`,

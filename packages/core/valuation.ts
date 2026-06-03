@@ -82,23 +82,25 @@ export function estimateValuationRange(subject: SubjectProperty, selectedCompara
   const weightedP20 = weightedPercentile(values, weights, 0.2);
   const weightedP80 = weightedPercentile(values, weights, 0.8);
   const looResiduals = leaveOneOutResiduals(values, weights);
-  const q80Residual = weightedPercentile(looResiduals, weights, 0.8);
+  const q_alpha = weightedPercentile(looResiduals, weights, 0.90);
 
   const prior = priorMean(subject, selectedComparables) || weightedAdjustedMean;
   const priorStd = 65000;
   const priorPrecision = 1 / Math.pow(priorStd, 2);
-  const evidencePrecision = weights.reduce((sum, weight) => sum + weight, 0);
+  const evidencePrecision = adjustedComparables.reduce((sum, comp) => sum + comp.comparableProbability * comp.precision, 0);
   const posteriorPrecision = priorPrecision + evidencePrecision;
+  
   const posteriorMean = posteriorPrecision > 0
-    ? (priorPrecision * prior + adjustedComparables.reduce((sum, comp, index) => sum + (weights[index] ?? 0) * comp.adjustedValue, 0)) / posteriorPrecision
+    ? (priorPrecision * prior + adjustedComparables.reduce((sum, comp) => sum + (comp.comparableProbability * comp.precision) * comp.adjustedValue, 0)) / posteriorPrecision
     : weightedAdjustedMean;
+    
   const posteriorVariance = posteriorPrecision > 0 ? 1 / posteriorPrecision : weightedVariance(values, weights);
   const posteriorStd = Math.sqrt(Math.max(0, posteriorVariance));
 
-  const baseLow = posteriorMean - 1.28 * posteriorStd;
-  const baseHigh = posteriorMean + 1.28 * posteriorStd;
-  const lowEstimate = roundToThousand(Math.min(baseLow, weightedP20) - 0.35 * q80Residual);
-  const highEstimate = roundToThousand(Math.max(baseHigh, weightedP80) + 0.35 * q80Residual);
+  const baseLow = posteriorMean - 1.645 * posteriorStd;
+  const baseHigh = posteriorMean + 1.645 * posteriorStd;
+  const lowEstimate = roundToThousand(baseLow - q_alpha);
+  const highEstimate = roundToThousand(baseHigh + q_alpha);
   const midpointEstimate = roundToThousand(posteriorMean);
   const rangeWidth = highEstimate - lowEstimate;
   const valueSpreadPercent = midpointEstimate > 0 ? Math.round((rangeWidth / midpointEstimate) * 1000) / 10 : 0;
@@ -133,8 +135,8 @@ export function estimateValuationRange(subject: SubjectProperty, selectedCompara
     weightedAdjustedMean: roundToThousand(weightedAdjustedMean),
     weightedP20: roundToThousand(weightedP20),
     weightedP80: roundToThousand(weightedP80),
-    residualBuffer: roundToThousand(0.35 * q80Residual),
-    effectiveSampleSize: confidence.effectiveSampleSize || Math.round(effectiveSampleSize(weights) * 10) / 10,
+    residualBuffer: roundToThousand(q_alpha),
+    effectiveSampleSize: Math.round(confidence.effectiveSampleSize * 10) / 10 || Math.round(effectiveSampleSize(weights) * 10) / 10,
     evidenceEntropy: confidence.evidenceEntropy || Math.round(entropy(weights) * 100) / 100,
     averageComparableProbability: confidence.averageComparableProbability,
     averageSourceReliability: confidence.averageSourceReliability,

@@ -28,26 +28,29 @@ function confidenceLevel(score: number): ConfidenceResult["level"] {
 
 export function calculateConfidence({ adjustedComparables, valueSpreadPercent, evidenceWeights }: ConfidenceInputs): ConfidenceResult {
   const count = adjustedComparables.length || 1;
-  const weights = evidenceWeights.length ? evidenceWeights : adjustedComparables.map((comp) => Math.max(0.001, comp.evidenceWeight || comp.totalScore / 100));
-  const nEff = effectiveSampleSize(weights);
+  const scores = adjustedComparables.map(c => Math.max(0.01, c.totalScore));
+  const sumScores = scores.reduce((sum, s) => sum + s, 0);
+  const weights = sumScores > 0 ? scores.map(s => s / sumScores) : scores.map(() => 1 / count);
+  const nEff = sumScores > 0 ? 1 / weights.reduce((sum, w) => sum + w * w, 0) : 0;
+  
   const evidenceEntropy = entropy(weights);
   const averageComparableProbability = adjustedComparables.reduce((sum, comp) => sum + comp.comparableProbability, 0) / count;
   const averageSourceReliability = adjustedComparables.reduce((sum, comp) => sum + comp.sourceReliability, 0) / count;
   const averageRecencyScore = adjustedComparables.reduce((sum, comp) => sum + comp.breakdown.saleRecencyScore / 100, 0) / count;
   const normalizedRiskSeverity = clamp01(adjustedComparables.reduce((sum, comp) => sum + comp.riskSeverity, 0) / count);
-  const spreadRatio = Math.max(0, valueSpreadPercent / 100);
+  
+  const averageScore = adjustedComparables.reduce((sum, comp) => sum + comp.totalScore, 0) / count;
+  const valueSpreadPenalty = Math.min(1, Math.max(0, valueSpreadPercent / 100));
+  const riskPenalty = normalizedRiskSeverity * 15;
 
-  const logit =
-    -1.2 +
-    0.55 * Math.log(1 + nEff) +
-    1.15 * averageComparableProbability +
-    0.75 * averageSourceReliability +
-    0.6 * averageRecencyScore +
-    0.45 * evidenceEntropy -
-    1.8 * spreadRatio -
-    0.95 * normalizedRiskSeverity;
+  const rawConfidence = 
+    35 * Math.min(nEff / 5, 1) + 
+    25 * (averageScore / 100) + 
+    20 * averageRecencyScore + 
+    20 * (1 - valueSpreadPenalty) - 
+    riskPenalty;
 
-  const score = Math.round(sigmoid(logit) * 100);
+  const score = clamp01(rawConfidence / 100) * 100;
   const level = confidenceLevel(score);
   const riskFlags = adjustedComparables.flatMap((comp) => comp.riskFlags).length;
 
