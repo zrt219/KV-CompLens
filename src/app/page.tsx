@@ -44,7 +44,9 @@ import {
   selectCivicGridViewModel,
   selectExportViewModel,
   selectInsightsViewModel,
-  selectMemoViewModel,
+  selectMemoViewModel
+} from "../../lib/selectors/pceSelectors";
+import {
   isSubjectReadyForAnalysis,
   usePceAnalysis,
   type PceToast,
@@ -57,35 +59,7 @@ type ViewMode = PceViewMode;
 type ToastState = PceToast;
 type WorkflowStepId = "intake" | "sources" | "review" | "adjust" | "export";
 
-const exampleSubject: SubjectProperty = {
-  id: "SUBJ-EDM-001",
-  address: "12345 109 St NW",
-  city: "Edmonton",
-  province: "AB",
-  postalCode: "T5G 0A0",
-  neighbourhood: "Central McDougall",
-  propertyType: "Detached",
-  yearBuilt: 2014,
-  bedrooms: 4,
-  bathrooms: 3,
-  livingAreaSqft: 2180,
-  lotSizeSqft: 5800,
-  parking: 2,
-  latitude: 53.5828,
-  longitude: -113.5082,
-  condition: "Good",
-  targetPriceHint: 690000,
-  dealName: "Oakridge Builder Draw Review",
-  borrowerType: "Home builder",
-  underwritingDate: "2026-05-31",
-  targetUnderwritingDate: "2026-05-31",
-  intendedUse: "Residential construction lending",
-  analystName: "Alex Carter"
-};
-
-const propertyTypes: PropertyType[] = ["Detached", "SemiDetached", "Townhouse", "Condo"];
-const conditions: PropertyCondition[] = ["Poor", "Average", "Good", "Renovated", "New"];
-const cities = ["Edmonton", "Calgary", "Airdrie", "Sherwood Park", "St. Albert"];
+import { defaultMockSubject, propertyTypes, conditions, cities } from "../../lib/mockData";
 
 const workflowNavItems: Array<{ id: WorkflowStepId; label: string; icon: ComponentType<{ size?: number; "aria-hidden"?: boolean }> }> = [
   { id: "intake", label: "Intake", icon: HomeIcon },
@@ -251,7 +225,7 @@ export default function Home() {
   }
 
   function loadExampleSubject() {
-    dispatch({ type: "LOAD_SUBJECT", subject: exampleSubject });
+    dispatch({ type: "LOAD_SUBJECT", subject: defaultMockSubject });
     setReportPrepared(false);
     setAdjustmentsLocked(false);
     setShowForm(true);
@@ -683,7 +657,7 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
             <Field label="Longitude" type="number" step="0.0001" value={numberFieldValue(subject.longitude)} onChange={(value) => update("longitude", Number(value))} />
           </div>
           <div className="form-actions subject-actions">
-            <button type="button" onClick={loadExample}>Use Example Property</button>
+            <button type="button" onClick={() => { update("address", "12345 109 St NW"); update("propertyType", "Detached"); update("city", "Edmonton"); loadExample(); }}>Use Example Property</button>
             <button className="primary-action" type="submit" disabled={!canRunAnalysis} title={!canRunAnalysis ? "Enter the property details first." : undefined}>Run Analysis</button>
           </div>
         </form>

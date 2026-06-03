@@ -1,4 +1,4 @@
-import { syntheticComparables } from "../data";
+import { syntheticComparables } from "../mockData";
 import { normalizeSubjectProperty } from "../agent";
 import { generateUnderwritingMemo } from "../memo";
 import { previewCandidateImpact } from "../marginalImpact";

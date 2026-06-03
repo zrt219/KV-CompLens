@@ -3,14 +3,16 @@ import {
   createBlankPceState,
   createInitialPceState,
   isSubjectReadyForAnalysis,
-  pceAnalysisReducer,
+  pceAnalysisReducer
+} from "../hooks/usePceAnalysis";
+import {
   selectAdjustmentGridViewModel,
   selectCivicGridViewModel,
   selectExportViewModel,
   selectInsightsViewModel,
   selectMemoViewModel
-} from "../hooks/usePceAnalysis";
-import { syntheticComparables } from "../lib/data";
+} from "../lib/selectors/pceSelectors";
+import { syntheticComparables } from "../lib/mockData";
 import type { SubjectProperty } from "../lib/types";
 
 const subject: SubjectProperty = {

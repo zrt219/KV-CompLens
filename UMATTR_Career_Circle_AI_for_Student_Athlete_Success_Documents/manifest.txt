@@ -1,0 +1,15 @@
+01_workshop_one_sheet.html	AI for Student-Athlete Success — Workshop One-Sheet	/mnt/data/umattr_career_circle_docs/01_workshop_one_sheet.html
+02_50_minute_workshop_outline.html	AI for Student-Athlete Success — 50-Minute Workshop Outline	/mnt/data/umattr_career_circle_docs/02_50_minute_workshop_outline.html
+03_participant_workbook.html	UMATTR Career Circle Student-Athlete Workbook	/mnt/data/umattr_career_circle_docs/03_participant_workbook.html
+04_worksheet_packet.html	Worksheet Packet — AI for Student-Athlete Success	/mnt/data/umattr_career_circle_docs/04_worksheet_packet.html
+05_ai_prompt_cheat_sheet.html	AI Prompt Cheat Sheet	/mnt/data/umattr_career_circle_docs/05_ai_prompt_cheat_sheet.html
+06_career_circle_resource_guide.html	UMATTR Career Circle Resource Guide	/mnt/data/umattr_career_circle_docs/06_career_circle_resource_guide.html
+07_speaker_introduction_sheet.html	Speaker Introduction Sheet	/mnt/data/umattr_career_circle_docs/07_speaker_introduction_sheet.html
+08_event_flyer_promo_copy.html	Event Flyer and Promo Copy	/mnt/data/umattr_career_circle_docs/08_event_flyer_promo_copy.html
+09_feedback_testimonial_form.html	Feedback and Testimonial Form	/mnt/data/umattr_career_circle_docs/09_feedback_testimonial_form.html
+10_certificate_template.html	Certificate of Completion Template	/mnt/data/umattr_career_circle_docs/10_certificate_template.html
+11_follow_up_email_templates.html	Follow-Up Email Templates	/mnt/data/umattr_career_circle_docs/11_follow_up_email_templates.html
+12_consulting_offer_sheet.html	UMATTR Student-Athlete Consulting Offer Sheet	/mnt/data/umattr_career_circle_docs/12_consulting_offer_sheet.html
+13_university_proposal_template.html	University and NCAA Proposal Template	/mnt/data/umattr_career_circle_docs/13_university_proposal_template.html
+14_speaker_sales_kit.html	Speaker Sales Kit and Program Menu	/mnt/data/umattr_career_circle_docs/14_speaker_sales_kit.html
+15_host_planning_checklist.html	Host Planning Checklist	/mnt/data/umattr_career_circle_docs/15_host_planning_checklist.html

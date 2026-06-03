@@ -31,6 +31,7 @@ KV CompLens separates deterministic valuation logic from AI-style explanation. T
 The project is designed to show:
 
 - product engineering under a tight hackathon scope
+- the explicit architectural pivot from a geographic map UI to a purely mathematical, deterministic PCE-V2 Evidence Board
 - deterministic comparable ranking and evidence fusion
 - transparent adjustment and value reconciliation logic
 - human-in-the-loop underwriting workflow design
@@ -57,7 +58,7 @@ Key verified outcomes from the log:
 
 - deterministic PCE-V2 snapshot pipeline
 - reducer-driven UI state and selector-backed view models
-- Evidence Board comparable-analysis surface
+- the replacement of geographic maps with the mathematical Evidence Board comparable-analysis surface
 - source reliability and provenance boundaries
 - adjustment review and value reconciliation flows
 - facts-only memo/report surface
@@ -71,6 +72,10 @@ Key verified outcomes from the log:
 - A multi-step review flow from subject intake to memo/export
 - A product proof layer for explainable AI underwriting support
 - A demo with explicit synthetic-data and public-source boundaries
+
+## Architectural Pivot: From Map to Matrix
+
+During the hackathon, KV CompLens deliberately pivoted its UI architecture. The original prototype relied on geographic map rendering (the `CivicGrid` map), which conflated location data with evidence quality. To align with the deterministic engine's philosophy, all map components were completely eradicated. The interface was rebuilt around the **Evidence Board**—a purely abstract, dark matrix UI that represents probabilistic space and marginal information gain, rather than physical coordinates.
 
 ## What It Is Not
 

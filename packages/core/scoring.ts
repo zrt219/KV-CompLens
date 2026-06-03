@@ -27,7 +27,7 @@ export function calculateDaysSinceSale(saleDate: string, targetDate = DEFAULT_UN
 }
 
 export function scoreLocation(distanceKm: number) {
-  return clampScore(100 * gaussianKernel(Math.max(0, distanceKm), 3));
+  return clampScore(100 * gaussianKernel(Math.max(0, distanceKm), 2.5));
 }
 
 function locationScore(subject: SubjectProperty, comp: ComparableProperty, distanceKm: number) {
@@ -52,7 +52,7 @@ export function scorePropertyType(subject: SubjectProperty, comp: ComparableProp
 export function scoreSize(subject: SubjectProperty, comp: ComparableProperty) {
   if (subject.livingAreaSqft <= 0 || comp.livingAreaSqft <= 0) return 0;
   const ratio = Math.abs(subject.livingAreaSqft - comp.livingAreaSqft) / subject.livingAreaSqft;
-  return clampScore(100 * gaussianKernel(ratio, 0.25));
+  return clampScore(100 * gaussianKernel(ratio, 0.15));
 }
 
 export function scoreBedsBaths(subject: SubjectProperty, comp: ComparableProperty) {
@@ -62,7 +62,7 @@ export function scoreBedsBaths(subject: SubjectProperty, comp: ComparablePropert
 }
 
 export function scoreRecency(days: number) {
-  return clampScore(100 * exponentialDecay(Math.max(0, days), 180));
+  return clampScore(100 * exponentialDecay(Math.max(0, days), 120));
 }
 
 export function scoreAgeCondition(subject: SubjectProperty, comp: ComparableProperty) {

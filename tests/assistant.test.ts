@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createAssistantContext, buildLocalAssistantDraft, buildAssistantPrompt } from "../lib/assistant";
-import { syntheticComparables } from "../lib/data";
+import { syntheticComparables } from "../lib/mockData";
 import { runPcePipeline } from "../lib/pce/runPcePipeline";
 import type { SubjectProperty } from "../lib/types";
 

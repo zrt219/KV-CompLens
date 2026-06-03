@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { syntheticComparables } from "../lib/data";
+import { syntheticComparables } from "../lib/mockData";
 import { buildExportArtifact, exportArtifactOptions } from "../lib/pce/exportPackage";
 import { createZeroPceSnapshot, runPcePipeline } from "../lib/pce/runPcePipeline";
 import type { SubjectProperty } from "../lib/types";
