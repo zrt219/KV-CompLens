@@ -9,13 +9,24 @@ It is not a real-estate chatbot, appraisal engine, credit decision system, MLS i
 - Public app: [kv-complens.vercel.app](https://kv-complens.vercel.app)
 - Repository: [zrt219/KV-CompLens](https://github.com/zrt219/KV-CompLens)
 - Hackathon build log: [ai-engineering/hackathon/kv-complens-build-log.md](ai-engineering/hackathon/kv-complens-build-log.md)
+- Final handoff index: [ai-engineering/hackathon/kv-complens-final-handoff.md](ai-engineering/hackathon/kv-complens-final-handoff.md)
 - Engineering source of truth: [ai-engineering/source-of-truth.md](ai-engineering/source-of-truth.md)
 - Stack: `Next.js`, `React`, `TypeScript`, `Vitest`, deterministic domain modules
 - Verified gates: `npm run lint`, `npm test`, `npm run build`, Browser-verified Vercel deployment
 
+## Rubric Alignment
+
+| Dimension | Evidence in This Repo |
+|-----------|----------------------|
+| **Code quality** | `packages/core/` — 31 modules, 46 tests, strict TypeScript, lint-clean |
+| **Agent & LLM design** | `packages/core/agent.ts` + `src/app/api/assistant/` — LLM orchestrates 3 deterministic tools; trace visible in Export screen |
+| **ML & data thinking** | `packages/core/scoring.ts` — Gaussian similarity kernels, MAD outlier detection, Bayesian evidence probability, model fusion blending |
+| **Communication** | This README, `PRODUCT.md` scope decisions, `ai-engineering/` build log, Loom walkthrough |
+| **Pragmatism** | `PRODUCT.md` anti-references, explicit scope cuts, simulated data labeled throughout |
+
 ## Reviewer Summary
 
-KV CompLens separates deterministic valuation logic from AI-style explanation. The PCE-V2 engine ranks comparable sales from structured inputs and evidence reliability, while the product layer turns computed facts into an analyst-readable comp packet, memo, audit trail, and export workflow.
+KV CompLens separates deterministic valuation logic from AI-style explanation. The PCE-V2 engine ranks comparable sales from structured inputs and evidence reliability, while the product layer turns computed facts into an analyst-readable comp packet, memo, audit trail, assistant trace, and export workflow.
 
 The project is designed to show:
 
@@ -101,15 +112,17 @@ This is a deliberate hackathon architecture choice. The goal is to show a credib
 ```txt
 Subject Intake
 -> Source Scan
--> Candidate Ranking
--> Comparable Analysis / Evidence Board
--> Comp Discovery / Find More Comparables
--> Adjustment Review
--> Value Reconciliation
--> Report Ready
--> Memo / Report
+-> Review Homes
+-> Adjust
 -> Export Package
 ```
+
+The detailed review surfaces still exist as subviews or panels:
+
+- discovery and deeper candidate exploration live inside the review step
+- valuation detail lives in the adjustment and export summaries
+- memo content is rendered inside the export screen and artifact bundle
+- the assistant trace is visible in the export screen and can be model-assisted when `OPENAI_API_KEY` is configured
 
 Core deterministic state flow:
 
@@ -216,7 +229,7 @@ Value reconciliation aggregates adjusted comparable evidence into a low estimate
 
 ### Memo / Report / Export
 
-The memo/report flow turns snapshot facts into structured analyst-readable sections:
+The export flow turns snapshot facts into structured analyst-readable sections:
 
 1. executive summary
 2. subject summary
@@ -227,7 +240,7 @@ The memo/report flow turns snapshot facts into structured analyst-readable secti
 7. confidence / risk
 8. limitations
 
-The export workflow has verified package generation for PDF, CSV, Markdown, TXT, and ZIP outputs from the deterministic snapshot.
+The export workflow has verified package generation for PDF, CSV, Markdown, TXT, and ZIP outputs from the deterministic snapshot, plus an embedded assistant trace for judge-facing explanation.
 
 ## Audit And Provenance
 

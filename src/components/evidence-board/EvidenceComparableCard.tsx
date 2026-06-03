@@ -30,11 +30,11 @@ export function EvidenceComparableCard({ comp, rank, active, isNew, onSelect }: 
       <span className="evidence-card-body">
         <span className="evidence-card-kicker">
           {isNew ? <Sparkles size={14} aria-hidden="true" /> : <CheckCircle2 size={14} aria-hidden="true" />}
-          <span>{isNew ? "New candidate" : "Selected comp"}</span>
+          <span>{isNew ? "New home" : "Selected home"}</span>
         </span>
         <strong>{comp.address}</strong>
         <em>{comp.neighbourhood} / {Math.round(comp.distanceKm * 10) / 10} km</em>
-        <span className="evidence-card-metrics" aria-label="Comparable pricing and evidence weight">
+        <span className="evidence-card-metrics" aria-label="Home pricing and match details">
           <span>
             <small>Sale</small>
             <b>{formatCurrency(comp.salePrice)}</b>
@@ -48,7 +48,7 @@ export function EvidenceComparableCard({ comp, rank, active, isNew, onSelect }: 
             <b>{comp.comparableProbabilityPercent}%</b>
           </span>
         </span>
-        <span className="evidence-card-footer">{Math.round(comp.totalScore)} Match / {evidenceWeight}% weight</span>
+        <span className="evidence-card-footer">{Math.round(comp.totalScore)} Match / {evidenceWeight}% strength</span>
       </span>
     </button>
   );

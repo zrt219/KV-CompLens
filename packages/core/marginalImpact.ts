@@ -37,13 +37,13 @@ export function previewCandidateImpact(subject: SubjectProperty, selected: Score
     marginalInformationGain: roundedMig
   };
   const improvementReasons = [
-    delta.confidenceDelta > 0 ? `Confidence changes by ${delta.confidenceDelta} pts.` : "",
-    delta.effectiveSampleSizeDelta > 0 ? `Effective sample size improves by ${delta.effectiveSampleSizeDelta.toFixed(1)}.` : "",
-    delta.entropyDelta > 0 ? `Evidence balance improves by ${delta.entropyDelta.toFixed(2)}.` : "",
-    delta.rangeNarrowed ? "Residual-buffered posterior range narrows after adding this evidence." : "",
-    candidate.comparableProbability >= 0.7 ? `Comparable probability is ${candidate.comparableProbabilityPercent}%.` : "",
-    candidate.energyQuality >= 0.55 ? `Evidence energy quality is ${Math.round(candidate.energyQuality * 100)}%.` : "",
-    roundedMig > 0 ? `Marginal information gain is ${roundedMig.toFixed(3)}.` : ""
+    delta.confidenceDelta > 0 ? `Confidence improves by ${delta.confidenceDelta} pts.` : "",
+    delta.effectiveSampleSizeDelta > 0 ? `The review set gains ${delta.effectiveSampleSizeDelta.toFixed(1)} more effective homes.` : "",
+    delta.entropyDelta > 0 ? `The evidence mix becomes more balanced by ${delta.entropyDelta.toFixed(2)}.` : "",
+    delta.rangeNarrowed ? "The value range narrows after adding this home." : "",
+    candidate.comparableProbability >= 0.7 ? `Match chance is ${candidate.comparableProbabilityPercent}%.` : "",
+    candidate.energyQuality >= 0.55 ? `Evidence strength is ${Math.round(candidate.energyQuality * 100)}%.` : "",
+    roundedMig > 0 ? `This home adds ${roundedMig.toFixed(3)} in information value.` : ""
   ].filter(Boolean);
 
   return {
@@ -58,7 +58,7 @@ export function previewCandidateImpact(subject: SubjectProperty, selected: Score
     deltaEntropy: delta.entropyDelta,
     riskChange: delta.riskSeverityDelta,
     marginalInformationGain: roundedMig,
-    improvementReasons: improvementReasons.length ? improvementReasons : ["Candidate provides additional deterministic comparable evidence for analyst review."],
+    improvementReasons: improvementReasons.length ? improvementReasons : ["This home adds more useful evidence for review."],
     addedRisks: candidate.riskFlags
   };
 }

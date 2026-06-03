@@ -17,13 +17,13 @@ export function EvidenceSubjectCard({ subject, valuation }: EvidenceSubjectCardP
       <div className="evidence-card-body">
         <div className="evidence-card-kicker">
           <Home size={14} aria-hidden="true" />
-          <span>Subject</span>
+          <span>Property</span>
         </div>
         <h4>{subject.address}</h4>
         <p>{subject.neighbourhood} / {subject.propertyType}</p>
         <div className="evidence-card-metrics" aria-label="Subject valuation summary">
           <span>
-            <small>Point estimate</small>
+            <small>Current estimate</small>
             <b>{formatCurrency(valuation.pointEstimate)}</b>
           </span>
           <span>
@@ -33,7 +33,7 @@ export function EvidenceSubjectCard({ subject, valuation }: EvidenceSubjectCardP
         </div>
         <div className="evidence-status-chip confirmed">
           <ShieldCheck size={14} aria-hidden="true" />
-          <span>Analysis target</span>
+          <span>Review target</span>
         </div>
       </div>
     </article>

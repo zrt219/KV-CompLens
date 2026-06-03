@@ -195,3 +195,39 @@
 - Verification performed: README content checks for hackathon log link, public deployment link, source-of-truth link, verified test count, Vercel guardrail wording, and matching `Deployment`/`Notes` footer pattern; local lint/test/build gate rerun for repository integrity.
 - Evidence/files: `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `ai-engineering/source-of-truth.md`, `ai-engineering/daily-engineering-log.md`.
 - Resume-safe bullet: Rebuilt the project README as a reviewer-facing AI engineering brief that links the canonical hackathon build log, documents deterministic PCE-V2 architecture, and grounds deployment claims in Browser-verified evidence.
+
+## 2026-06-03 — Verified Engineering Work
+
+- Built/changed: Clarified the visible property-review flow with plain-language state text, helper copy, export wording, demo/provenance labels, and a responsive mobile shell repair that restores a single-column layout on narrow screens.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `hooks/usePceAnalysis.ts`, `lib/pce/exportPackage.ts`, `lib/pce/runPcePipeline.ts`, `packages/core/*.ts`, `tests/*.test.ts`.
+- Technical skills demonstrated: UI copy simplification, workflow-state feedback design, responsive layout repair, deterministic demo labeling, browser-based regression verification.
+- Verification performed: `npm run lint`, `npm run test`, `npm run build`, production-browser checks on desktop review state and mobile intake-to-analysis flow, plus a mobile `scrollWidth` check confirming no horizontal overflow.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `hooks/usePceAnalysis.ts`, `lib/pce/exportPackage.ts`, `packages/core/memo.ts`, `packages/core/provenance.ts`, `packages/core/sourceScan.ts`, `browser-analysis-desktop.png`, `browser-analysis-mobile.png`.
+- Resume-safe bullet: Clarified a deterministic property-review workspace with plain-language status messaging, calmer export/memo copy, and a browser-verified mobile layout fix that preserves the intake-to-review flow.
+
+## 2026-06-03 — Verified Engineering Work
+
+- Built/changed: Sealed the PCE-V2 review path behind intake-first zero-state behavior, cleared computed outputs on subject edits until rerun, removed visible zero placeholders from the intake form, and tightened memo/export wording so the public UI stays free of formulas or derivations.
+- Systems involved: `hooks/usePceAnalysis.ts`, `src/app/page.tsx`, `lib/pce/exportPackage.ts`, `packages/core/memo.ts`, `packages/core/modelFusion.ts`, `packages/core/valuation.ts`, `tests/pceUiState.test.ts`, `tests/pcePipeline.test.ts`, `tests/exportPackage.test.ts`.
+- Technical skills demonstrated: Deterministic UI state gating, zero-state UX design, browser-driven regression repair, evidence-safe export copy, local-only workflow orchestration.
+- Verification performed: `npm run lint`, `npm test`, `npm run build`, browser smoke verification on `http://127.0.0.1:3002` covering initial zero-state, disabled demo loader, valid intake unlock, analysis progression, and desktop/mobile screenshots.
+- Evidence/files: `browser-pce-desktop.png`, `browser-pce-mobile.png`, `src/app/page.tsx`, `hooks/usePceAnalysis.ts`, `ai-engineering/daily-engineering-log.md`.
+- Resume-safe bullet: Built a sealed PCE-V2 review workflow with intake-first zero-state gating, deterministic local analysis, and browser-verified blank-entry UX that hides computed values until a review is run.
+
+## 2026-06-03 — Verified Engineering Work
+
+- Built/changed: Added a first-run intake tutorial with four plain-language steps, collapse/expand behavior, and calm onboarding copy so a new user can understand the workflow before entering property details.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/tutorial.ts`, `tests/tutorial.test.ts`.
+- Technical skills demonstrated: Onboarding UX design, accessible collapsible content, responsive card layout, browser-verified first-paint guidance.
+- Verification performed: `npm run lint`, `npm test`, `npm run build`, browser verification on `http://127.0.0.1:3002` for tutorial visibility, collapse/reopen behavior, zero-state intake, valid analysis progression, and desktop/mobile screenshots.
+- Evidence/files: `browser-tutorial-desktop.png`, `browser-tutorial-mobile.png`, `src/app/page.tsx`, `src/app/globals.css`, `lib/tutorial.ts`.
+- Resume-safe bullet: Added a browser-verified intake tutorial to a deterministic property-review workflow so first-time users can follow a plain-language walkthrough from blank intake to review and export.
+
+## 2026-06-03 — Verified Engineering Work
+
+- Built/changed: Refactored the KV CompLens workspace into a canonical 5-step intake-to-export flow, added a truthful local-first assistant trace with optional OpenAI-backed drafting, merged the report/export preview into the export screen, regenerated the canonical Review-base export artifacts, and aligned the handoff index with the live bundle.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `lib/tutorial.ts`, `lib/pce/exportPackage.ts`, `tests/assistant.test.ts`, `tests/tutorial.test.ts`, `tests/exportPackage.test.ts`, `ai-engineering/hackathon/kv-complens-final-handoff.md`.
+- Technical skills demonstrated: Workflow-state refactoring, assistant prompt normalization, local-fallback AI design, export artifact packaging, responsive shell repair, Playwright browser QA, evidence-driven documentation.
+- Verification performed: `npm run lint`, `npm test` (55 tests), `npm run build`, Playwright browser smoke on `http://127.0.0.1:3002` at desktop 1440x900 and mobile 390x844, with zero console/page errors and no horizontal overflow; verified the path `Use Example Property -> Run Analysis -> Review Homes -> Adjustments -> Confirm and Lock -> Export preview`.
+- Evidence/files: `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Property_Review_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Home_List.csv`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Adjustment_Notes.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Review_Summary.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Activity_Log.txt`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Review_Package.zip`, `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `tests/exportPackage.test.ts`.
+- Resume-safe bullet: Built a judge-friendly 5-step comparable-review workflow with a truthful local-first assistant trace and canonical Review-base export artifacts, then verified the full path with Playwright desktop/mobile smoke checks.

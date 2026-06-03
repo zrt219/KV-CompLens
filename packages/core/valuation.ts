@@ -31,51 +31,49 @@ function leaveOneOutResiduals(values: number[], weights: number[]) {
   });
 }
 
-function emptyRange(subject: SubjectProperty, selectedComparables: ScoredComparable[]): ValuationRange {
-  const fallback = roundToThousand(priorMean(subject, selectedComparables));
-  const buffer = roundToThousand(Math.max(50000, fallback * 0.12));
-  const subModels = createValuationSubModels(subject, [], fallback, Math.pow(buffer, 2), fallback);
-  const fusion = fuseValuationSubModels(subModels);
+export function createZeroValuationRange(): ValuationRange {
   return {
-    lowEstimate: Math.max(0, fallback - buffer),
-    pointEstimate: fallback,
-    midpointEstimate: fallback,
-    highEstimate: fallback + buffer,
-    confidenceScore: 20,
+    lowEstimate: 0,
+    pointEstimate: 0,
+    midpointEstimate: 0,
+    highEstimate: 0,
+    confidenceScore: 0,
     confidenceLevel: "Review Required",
-    confidenceRationale: "No usable selected comparable evidence was available.",
+    confidenceRationale: "Awaiting intake and initial scan.",
     valueDispersion: 0,
     valueSpreadPercent: 0,
-    rangeWidth: buffer * 2,
-    posteriorMean: fallback,
-    posteriorVariance: Math.pow(buffer, 2),
-    posteriorStd: buffer,
-    weightedAdjustedMean: fallback,
-    weightedP20: fallback,
-    weightedP80: fallback,
-    residualBuffer: buffer,
+    rangeWidth: 0,
+    posteriorMean: 0,
+    posteriorVariance: 0,
+    posteriorStd: 0,
+    weightedAdjustedMean: 0,
+    weightedP20: 0,
+    weightedP80: 0,
+    residualBuffer: 0,
     effectiveSampleSize: 0,
     evidenceEntropy: 0,
     averageComparableProbability: 0,
     averageSourceReliability: 0,
     averageRecency: 0,
-    normalizedRiskSeverity: 1,
+    normalizedRiskSeverity: 0,
     averageSimilarity: 0,
-    riskFlags: ["Insufficient selected comps"],
+    riskFlags: [],
     includedCompCount: 0,
     adjustedComparables: [],
-    subModels,
+    subModels: [],
     modelFusion: {
-      finalEstimate: fusion.finalEstimate,
-      finalVariance: fusion.finalVariance,
-      modelWeights: fusion.modelWeights
-    }
+      finalEstimate: 0,
+      finalVariance: 0,
+      modelWeights: []
+    },
+    analysisStatus: "idle",
+    isZeroState: true
   };
 }
 
 export function estimateValuationRange(subject: SubjectProperty, selectedComparables: ScoredComparable[]): ValuationRange {
   const adjustedWithoutWeights = selectedComparables.map((comp) => adjustComparableValue(subject, comp));
-  if (!adjustedWithoutWeights.length) return emptyRange(subject, selectedComparables);
+  if (!adjustedWithoutWeights.length) return createZeroValuationRange();
 
   const values = adjustedWithoutWeights.map((comp) => comp.adjustedValue);
   const weights = adjustedWithoutWeights.map(evidenceWeight);
@@ -113,9 +111,9 @@ export function estimateValuationRange(subject: SubjectProperty, selectedCompara
 
   const riskFlags = Array.from(new Set([
     ...adjustedComparables.flatMap((comp) => comp.riskFlags),
-    adjustedComparables.length < 3 ? "Insufficient selected comps" : "",
+    adjustedComparables.length < 3 ? "Not enough homes selected." : "",
     valueSpreadPercent > 18 ? "Wide adjusted-value spread" : "",
-    staleSales > 0 ? "Stale sale dates in selected set" : ""
+    staleSales > 0 ? "Stale sale dates in selected homes." : ""
   ].filter(Boolean)));
 
   return {
@@ -151,7 +149,9 @@ export function estimateValuationRange(subject: SubjectProperty, selectedCompara
       finalEstimate: fusion.finalEstimate,
       finalVariance: fusion.finalVariance,
       modelWeights: fusion.modelWeights
-    }
+    },
+    analysisStatus: "complete",
+    isZeroState: false
   };
 }
 

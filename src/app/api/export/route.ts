@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { buildExportArtifact, type ExportArtifactType } from "../../../../lib/pce/exportPackage";
+import { buildExportArtifact, isExportReady, type ExportArtifactType } from "../../../../lib/pce/exportPackage";
 import type { PceAnalysisSnapshot } from "../../../../lib/pce/runPcePipeline";
 import type { SubjectProperty } from "../../../../lib/types";
 
@@ -19,7 +19,13 @@ export async function POST(request: Request) {
     return new Response("Missing export payload.", { status: 400 });
   }
 
-  const artifact = buildExportArtifact(body.type, body.subject, body.snapshot);
+  const snapshot = body.snapshot;
+
+  if (!isExportReady(snapshot)) {
+    return new Response("Analysis must run before export.", { status: 409 });
+  }
+
+  const artifact = buildExportArtifact(body.type, body.subject, snapshot);
   const bytes = typeof artifact.content === "string"
     ? new TextEncoder().encode(artifact.content)
     : artifact.content;

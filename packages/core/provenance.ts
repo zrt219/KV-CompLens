@@ -11,4 +11,4 @@ export type PublicAssessmentSource = {
 export const publicAssessmentSources = sources as PublicAssessmentSource[];
 
 export const dataProvenanceLabel =
-  "Synthetic sale comps calibrated against public assessment context, not MLS sold data.";
+  "Local synthetic home sales calibrated against public assessment context. Not MLS sold data.";

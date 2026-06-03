@@ -36,6 +36,8 @@ export type PcePipelineInput = {
 };
 
 export type PceAnalysisSnapshot = {
+  analysisStatus: "idle" | "complete";
+  isZeroState: boolean;
   subject: SubjectProperty;
   sourceScan: SourceScanSummary;
   rankedComparables: ScoredComparable[];
@@ -52,6 +54,47 @@ export type PceAnalysisSnapshot = {
   riskFlags: string[];
 };
 
+export function createZeroPceSnapshot(subject: SubjectProperty, generatedAt = new Date().toISOString()): PceAnalysisSnapshot {
+  const normalizedSubject = normalizeSubjectProperty(subject);
+  return {
+    analysisStatus: "idle",
+    isZeroState: true,
+    subject: normalizedSubject,
+    sourceScan: {
+      syntheticRecentSalesScanned: 0,
+      municipalAssessmentReferences: 0,
+      listingStyleRecords: 0,
+      priorDealComparables: 0,
+      marketTrendReferences: 0,
+      totalRecordsScanned: 0,
+      recordsScanned: 0,
+      syntheticRecentSalesMatched: 0,
+      assessmentRecordsMatched: 0,
+      listingRecordsMatched: 0,
+      priorDealCompsMatched: 0,
+      marketTrendReferencesMatched: 0,
+      candidatePoolCount: 0,
+      selectedCompCount: 0,
+      rejectedCount: 0,
+      sourcesConsolidated: 0,
+      estimatedManualTimeSavedHours: 0,
+      dataBoundaryNote: "Awaiting subject intake. No scan has run."
+    },
+    rankedComparables: [],
+    selectedComparables: [],
+    rejectedComparables: [],
+    remainingCandidates: [],
+    valuation: estimateValuationRange(normalizedSubject, []),
+    memo: "",
+    auditEvents: [],
+    activeComparableId: undefined,
+    generatedAt,
+    candidateImpact: undefined,
+    valuationDelta: undefined,
+    riskFlags: []
+  };
+}
+
 export function calculateAdjustmentsForSelected(subject: SubjectProperty, selectedComparables: ScoredComparable[]): AdjustedComparable[] {
   return selectedComparables.map((comp) => adjustComparableValue(subject, comp));
 }
@@ -66,41 +109,41 @@ export function buildAuditEvents(snapshot: Omit<PceAnalysisSnapshot, "auditEvent
       id: `source-scan-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "source_scan",
-      source: "PCE-V2 deterministic pipeline",
+      source: "Source review",
       status: "confirmed",
-      summary: `${snapshot.sourceScan.recordsScanned} demo records scanned across ${snapshot.sourceScan.sourcesConsolidated} source buckets.`
+      summary: `${snapshot.sourceScan.recordsScanned} demo records reviewed across ${snapshot.sourceScan.sourcesConsolidated} source groups.`
     },
     {
       id: `ranking-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "ranking",
-      source: "rankComparables",
+      source: "Home ranking",
       status: "confirmed",
-      summary: `${snapshot.rankedComparables.length} candidates ranked; ${snapshot.remainingCandidates.length} remain outside selected set.`
+      summary: `${snapshot.rankedComparables.length} homes ranked; ${snapshot.remainingCandidates.length} remain outside the review set.`
     },
     {
       id: `selection-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "selection",
-      source: "PCE selectedComparableIds",
+      source: "Home selection",
       status: snapshot.selectedComparables.length ? "confirmed" : "review",
-      summary: `${snapshot.selectedComparables.length} comparables selected for valuation.`
+      summary: `${snapshot.selectedComparables.length} homes selected for review.`
     },
     {
       id: `valuation-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "valuation",
-      source: "estimateValuationRange",
+      source: "Value estimate",
       status: "ready",
-      summary: `Point estimate ${snapshot.valuation.pointEstimate}; confidence ${snapshot.valuation.confidenceScore}%.`
+      summary: `Estimated value ${snapshot.valuation.pointEstimate}; confidence ${snapshot.valuation.confidenceScore}%.`
     },
     {
       id: `memo-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "memo",
-      source: "generateUnderwritingMemo",
+      source: "Summary export",
       status: "ready",
-      summary: "Facts-only underwriting memo generated from snapshot evidence."
+      summary: "Plain-language summary generated from the current review set."
     }
   ];
 }
@@ -129,7 +172,7 @@ export function runPcePipeline(input: PcePipelineInput): PceAnalysisSnapshot {
       ...comp,
       status: "rejected" as const,
       wasRejected: true,
-      rejectionReason: comp.rejectionReason ?? comp.penalties[0] ?? "Lower-ranked than selected comparable set."
+      rejectionReason: comp.rejectionReason ?? comp.penalties[0] ?? "Lower match than the homes already selected."
     }));
   const valuation = calculateValuation(subject, selectedComparables);
   const sourceScan = runSourceScan(subject, candidates, rankedComparables.length, selectedComparables.length, rejectedComparables.length);
@@ -141,6 +184,8 @@ export function runPcePipeline(input: PcePipelineInput): PceAnalysisSnapshot {
     ? input.activeComparableId
     : valuation.adjustedComparables[0]?.id ?? selectedComparables[0]?.id;
   const partial = {
+    analysisStatus: "complete" as const,
+    isZeroState: false,
     subject,
     sourceScan,
     rankedComparables,
@@ -169,7 +214,7 @@ export function runPcePipeline(input: PcePipelineInput): PceAnalysisSnapshot {
     riskFlags
   });
   const withoutAudit = { ...partial, memo };
-  return { ...withoutAudit, auditEvents: buildAuditEvents(withoutAudit) };
+  return { ...withoutAudit, analysisStatus: "complete", isZeroState: false, auditEvents: buildAuditEvents(withoutAudit) };
 }
 
 function selectHighestPositiveImpact(subject: SubjectProperty, selectedComparables: ScoredComparable[], remainingCandidates: ScoredComparable[]) {

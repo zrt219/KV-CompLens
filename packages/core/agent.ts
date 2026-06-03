@@ -7,6 +7,27 @@ import { runSourceScan } from "./sourceScan";
 import { compareValuationBeforeAfter, estimateValuationRange } from "./valuation";
 import type { CompAnalysisResult, ComparableProperty, ScoredComparable, SubjectProperty } from "./types";
 
+export function createBlankSubjectProperty(): SubjectProperty {
+  return {
+    address: "",
+    city: "",
+    province: "AB",
+    neighbourhood: "",
+    propertyType: "Detached",
+    yearBuilt: 0,
+    bedrooms: 0,
+    bathrooms: 0,
+    livingAreaSqft: 0,
+    lotSizeSqft: 0,
+    parking: 0,
+    latitude: 0,
+    longitude: 0,
+    condition: "Average",
+    intendedUse: "",
+    analystName: ""
+  };
+}
+
 export function normalizeSubjectProperty(input: SubjectProperty): SubjectProperty {
   return {
     ...input,
@@ -61,11 +82,16 @@ export function runCompAnalysis(input: SubjectProperty, options: { selectedCompa
   const valuationDelta = options.previousValuation ? compareValuationBeforeAfter(options.previousValuation, valuation) : undefined;
   const rejectedComparables = rankedComparables
     .filter((comp) => !selectedComparables.some((selected) => selected.id === comp.id) && comp.id !== candidateComparable?.id)
-    .map((comp) => ({ ...comp, status: "rejected" as const, wasRejected: true, rejectionReason: comp.rejectionReason ?? comp.penalties[0] ?? "Lower-ranked than selected comparable set." }));
+    .map((comp) => ({ ...comp, status: "rejected" as const, wasRejected: true, rejectionReason: comp.rejectionReason ?? comp.penalties[0] ?? "Lower-ranked than the homes already selected." }));
   const riskFlags = Array.from(new Set([...valuation.riskFlags, ...valuation.adjustedComparables.flatMap((comp) => comp.riskFlags)]));
   const sourceScanSummary = runSourceScan(subject, candidates, rankedComparables.length, selectedComparables.length, rejectedComparables.length);
   const partial = { subject, sourceScanSummary, rankedComparables, selectedComparables, rejectedComparables, candidateComparable, candidateImpact, previousValuation: options.previousValuation, valuationDelta, valuation, riskFlags };
-  return { ...partial, memo: generateUnderwritingMemo(partial) };
+  return {
+    ...partial,
+    memo: generateUnderwritingMemo(partial),
+    analysisStatus: "complete",
+    isZeroState: selectedComparables.length === 0
+  };
 }
 
 export { formatCurrency };

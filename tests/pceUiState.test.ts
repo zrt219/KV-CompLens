@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  createBlankPceState,
   createInitialPceState,
+  isSubjectReadyForAnalysis,
   pceAnalysisReducer,
   selectAdjustmentGridViewModel,
   selectCivicGridViewModel,
@@ -33,6 +35,60 @@ const subject: SubjectProperty = {
 };
 
 describe("PCE UI state reducer", () => {
+  it("starts in a zero-state before intake is submitted", () => {
+    const state = createBlankPceState(syntheticComparables, "2026-06-01T00:00:00.000Z");
+    const civicGrid = selectCivicGridViewModel(state);
+    const insights = selectInsightsViewModel(state);
+    const adjustmentGrid = selectAdjustmentGridViewModel(state);
+    const exportView = selectExportViewModel(state);
+
+    expect(state.analysisStarted).toBe(false);
+    expect(isSubjectReadyForAnalysis(state.subject)).toBe(false);
+    expect(state.snapshot.sourceScan.recordsScanned).toBe(0);
+    expect(state.snapshot.valuation.pointEstimate).toBe(0);
+    expect(civicGrid.workflow.sourceSummary).toBe("Awaiting intake");
+    expect(civicGrid.workflow.candidateSummary).toBe("No homes ranked yet");
+    expect(civicGrid.workflow.adjustmentSummary).toBe("No homes confirmed yet");
+    expect(civicGrid.workflow.valueSummary).toBe("Awaiting analysis");
+    expect(insights.valueRange).toBe("Awaiting analysis");
+    expect(insights.pointEstimate).toBe("N/A");
+    expect(insights.confidenceScore).toBe(0);
+    expect(insights.averageMatch).toBe("Awaiting analysis");
+    expect(insights.effectiveSampleSize).toBe("No homes reviewed yet");
+    expect(insights.auditEvents).toHaveLength(0);
+    expect(adjustmentGrid.comps).toHaveLength(0);
+    expect(exportView.includedCompCount).toBe("No homes selected yet");
+  });
+
+  it("keeps the app in intake mode until the subject is valid", () => {
+    const blank = createBlankPceState(syntheticComparables, "2026-06-01T00:00:00.000Z");
+    const blocked = pceAnalysisReducer(blank, { type: "RUN_ANALYSIS", generatedAt: "2026-06-01T00:30:00.000Z" });
+    const loaded = pceAnalysisReducer(blank, { type: "LOAD_SUBJECT", subject });
+    const ready = pceAnalysisReducer(loaded, { type: "RUN_ANALYSIS", generatedAt: "2026-06-01T01:00:00.000Z" });
+
+    expect(blocked.analysisStarted).toBe(false);
+    expect(blocked.toast?.tone).toBe("review");
+    expect(loaded.analysisStarted).toBe(false);
+    expect(isSubjectReadyForAnalysis(loaded.subject)).toBe(true);
+    expect(ready.analysisStarted).toBe(true);
+    expect(ready.snapshot.valuation.pointEstimate).toBeGreaterThan(0);
+  });
+
+  it("clears computed outputs when the subject changes after analysis", () => {
+    const initial = createInitialPceState(subject, syntheticComparables, "2026-06-01T00:00:00.000Z");
+    const edited = pceAnalysisReducer(initial, { type: "UPDATE_SUBJECT", key: "livingAreaSqft", value: 2400 });
+    const civicGrid = selectCivicGridViewModel(edited);
+    const insights = selectInsightsViewModel(edited);
+    const exportView = selectExportViewModel(edited);
+
+    expect(edited.analysisStarted).toBe(false);
+    expect(edited.selectedComparableIds).toHaveLength(0);
+    expect(edited.snapshot.valuation.pointEstimate).toBe(0);
+    expect(civicGrid.workflow.valueSummary).toBe("Awaiting analysis");
+    expect(insights.pointEstimate).toBe("N/A");
+    expect(exportView.includedCompCount).toBe("No homes selected yet");
+  });
+
   it("RUN_ANALYSIS recomputes the snapshot", () => {
     const initial = createInitialPceState(subject, syntheticComparables, "2026-06-01T00:00:00.000Z");
     const edited = pceAnalysisReducer(initial, { type: "UPDATE_SUBJECT", key: "livingAreaSqft", value: 2400 });

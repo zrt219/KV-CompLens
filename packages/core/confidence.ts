@@ -54,7 +54,7 @@ export function calculateConfidence({ adjustedComparables, valueSpreadPercent, e
   return {
     score,
     level,
-    rationale: `${adjustedComparables.length} comps used; effective sample size ${nEff.toFixed(1)}; average comparable probability ${Math.round(averageComparableProbability * 100)}%; adjusted value spread ${valueSpreadPercent}%; ${riskFlags} risk flags across selected comps.`,
+    rationale: `${adjustedComparables.length} homes used; effective sample size ${nEff.toFixed(1)}; average match ${Math.round(averageComparableProbability * 100)}%; value spread ${valueSpreadPercent}%; ${riskFlags} review flags across the selected homes.`,
     effectiveSampleSize: Math.round(nEff * 10) / 10,
     evidenceEntropy: Math.round(evidenceEntropy * 100) / 100,
     averageComparableProbability: Math.round(averageComparableProbability * 100) / 100,

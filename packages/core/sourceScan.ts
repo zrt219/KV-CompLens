@@ -53,6 +53,6 @@ export function runSourceScan(
     rejectedCount,
     sourcesConsolidated,
     estimatedManualTimeSavedHours: Math.round((1.15 + candidateComplexity * 0.32 + selectedCompCount * 0.18) * 10) / 10,
-    dataBoundaryNote: "Synthetic sales / public assessment context. Not live MLS. Analyst review required."
+    dataBoundaryNote: "Local synthetic sales and public assessment context only. Not live MLS. Analyst review required."
   };
 }

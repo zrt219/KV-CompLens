@@ -21,11 +21,11 @@ export function EvidenceBoard(props: EvidenceBoardProps) {
   const { selectedComparables, onRunAnalysis } = props;
 
   return (
-    <section className="evidence-board" aria-label="PCE evidence board">
+    <section className="evidence-board" aria-label="Selected homes board">
       <div className="evidence-board-head">
         <div>
           <h3>Evidence Board</h3>
-          <span>PCE-V2 deterministic comparable evidence</span>
+          <span>Selected homes and source support</span>
         </div>
         <div className="evidence-board-controls" aria-label="Evidence board display mode">
           <span className="evidence-board-mode">Board</span>

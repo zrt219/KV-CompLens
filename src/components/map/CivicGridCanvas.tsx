@@ -59,7 +59,7 @@ export function CivicGridCanvas({ subject, comps, candidate, newCompId }: { subj
 
   return (
     <div className="civic-grid-layer" aria-label="CivicGrid abstract evidence map">
-      <svg className="civic-grid-svg" viewBox="0 0 1000 680" preserveAspectRatio="none" role="img" aria-label="Abstract Edmonton CivicGrid using real latitude and longitude evidence geometry">
+      <svg className="civic-grid-svg" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Abstract Edmonton CivicGrid using real latitude and longitude evidence geometry">
         <defs>
           <filter id="evidenceGlow">
             <feGaussianBlur stdDeviation="4" result="blur" />
@@ -136,7 +136,7 @@ export function CivicGridCanvas({ subject, comps, candidate, newCompId }: { subj
         </g>
 
         <g className="civic-subject">
-          <circle cx="500" cy="340" r="82" />
+          <circle className="subject-sonar-pulse" cx="500" cy="340" r="82" />
           <circle cx="500" cy="340" r="132" />
           <circle cx="500" cy="340" r="186" />
           <rect x="420" y="306" width="160" height="68" rx="12" />
@@ -148,7 +148,7 @@ export function CivicGridCanvas({ subject, comps, candidate, newCompId }: { subj
           {points.map((point, index) => (
             <g key={`marker-${point.comp.id}-${point.isCandidate ? "candidate" : "selected"}`} className={`civic-marker ${evidenceTone(point.comp, point.isNew, point.isCandidate)}`} transform={`translate(${point.x} ${point.y})`}>
               <title>{point.comp.address}: {point.district}, {point.comp.distanceKm?.toFixed(1)} km, probability {point.comp.comparableProbabilityPercent}%</title>
-              <circle r={point.isCandidate ? 12 : 10} />
+              <circle r={point.isCandidate ? 14 : 8 + (point.comp.comparableProbabilityPercent / 100) * 6} />
               <text y="4" textAnchor="middle">{point.isCandidate ? "C" : index + 1}</text>
             </g>
           ))}

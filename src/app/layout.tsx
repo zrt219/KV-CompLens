@@ -1,14 +1,22 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"]
+});
+
 export const metadata: Metadata = {
-  title: "KV CompLens",
-  description: "Deterministic comparable property valuation agent for Alberta residential underwriting."
+  title: "KV CompLens | Comparable Review Workflow",
+  description: "Deterministic 5-step comparable-property review workflow with source scan, adjustment, export, and assistant draft."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body>{children}</body>
     </html>
   );

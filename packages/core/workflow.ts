@@ -22,15 +22,15 @@ export function createInitialActivity(analysis: CompAnalysisResult): ActivityIte
   return [
     {
       id: "analysis-created",
-      label: "Initial comparable set created",
-      detail: `${analysis.valuation.includedCompCount} synthetic sale comps selected for review.`,
+      label: "Initial home set created",
+      detail: `${analysis.valuation.includedCompCount} homes selected for review.`,
       time: "Start",
       status: "confirmed"
     },
     {
       id: "sources-attached",
       label: "Public context attached",
-      detail: "Assessment-source links recorded as provenance context only.",
+      detail: "Public assessment links recorded as background context.",
       time: "Start",
       status: "review"
     }
@@ -49,29 +49,29 @@ export function addCandidateToAnalysis(subject: SubjectProperty, current: CompAn
   const nextActivity: ActivityItem[] = [
     {
       id: `comp-added-${candidate.id}`,
-      label: `Comp ${selectedIds.length} added`,
-      detail: `${candidate.address} added to selected analysis set.`,
+      label: `Home ${selectedIds.length} added`,
+      detail: `${candidate.address} added to the selected review set.`,
       time: "Just now",
       status: "confirmed"
     },
     {
       id: `confidence-${candidate.id}`,
       label: "Confidence recalculated",
-      detail: delta ? `${formatSigned(delta.confidenceDelta)} pts confidence change.` : "Confidence recalculated from selected comps.",
+      detail: delta ? `${formatSigned(delta.confidenceDelta)} pts confidence change.` : "Review confidence recalculated from the selected homes.",
       time: "Just now",
       status: "confirmed"
     },
     {
       id: `valuation-${candidate.id}`,
       label: "Valuation range updated",
-      detail: delta ? `${formatSigned(delta.pointDelta)} midpoint change.` : "Valuation updated.",
+      detail: delta ? `${formatSigned(delta.pointDelta)} midpoint change.` : "Value range updated.",
       time: "Just now",
       status: "ready"
     },
     {
       id: `report-${candidate.id}`,
       label: "Report draft refreshed",
-      detail: "Facts-only memo regenerated from selected comps.",
+      detail: "Review summary refreshed from the selected homes.",
       time: "Just now",
       status: "ready"
     },

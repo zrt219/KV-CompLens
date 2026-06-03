@@ -39,13 +39,25 @@ const comps: ComparableProperty[] = Array.from({ length: 5 }, (_, index) => ({
 }));
 
 describe("valuation", () => {
+  it("returns a zero-state fallback when no selected comps exist", () => {
+    const zero = estimateValuationRange(subject, []);
+
+    expect(zero.lowEstimate).toBe(0);
+    expect(zero.pointEstimate).toBe(0);
+    expect(zero.highEstimate).toBe(0);
+    expect(zero.confidenceScore).toBe(0);
+    expect(zero.effectiveSampleSize).toBe(0);
+    expect(zero.isZeroState).toBe(true);
+    expect(zero.analysisStatus).toBe("idle");
+  });
+
   it("returns low <= point <= high", () => {
     const range = estimateValuationRange(subject, scoreComparableProperties(subject, comps));
     expect(range.lowEstimate).toBeLessThanOrEqual(range.pointEstimate);
     expect(range.pointEstimate).toBeLessThanOrEqual(range.highEstimate);
     expect(range.posteriorVariance).toBeGreaterThan(0);
     expect(range.effectiveSampleSize).toBeGreaterThan(0);
-    expect(range.subModels.map((model) => model.label)).toContain("ComparableEvidenceModel");
+    expect(range.subModels.map((model) => model.label)).toContain("Primary evidence");
     expect(range.modelFusion.finalEstimate).toBeGreaterThan(0);
     expect(range.adjustedComparables.every((comp) => typeof comp.normalizedEvidenceWeight === "number")).toBe(true);
   });

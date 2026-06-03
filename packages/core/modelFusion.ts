@@ -39,35 +39,35 @@ export function createValuationSubModels(
   return [
     {
       id: "comparable-evidence",
-      label: "ComparableEvidenceModel",
+      label: "Primary evidence",
       estimate: roundToThousand(posteriorMean),
       variance: posteriorVariance,
       reliability: 0.9,
-      rationale: "Posterior estimate from probability-weighted adjusted comparable observations."
+      rationale: "Primary estimate from the selected homes and their review weight."
     },
     {
       id: "hedonic-feature",
-      label: "HedonicFeatureModel",
+      label: "Feature check",
       estimate: roundToThousand(featureEstimate),
       variance: Math.pow(85000, 2),
       reliability: 0.58,
-      rationale: "Simple deterministic feature estimate from sqft, beds, baths, and condition."
+      rationale: "Feature-based check from size, beds, baths, and condition."
     },
     {
       id: "market-trend",
-      label: "MarketTrendModel",
+      label: "Trend check",
       estimate: roundToThousand(trendEstimate),
       variance: Math.pow(90000, 2),
       reliability: 0.52,
-      rationale: "Selected sale evidence adjusted by deterministic time trend only."
+      rationale: "Selected sale evidence adjusted for timing only."
     },
     {
       id: "assessment-anchor",
-      label: "AssessmentAnchorModel",
+      label: "Local anchor",
       estimate: roundToThousand(assessmentAnchor),
       variance: Math.pow(95000, 2),
       reliability: 0.5,
-      rationale: "Prior/assessment-style anchor used as context only, not MLS sold data."
+      rationale: "Local anchor from the subject price hint or review context."
     }
   ];
 }

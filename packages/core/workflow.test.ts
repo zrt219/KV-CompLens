@@ -38,7 +38,7 @@ describe("workflow", () => {
     expect(next.analysis.selectedComparables.find((comp) => comp.id === candidate.id)?.latitude).toEqual(expect.any(Number));
     expect(next.analysis.selectedComparables.find((comp) => comp.id === candidate.id)?.longitude).toEqual(expect.any(Number));
     expect(next.analysis.valuation.includedCompCount).toBe(workflow.analysis.valuation.includedCompCount + 1);
-    expect(next.activityFeed.some((item) => item.label.includes("Comp") && item.label.includes("added"))).toBe(true);
+    expect(next.activityFeed.some((item) => item.label.includes("Home") && item.label.includes("added"))).toBe(true);
 
     const duplicate = addCandidateToAnalysis(subject, next.analysis, candidate, next.activityFeed);
     expect(duplicate.selectedIds.filter((id) => id === candidate.id)).toHaveLength(1);

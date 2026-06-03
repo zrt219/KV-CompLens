@@ -153,6 +153,8 @@ export type ValuationRange = {
   adjustedComparables: AdjustedComparable[];
   subModels: ValuationSubModel[];
   modelFusion: ModelFusionResult;
+  analysisStatus?: "idle" | "ready" | "complete";
+  isZeroState?: boolean;
 };
 
 export type ValuationDelta = {
@@ -238,4 +240,6 @@ export type CompAnalysisResult = {
   valuation: ValuationRange;
   memo: string;
   riskFlags: string[];
+  analysisStatus?: "idle" | "ready" | "complete";
+  isZeroState?: boolean;
 };

@@ -36,12 +36,14 @@ const propertyImages: Record<PropertyType, string[]> = {
 };
 
 export function PropertyThumbnail({ propertyType, seed, isSubject, isNew, compact, className }: PropertyThumbnailProps) {
+  const hasSeed = Boolean(seed?.trim());
   const hash = hashSeed(seed);
   const imageSet = propertyImages[propertyType];
-  const imageSrc = isSubject ? imageSet[0] : imageSet[hash % imageSet.length];
+  const imageSrc = hasSeed ? (isSubject ? imageSet[0] : imageSet[hash % imageSet.length]) : undefined;
   const label = propertyType === "SemiDetached" ? "Semi" : propertyType;
   const classNames = [
     "property-thumbnail",
+    !hasSeed && "empty-thumb",
     isSubject && "subject-thumb",
     isNew && "new-thumb",
     compact && "compact-thumb",
@@ -50,8 +52,14 @@ export function PropertyThumbnail({ propertyType, seed, isSubject, isNew, compac
 
   return (
     <div className={classNames} aria-hidden="true">
-      <Image src={imageSrc} alt="" fill sizes={compact ? "220px" : "320px"} priority={Boolean(isSubject)} />
-      <span>{isSubject ? "Subject" : label}</span>
+      {imageSrc ? (
+        <Image src={imageSrc} alt="" fill sizes={compact ? "220px" : "320px"} priority={Boolean(isSubject)} />
+      ) : (
+        <div className="property-thumbnail-empty">
+          <span>Waiting for property details</span>
+        </div>
+      )}
+      <span>{hasSeed ? (isSubject ? "Subject" : label) : ""}</span>
     </div>
   );
 }

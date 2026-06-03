@@ -23,53 +23,64 @@ export type ExportArtifact = {
 };
 
 const exportArtifactOptions: ExportArtifactOption[] = [
-  { id: "memo-pdf", label: "PDF Underwriting Memo", description: "Recommended" },
-  { id: "comparables-csv", label: "CSV Comparable Set", description: "Available from snapshot" },
-  { id: "adjustments-pdf", label: "PDF Adjustment Appendix", description: "Available from snapshot" },
-  { id: "snapshot-md", label: "MD Snapshot Memo", description: "Available from snapshot" },
-  { id: "audit-txt", label: "TXT Audit Log", description: "Available from snapshot" },
-  { id: "evidence-zip", label: "ZIP Evidence Package", description: "Available from snapshot" }
+  { id: "memo-pdf", label: "PDF Summary", description: "Recommended" },
+  { id: "comparables-csv", label: "CSV Home List", description: "Available from snapshot" },
+  { id: "adjustments-pdf", label: "PDF Adjustment Notes", description: "Available from snapshot" },
+  { id: "snapshot-md", label: "Markdown Summary", description: "Available from snapshot" },
+  { id: "audit-txt", label: "Text Activity Log", description: "Available from snapshot" },
+  { id: "evidence-zip", label: "ZIP Review Package", description: "Available from snapshot" }
 ];
 
 export { exportArtifactOptions };
 
+export function isExportReady(snapshot: PceAnalysisSnapshot) {
+  return snapshot.analysisStatus === "complete" && !snapshot.isZeroState && snapshot.valuation.includedCompCount > 0;
+}
+
+function assertExportReady(snapshot: PceAnalysisSnapshot) {
+  if (!isExportReady(snapshot)) {
+    throw new Error("Analysis must run before exporting a review package.");
+  }
+}
+
 export function buildExportArtifact(type: ExportArtifactType, subject: SubjectProperty, snapshot: PceAnalysisSnapshot): ExportArtifact {
+  assertExportReady(snapshot);
   const baseName = buildBaseFileName(subject, snapshot.generatedAt);
 
   switch (type) {
     case "memo-pdf":
       return {
-        fileName: `${baseName}_Underwriting_Memo.pdf`,
+        fileName: `${baseName}_Property_Review_Memo.pdf`,
         mimeType: "application/pdf",
         content: buildSimplePdf(buildMemoPdfLines(subject, snapshot))
       };
     case "comparables-csv":
       return {
-        fileName: `${baseName}_Comparable_Set.csv`,
+        fileName: `${baseName}_Home_List.csv`,
         mimeType: "text/csv;charset=utf-8",
         content: buildComparableCsv(snapshot)
       };
     case "adjustments-pdf":
       return {
-        fileName: `${baseName}_Adjustment_Appendix.pdf`,
+        fileName: `${baseName}_Adjustment_Notes.pdf`,
         mimeType: "application/pdf",
         content: buildSimplePdf(buildAdjustmentAppendixLines(subject, snapshot))
       };
     case "snapshot-md":
       return {
-        fileName: `${baseName}_Snapshot_Memo.md`,
+        fileName: `${baseName}_Review_Summary.md`,
         mimeType: "text/markdown;charset=utf-8",
         content: buildSnapshotMarkdown(subject, snapshot)
       };
     case "audit-txt":
       return {
-        fileName: `${baseName}_Audit_Log.txt`,
+        fileName: `${baseName}_Activity_Log.txt`,
         mimeType: "text/plain;charset=utf-8",
         content: buildAuditLogText(subject, snapshot)
       };
     case "evidence-zip":
       return {
-        fileName: `${baseName}_Evidence_Package.zip`,
+        fileName: `${baseName}_Review_Package.zip`,
         mimeType: "application/zip",
         content: buildEvidenceZip(subject, snapshot)
       };
@@ -99,7 +110,7 @@ export function downloadExportArtifact(artifact: ExportArtifact) {
 
 function buildComparableCsv(snapshot: PceAnalysisSnapshot) {
   const header = [
-    "Comparable ID",
+    "Home ID",
     "Address",
     "Neighbourhood",
     "City",
@@ -108,9 +119,9 @@ function buildComparableCsv(snapshot: PceAnalysisSnapshot) {
     "Adjusted Value",
     "Distance Km",
     "Match Score",
-    "Comparable Probability",
+    "Match Chance",
     "Evidence Weight",
-    "Risk Flags"
+    "Review Flags"
   ];
 
   const rows = snapshot.valuation.adjustedComparables.map((comp) => [
@@ -141,9 +152,10 @@ function buildSnapshotMarkdown(subject: SubjectProperty, snapshot: PceAnalysisSn
   ).join("\n");
 
   return [
-    "# KV CompLens Snapshot Memo",
+    "# KV CompLens Review Summary",
     "",
     "> DEMO MODE ONLY. Local synthetic sales calibrated against public assessment content. Analyst review required.",
+    "> Deterministic internal engine. Detailed methods are not disclosed.",
     "",
     "## Subject",
     `- Address: ${subject.address}, ${subject.city}, ${subject.province ?? "AB"}`,
@@ -157,8 +169,13 @@ function buildSnapshotMarkdown(subject: SubjectProperty, snapshot: PceAnalysisSn
     `- Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     `- Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}`,
     `- Effective sample size: ${snapshot.valuation.effectiveSampleSize}`,
+    `- Evidence entropy: ${Math.round(snapshot.valuation.evidenceEntropy * 100)}%`,
+    `- Average match chance: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
+    `- Average source reliability: ${Math.round(snapshot.valuation.averageSourceReliability * 100)}%`,
+    `- Residual buffer: ${formatCurrency(snapshot.valuation.residualBuffer)}`,
+    `- Blend estimate: ${formatCurrency(snapshot.valuation.modelFusion.finalEstimate)} (variance ${Math.round(snapshot.valuation.modelFusion.finalVariance)})`,
     "",
-    "## Selected Comparables",
+    "## Selected Homes",
     "| # | Address | Sale Price | Adjusted Value | Distance | Match |",
     "| --- | --- | --- | --- | --- | --- |",
     selectedRows,
@@ -166,20 +183,20 @@ function buildSnapshotMarkdown(subject: SubjectProperty, snapshot: PceAnalysisSn
     "## Source Scan",
     `- Sources consolidated: ${snapshot.sourceScan.sourcesConsolidated}`,
     `- Records scanned: ${snapshot.sourceScan.recordsScanned}`,
-    `- Candidate pool: ${snapshot.sourceScan.candidatePoolCount}`,
-    `- Selected comps: ${snapshot.sourceScan.selectedCompCount}`,
+    `- Homes ranked: ${snapshot.sourceScan.candidatePoolCount}`,
+    `- Homes selected: ${snapshot.sourceScan.selectedCompCount}`,
     "",
     "## Memo",
     ...sanitizeMultiline(snapshot.memo).split("\n"),
     "",
-    "## Audit Events",
+    "## Review Activity",
     auditRows
   ].join("\n");
 }
 
 function buildAuditLogText(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
   return [
-    "KV CompLens PCE Audit Log",
+    "KV CompLens Review Activity Log",
     "DEMO MODE ONLY - Local synthetic evidence. Analyst review required.",
     "",
     `Subject: ${subject.address}, ${subject.city}, ${subject.province ?? "AB"}`,
@@ -195,8 +212,9 @@ function buildAuditLogText(subject: SubjectProperty, snapshot: PceAnalysisSnapsh
 
 function buildMemoPdfLines(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
   return [
-    "KV CompLens - Underwriting Memo",
+    "KV CompLens - Property Review Memo",
     "DEMO MODE ONLY - Local synthetic evidence. Analyst review required.",
+    "Deterministic internal engine. Detailed methods are not disclosed.",
     "",
     `Generated: ${snapshot.generatedAt}`,
     `Subject: ${subject.address}, ${subject.city}, ${subject.province ?? "AB"}`,
@@ -206,21 +224,26 @@ function buildMemoPdfLines(subject: SubjectProperty, snapshot: PceAnalysisSnapsh
     `Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     `Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}`,
     `Effective sample size: ${snapshot.valuation.effectiveSampleSize}`,
+    `Evidence entropy: ${Math.round(snapshot.valuation.evidenceEntropy * 100)}%`,
+    `Average match chance: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
+    `Average source reliability: ${Math.round(snapshot.valuation.averageSourceReliability * 100)}%`,
+    `Residual buffer: ${formatCurrency(snapshot.valuation.residualBuffer)}`,
+    `Blend estimate: ${formatCurrency(snapshot.valuation.modelFusion.finalEstimate)} (variance ${Math.round(snapshot.valuation.modelFusion.finalVariance)})`,
     "",
-    "Selected comparables:",
+    "Selected homes:",
     ...snapshot.valuation.adjustedComparables.flatMap((comp, index) => [
       `${index + 1}. ${comp.address} | sale ${formatCurrency(comp.salePrice)} | adjusted ${formatCurrency(comp.adjustedValue)} | ${comp.distanceKm.toFixed(1)} km | match ${Math.round(comp.totalScore)}`,
-      `   Evidence weight ${Math.round((comp.normalizedEvidenceWeight ?? comp.evidenceWeight) * 100)}% | probability ${Math.round(comp.comparableProbability * 100)}%`
+      `   Evidence weight ${Math.round((comp.normalizedEvidenceWeight ?? comp.evidenceWeight) * 100)}% | match chance ${Math.round(comp.comparableProbability * 100)}%`
     ]),
     "",
-    "Underwriting memo:",
+    "Review summary:",
     ...sanitizeMultiline(snapshot.memo).split("\n")
   ];
 }
 
 function buildAdjustmentAppendixLines(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
   return [
-    "KV CompLens - Adjustment Appendix",
+    "KV CompLens - Adjustment Notes",
     "DEMO MODE ONLY - Local synthetic evidence. Analyst review required.",
     "",
     `Generated: ${snapshot.generatedAt}`,
@@ -228,7 +251,7 @@ function buildAdjustmentAppendixLines(subject: SubjectProperty, snapshot: PceAna
     `Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     "",
     ...snapshot.valuation.adjustedComparables.flatMap((comp, index) => [
-      `Comparable ${index + 1}: ${comp.address}`,
+      `Home ${index + 1}: ${comp.address}`,
       `Sale price ${formatCurrency(comp.salePrice)} | Adjusted value ${formatCurrency(comp.adjustedValue)} | Distance ${comp.distanceKm.toFixed(1)} km | Match ${Math.round(comp.totalScore)}`,
       ...comp.adjustmentLines.map((line) =>
         `- ${line.label}: ${formatSignedCurrency(line.amount)} | ${sanitizeInline(line.rationale)}`
@@ -255,7 +278,7 @@ function buildEvidenceZip(subject: SubjectProperty, snapshot: PceAnalysisSnapsho
 }
 
 function buildBaseFileName(subject: SubjectProperty, generatedAt: string) {
-  return `${slugify(subject.address)}_PCE_${generatedAt.slice(0, 10)}`;
+  return `${slugify(subject.address)}_Review_${generatedAt.slice(0, 10)}`;
 }
 
 function slugify(value: string) {

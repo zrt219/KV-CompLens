@@ -30,19 +30,19 @@ export function EvidenceBoardCanvas({
   const activeId = activeComparableId ?? visibleComps[0]?.id;
 
   return (
-    <div className="evidence-board-canvas">
+    <div className="evidence-board-canvas" aria-label="Home discovery board">
       <div className="evidence-board-actions">
         <label className="evidence-search">
-          <span>Search comparables</span>
+          <span>Search homes</span>
           <input
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
-            placeholder="Address, area, score"
+            placeholder="Address, area, match"
           />
         </label>
-        <span className="evidence-subject-filter">Subject Property</span>
-        <button className="canvas-find" type="button" onClick={onFindCandidate}>Find candidate</button>
+        <span className="evidence-subject-filter">Subject home</span>
+        <button className="canvas-find" type="button" onClick={onFindCandidate}>Find more homes</button>
       </div>
       <EvidenceLinkLayer comps={visibleComps} activeComparableId={activeId} newCandidateId={newCandidateId} />
       <div className="evidence-subject-slot">
@@ -60,10 +60,10 @@ export function EvidenceBoardCanvas({
         </div>
       )) : (
         <div className="evidence-empty-state evidence-search-empty">
-          No selected comparables match <strong>{searchTerm}</strong>.
+          No selected homes match <strong>{searchTerm}</strong>.
         </div>
       )}
-      {hiddenCount > 0 && <div className="evidence-more-pill">+{hiddenCount} more selected comps</div>}
+      {hiddenCount > 0 && <div className="evidence-more-pill">+{hiddenCount} more selected homes</div>}
     </div>
   );
 }

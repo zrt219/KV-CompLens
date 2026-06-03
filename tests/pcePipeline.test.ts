@@ -30,6 +30,8 @@ describe("runPcePipeline", () => {
   it("returns a complete deterministic snapshot", () => {
     const snapshot = runPcePipeline({ subject, candidates: syntheticComparables, generatedAt });
 
+    expect(snapshot.analysisStatus).toBe("complete");
+    expect(snapshot.isZeroState).toBe(false);
     expect(snapshot.subject.address).toBe(subject.address);
     expect(snapshot.sourceScan.recordsScanned).toBeGreaterThan(0);
     expect(snapshot.rankedComparables.length).toBeGreaterThan(0);
@@ -37,7 +39,7 @@ describe("runPcePipeline", () => {
     expect(snapshot.rejectedComparables).toBeDefined();
     expect(snapshot.remainingCandidates).toBeDefined();
     expect(snapshot.valuation.pointEstimate).toBeGreaterThan(0);
-    expect(snapshot.memo).toContain("Subject Property Summary");
+    expect(snapshot.memo).toContain("Subject Details");
     expect(snapshot.auditEvents).toHaveLength(5);
     expect(snapshot.activeComparableId).toBe(snapshot.valuation.adjustedComparables[0]?.id);
     expect(snapshot.generatedAt).toBe(generatedAt);
@@ -67,6 +69,8 @@ describe("runPcePipeline", () => {
     expect(snapshot.memo).toContain(String(snapshot.sourceScan.selectedCompCount));
     expect(snapshot.memo).toContain(snapshot.selectedComparables[0].address);
     expect(snapshot.memo).toContain(snapshot.valuation.effectiveSampleSize.toString());
+    expect(snapshot.memo).toContain("Selected Homes");
+    expect(snapshot.memo).toContain("Review Summary");
   });
 
   it("builds deterministic audit events with a fixed timestamp", () => {

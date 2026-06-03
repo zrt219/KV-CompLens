@@ -100,35 +100,35 @@ export function evaluateEligibility(subject: SubjectProperty, comp: ComparablePr
   if (comp.salePrice <= 0 || comp.livingAreaSqft <= 0) {
     failed = true;
     penalty += 100;
-    reasons.push("Invalid sale price or living area.");
+    reasons.push("Missing or invalid sale price or home size.");
   }
   if (distanceKm > 65) {
     failed = true;
     penalty += 35;
-    reasons.push(`Outside market evidence radius at ${distanceKm.toFixed(1)} km.`);
+    reasons.push(`Too far away at ${distanceKm.toFixed(1)} km.`);
   } else if (distanceKm > 18) {
     penalty += 12;
-    reasons.push(`Distance exceeds preferred radius: ${distanceKm.toFixed(1)} km from subject.`);
+    reasons.push(`Farther than preferred at ${distanceKm.toFixed(1)} km from the subject home.`);
   }
   if (daysSinceSale > 730) {
     failed = true;
     penalty += 24;
-    reasons.push(`Sale is stale at ${daysSinceSale} days.`);
+    reasons.push(`Sale is older than preferred at ${daysSinceSale} days.`);
   } else if (daysSinceSale > 365) {
     penalty += 10;
-    reasons.push(`Sale recency is weak at ${daysSinceSale} days.`);
+    reasons.push(`Sale timing is weak at ${daysSinceSale} days.`);
   }
   if (scorePropertyType(subject, comp) < 35) {
     penalty += 16;
-    reasons.push("Property type is incompatible with subject.");
+    reasons.push("Property type does not match the subject home.");
   }
   if (sizeVariance > 0.4) {
     penalty += 10;
-    reasons.push(`Living area variance is ${Math.round(sizeVariance * 100)}%.`);
+    reasons.push(`Home size differs by ${Math.round(sizeVariance * 100)}%.`);
   }
   if (sourceReliability < 0.65) {
     penalty += 8;
-    reasons.push("Source reliability is below preferred threshold.");
+    reasons.push("Source quality is below the preferred threshold.");
   }
 
   const severity: GateResult["severity"] = failed ? "fail" : penalty > 0 ? "warn" : "pass";
@@ -254,10 +254,10 @@ export function scoreComparableProperty(subject: SubjectProperty, comp: Comparab
 
   const reasonParts = [
     subject.propertyType === comp.propertyType ? `Same property type: ${comp.propertyType}.` : `Property type differs: ${comp.propertyType}.`,
-    distanceKm <= 3 ? `Inside preferred radius at ${distanceKm.toFixed(1)} km.` : `${distanceKm.toFixed(1)} km from subject.`,
-    sizeVariance <= 0.25 ? `Living area inside size tolerance.` : `${Math.round(sizeVariance * 100)}% living-area variance.`,
+    distanceKm <= 3 ? `Within the preferred distance at ${distanceKm.toFixed(1)} km.` : `${distanceKm.toFixed(1)} km from the subject home.`,
+    sizeVariance <= 0.25 ? `Home size is within tolerance.` : `${Math.round(sizeVariance * 100)}% home-size difference.`,
     daysSinceSale <= 180 ? `Recent sale within ${daysSinceSale} days.` : `Sale age is ${daysSinceSale} days.`,
-    `PCE-V2 probability ${Math.round(comparableProbability * 100)}%, energy quality ${Math.round(energy.energyQuality * 100)}%, source reliability ${Math.round(sourceReliability * 100)}%.`
+    `Match chance ${Math.round(comparableProbability * 100)}%, evidence strength ${Math.round(energy.energyQuality * 100)}%, source reliability ${Math.round(sourceReliability * 100)}%.`
   ];
   const status = !eligibility.passed || totalScore < 48 || comparableProbability < 0.28 ? "rejected" : "candidate";
 
@@ -265,7 +265,7 @@ export function scoreComparableProperty(subject: SubjectProperty, comp: Comparab
     ...comp,
     status,
     wasRejected: status === "rejected",
-    rejectionReason: status === "rejected" ? (basePenalties[0] ?? "Lower probability than selected comparable set.") : comp.rejectionReason,
+    rejectionReason: status === "rejected" ? (basePenalties[0] ?? "Lower match than the homes already selected.") : comp.rejectionReason,
     totalScore: Math.round(totalScore * 10) / 10,
     rawScore: Math.round(rawScore * 10) / 10,
     breakdown,
