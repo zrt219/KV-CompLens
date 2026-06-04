@@ -38,12 +38,12 @@ export function previewCandidateImpact(subject: SubjectProperty, selected: Score
   };
   const improvementReasons = [
     delta.confidenceDelta > 0 ? `Confidence improves by ${delta.confidenceDelta} pts.` : "",
-    delta.effectiveSampleSizeDelta > 0 ? `The review set gains ${delta.effectiveSampleSizeDelta.toFixed(1)} more effective homes.` : "",
-    delta.entropyDelta > 0 ? `The evidence mix becomes more balanced by ${delta.entropyDelta.toFixed(2)}.` : "",
-    delta.rangeNarrowed ? "The value range narrows after adding this home." : "",
-    candidate.comparableProbability >= 0.7 ? `Match chance is ${candidate.comparableProbabilityPercent}%.` : "",
-    candidate.energyQuality >= 0.55 ? `Evidence strength is ${Math.round(candidate.energyQuality * 100)}%.` : "",
-    roundedMig > 0 ? `This home adds ${roundedMig.toFixed(3)} in information value.` : ""
+    delta.effectiveSampleSizeDelta > 0 ? `The review set gains ${delta.effectiveSampleSizeDelta.toFixed(1)} more reviewed comparable depth.` : "",
+    delta.entropyDelta > 0 ? `The selected comparable set becomes more balanced.` : "",
+    delta.rangeNarrowed ? "The value range narrows after adding this comparable." : "",
+    candidate.comparableProbability >= 0.7 ? `Comparable probability is ${candidate.comparableProbabilityPercent}%.` : "",
+    candidate.energyQuality >= 0.55 ? `Evidence support is ${Math.round(candidate.energyQuality * 100)}%.` : "",
+    roundedMig > 0 ? `This comparable improves the review set.` : ""
   ].filter(Boolean);
 
   return {
@@ -58,7 +58,7 @@ export function previewCandidateImpact(subject: SubjectProperty, selected: Score
     deltaEntropy: delta.entropyDelta,
     riskChange: delta.riskSeverityDelta,
     marginalInformationGain: roundedMig,
-    improvementReasons: improvementReasons.length ? improvementReasons : ["This home adds more useful evidence for review."],
+    improvementReasons: improvementReasons.length ? improvementReasons : ["This comparable adds more useful evidence for review."],
     addedRisks: candidate.riskFlags
   };
 }

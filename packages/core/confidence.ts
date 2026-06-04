@@ -1,5 +1,5 @@
 import type { AdjustedComparable } from "./types";
-import { clamp01, effectiveSampleSize, entropy, sigmoid } from "./probability";
+import { clamp01, entropy } from "./probability";
 
 export type ConfidenceInputs = {
   adjustedComparables: AdjustedComparable[];
@@ -26,7 +26,7 @@ function confidenceLevel(score: number): ConfidenceResult["level"] {
   return "Review Required";
 }
 
-export function calculateConfidence({ adjustedComparables, valueSpreadPercent, evidenceWeights }: ConfidenceInputs): ConfidenceResult {
+export function calculateConfidence({ adjustedComparables, valueSpreadPercent }: ConfidenceInputs): ConfidenceResult {
   const count = adjustedComparables.length || 1;
   const scores = adjustedComparables.map(c => Math.max(0.01, c.totalScore));
   const sumScores = scores.reduce((sum, s) => sum + s, 0);
@@ -57,7 +57,7 @@ export function calculateConfidence({ adjustedComparables, valueSpreadPercent, e
   return {
     score,
     level,
-    rationale: `${adjustedComparables.length} homes used; effective sample size ${nEff.toFixed(1)}; average match ${Math.round(averageComparableProbability * 100)}%; value spread ${valueSpreadPercent}%; ${riskFlags} review flags across the selected homes.`,
+    rationale: `${adjustedComparables.length} comparables reviewed; review depth ${nEff.toFixed(1)}; average comparable fit ${Math.round(averageComparableProbability * 100)}%; value spread ${valueSpreadPercent}%; ${riskFlags} review flags across the selected comparables.`,
     effectiveSampleSize: Math.round(nEff * 10) / 10,
     evidenceEntropy: Math.round(evidenceEntropy * 100) / 100,
     averageComparableProbability: Math.round(averageComparableProbability * 100) / 100,

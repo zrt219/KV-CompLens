@@ -43,7 +43,7 @@ export function createValuationSubModels(
       estimate: roundToThousand(posteriorMean),
       variance: posteriorVariance,
       reliability: 0.9,
-      rationale: "Primary estimate from the selected homes and their review weight."
+      rationale: "Primary estimate from the selected comparables and their review support."
     },
     {
       id: "hedonic-feature",

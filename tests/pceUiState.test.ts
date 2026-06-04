@@ -36,7 +36,7 @@ const subject: SubjectProperty = {
   underwritingDate: "2026-05-31"
 };
 
-describe("PCE UI state reducer", () => {
+describe("review UI state reducer", () => {
   it("starts in a zero-state before intake is submitted", () => {
     const state = createBlankPceState(syntheticComparables, "2026-06-01T00:00:00.000Z");
     const civicGrid = selectCivicGridViewModel(state);
@@ -49,17 +49,17 @@ describe("PCE UI state reducer", () => {
     expect(state.snapshot.sourceScan.recordsScanned).toBe(0);
     expect(state.snapshot.valuation.pointEstimate).toBe(0);
     expect(civicGrid.workflow.sourceSummary).toBe("Awaiting intake");
-    expect(civicGrid.workflow.candidateSummary).toBe("No homes ranked yet");
-    expect(civicGrid.workflow.adjustmentSummary).toBe("No homes confirmed yet");
+    expect(civicGrid.workflow.candidateSummary).toBe("No comparables ranked yet");
+    expect(civicGrid.workflow.adjustmentSummary).toBe("No comparables confirmed yet");
     expect(civicGrid.workflow.valueSummary).toBe("Awaiting analysis");
     expect(insights.valueRange).toBe("Awaiting analysis");
     expect(insights.pointEstimate).toBe("N/A");
     expect(insights.confidenceScore).toBe(0);
     expect(insights.averageMatch).toBe("Awaiting analysis");
-    expect(insights.effectiveSampleSize).toBe("No homes reviewed yet");
+    expect(insights.effectiveSampleSize).toBe("No comparables reviewed yet");
     expect(insights.auditEvents).toHaveLength(0);
     expect(adjustmentGrid.comps).toHaveLength(0);
-    expect(exportView.includedCompCount).toBe("No homes selected yet");
+    expect(exportView.includedCompCount).toBe("No comparables selected yet");
   });
 
   it("keeps the app in intake mode until the subject is valid", () => {
@@ -88,7 +88,7 @@ describe("PCE UI state reducer", () => {
     expect(edited.snapshot.valuation.pointEstimate).toBe(0);
     expect(civicGrid.workflow.valueSummary).toBe("Awaiting analysis");
     expect(insights.pointEstimate).toBe("N/A");
-    expect(exportView.includedCompCount).toBe("No homes selected yet");
+    expect(exportView.includedCompCount).toBe("No comparables selected yet");
   });
 
   it("RUN_ANALYSIS recomputes the snapshot", () => {
@@ -175,5 +175,20 @@ describe("PCE UI state reducer", () => {
     expect(adjustmentGrid.comps).toEqual(state.snapshot.valuation.adjustedComparables);
     expect(memo.memo).toBe(state.snapshot.memo);
     expect(exportView.adjustedComparables).toEqual(state.snapshot.valuation.adjustedComparables);
+  });
+
+  it("ATTACH_REVIEW_INTELLIGENCE stores a verified memo attachment event", () => {
+    const state = createInitialPceState(subject, syntheticComparables, "2026-06-01T00:00:00.000Z");
+    const attached = pceAnalysisReducer(state, {
+      type: "ATTACH_REVIEW_INTELLIGENCE",
+      generatedAt: "2026-06-01T04:00:00.000Z"
+    });
+    const memo = selectMemoViewModel(attached);
+    const exportView = selectExportViewModel(attached);
+
+    expect(attached.reviewIntelligenceAttached).toBe(true);
+    expect(memo.reviewIntelligenceAttached).toBe(true);
+    expect(exportView.reviewIntelligenceAttached).toBe(true);
+    expect(memo.auditEvents.some((event) => event.type === "review_intelligence_v2_added_to_memo")).toBe(true);
   });
 });

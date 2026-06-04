@@ -26,8 +26,8 @@ export function selectCivicGridViewModel(state: PceAnalysisState) {
     workflow: {
       subjectAddress,
       sourceSummary: state.analysisStarted ? `${snapshot.sourceScan.sourcesConsolidated} sources / ${snapshot.sourceScan.recordsScanned} records` : "Awaiting intake",
-      candidateSummary: state.analysisStarted ? `${snapshot.sourceScan.candidatePoolCount} homes ranked` : "No homes ranked yet",
-      adjustmentSummary: state.analysisStarted ? `${snapshot.valuation.includedCompCount} homes confirmed` : "No homes confirmed yet",
+      candidateSummary: state.analysisStarted ? `${snapshot.sourceScan.candidatePoolCount} comparables ranked` : "No comparables ranked yet",
+      adjustmentSummary: state.analysisStarted ? `${snapshot.valuation.includedCompCount} comparables confirmed` : "No comparables confirmed yet",
       valueSummary: state.analysisStarted ? `${formatCurrency(snapshot.valuation.lowEstimate)} - ${formatCurrency(snapshot.valuation.highEstimate)}` : "Awaiting analysis"
     }
   };
@@ -47,10 +47,10 @@ export function selectInsightsViewModel(state: PceAnalysisState) {
       confidenceRationale: "Enter the property details and run the analysis to see the value range.",
       selectedComparable: undefined,
       averageScore: 0,
-      distanceRange: "No homes selected",
+      distanceRange: "No comparables selected",
       averageMatch: "Awaiting analysis",
-      averageComparableProbability: "No homes reviewed yet",
-      effectiveSampleSize: "No homes reviewed yet",
+      averageComparableProbability: "No comparables reviewed yet",
+      effectiveSampleSize: "No comparables reviewed yet",
       averageSourceReliability: "No source scan yet",
       valueSpread: "No value range yet",
       sourceScan: snapshot.sourceScan,
@@ -74,12 +74,12 @@ export function selectInsightsViewModel(state: PceAnalysisState) {
     averageScore,
     distanceRange: distanceRange(snapshot.valuation.adjustedComparables),
     averageMatch: `${snapshot.valuation.averageSimilarity}/100`,
-    averageComparableProbability: `${Math.round(snapshot.valuation.averageComparableProbability * 100)}% average match`,
-    effectiveSampleSize: `${snapshot.valuation.effectiveSampleSize} reviewed homes`,
+    averageComparableProbability: `${Math.round(snapshot.valuation.averageComparableProbability * 100)}% average probability`,
+    effectiveSampleSize: `${snapshot.valuation.effectiveSampleSize} reviewed comparables`,
     averageSourceReliability: `${Math.round(snapshot.valuation.averageSourceReliability * 100)}% average`,
     valueSpread: `${snapshot.valuation.valueSpreadPercent}% range spread`,
     sourceScan: snapshot.sourceScan,
-    riskFlags: snapshot.riskFlags.length ? snapshot.riskFlags : ["No major review flags in the selected homes."],
+    riskFlags: snapshot.riskFlags.length ? snapshot.riskFlags : ["No major review flags in the selected comparables."],
     auditEvents: snapshot.auditEvents,
     confidenceSupportsReview: snapshot.valuation.confidenceLevel === "High",
     valuationRiskFlags: new Set(snapshot.valuation.riskFlags),
@@ -101,8 +101,9 @@ export function selectAdjustmentGridViewModel(state: PceAnalysisState) {
 export function selectMemoViewModel(state: PceAnalysisState) {
   return {
     memo: state.snapshot.memo,
-    auditEvents: state.snapshot.auditEvents,
-    generatedAt: state.snapshot.generatedAt
+    auditEvents: [...state.snapshot.auditEvents, ...state.uiAuditEvents],
+    generatedAt: state.snapshot.generatedAt,
+    reviewIntelligenceAttached: state.reviewIntelligenceAttached
   };
 }
 
@@ -112,20 +113,22 @@ export function selectExportViewModel(state: PceAnalysisState) {
       pointEstimate: "Awaiting analysis",
       valueRange: "Awaiting analysis",
       confidence: "Waiting for property details",
-      includedCompCount: "No homes selected yet",
+      includedCompCount: "No comparables selected yet",
       adjustedComparables: [],
       newCandidateId: state.newCandidateId,
-      auditEvents: []
+      auditEvents: [],
+      reviewIntelligenceAttached: false
     };
   }
   return {
     pointEstimate: formatCurrency(state.snapshot.valuation.pointEstimate),
     valueRange: `${formatCurrency(state.snapshot.valuation.lowEstimate)} - ${formatCurrency(state.snapshot.valuation.highEstimate)}`,
-    confidence: `${state.snapshot.valuation.confidenceScore}% ${displayConfidenceLevel(state.snapshot.valuation.confidenceLevel)}`,
+    confidence: `${Math.round(state.snapshot.valuation.confidenceScore)}% ${displayConfidenceLevel(state.snapshot.valuation.confidenceLevel)}`,
     includedCompCount: String(state.snapshot.valuation.includedCompCount),
     adjustedComparables: state.snapshot.valuation.adjustedComparables,
     newCandidateId: state.newCandidateId,
-    auditEvents: state.snapshot.auditEvents
+    auditEvents: [...state.snapshot.auditEvents, ...state.uiAuditEvents],
+    reviewIntelligenceAttached: state.reviewIntelligenceAttached
   };
 }
 
@@ -145,7 +148,7 @@ export function selectActiveAdjustedComparable(state: PceAnalysisState): Adjuste
 }
 
 export function distanceRange(comps: AdjustedComparable[]) {
-  if (!comps.length) return "No homes selected";
+  if (!comps.length) return "No comparables selected";
   const distances = comps.map((comp) => comp.distanceKm).sort((a, b) => a - b);
   return `${distances[0].toFixed(1)}-${distances[distances.length - 1].toFixed(1)} km`;
 }

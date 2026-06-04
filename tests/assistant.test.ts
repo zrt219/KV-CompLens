@@ -56,7 +56,7 @@ describe("assistant draft helpers", () => {
 
     expect(prompt).toContain("Do not change the value math.");
     expect(prompt).toContain("Return JSON that matches the supplied schema exactly.");
-    expect(prompt).toContain("Selected homes:");
+    expect(prompt).toContain("Selected comparables:");
     expect(prompt).toContain("Latest audit events:");
   });
 });

@@ -1,6 +1,8 @@
 import { formatCurrency } from "../format";
 import type { PceAnalysisSnapshot } from "./runPcePipeline";
+import type { PceAuditEvent } from "./runPcePipeline";
 import type { SubjectProperty } from "../types";
+import { runEvidenceCourt } from "../review-intelligence-v2/runEvidenceCourt";
 
 export type ExportArtifactType =
   | "memo-pdf"
@@ -22,9 +24,14 @@ export type ExportArtifact = {
   content: string | Uint8Array;
 };
 
+export type ExportArtifactBuildOptions = {
+  includeReviewIntelligence?: boolean;
+  auditEvents?: PceAuditEvent[];
+};
+
 const exportArtifactOptions: ExportArtifactOption[] = [
   { id: "memo-pdf", label: "PDF Summary", description: "Recommended" },
-  { id: "comparables-csv", label: "CSV Home List", description: "Available from snapshot" },
+  { id: "comparables-csv", label: "CSV Comparable List", description: "Available from snapshot" },
   { id: "adjustments-pdf", label: "PDF Adjustment Notes", description: "Available from snapshot" },
   { id: "snapshot-md", label: "Markdown Summary", description: "Available from snapshot" },
   { id: "audit-txt", label: "Text Activity Log", description: "Available from snapshot" },
@@ -43,20 +50,22 @@ function assertExportReady(snapshot: PceAnalysisSnapshot) {
   }
 }
 
-export function buildExportArtifact(type: ExportArtifactType, subject: SubjectProperty, snapshot: PceAnalysisSnapshot): ExportArtifact {
+export function buildExportArtifact(type: ExportArtifactType, subject: SubjectProperty, snapshot: PceAnalysisSnapshot, options: ExportArtifactBuildOptions = {}): ExportArtifact {
   assertExportReady(snapshot);
   const baseName = buildBaseFileName(subject, snapshot.generatedAt);
+  const reviewIntelligence = options.includeReviewIntelligence ? runEvidenceCourt(snapshot) : undefined;
+  const auditEvents = options.auditEvents ?? snapshot.auditEvents;
 
   switch (type) {
     case "memo-pdf":
       return {
         fileName: `${baseName}_Property_Review_Memo.pdf`,
         mimeType: "application/pdf",
-        content: buildSimplePdf(buildMemoPdfLines(subject, snapshot))
+        content: buildSimplePdf(buildMemoPdfLines(subject, snapshot, reviewIntelligence))
       };
     case "comparables-csv":
       return {
-        fileName: `${baseName}_Home_List.csv`,
+        fileName: `${baseName}_Comparable_List.csv`,
         mimeType: "text/csv;charset=utf-8",
         content: buildComparableCsv(snapshot)
       };
@@ -70,19 +79,19 @@ export function buildExportArtifact(type: ExportArtifactType, subject: SubjectPr
       return {
         fileName: `${baseName}_Review_Summary.md`,
         mimeType: "text/markdown;charset=utf-8",
-        content: buildSnapshotMarkdown(subject, snapshot)
+        content: buildSnapshotMarkdown(subject, snapshot, reviewIntelligence, auditEvents)
       };
     case "audit-txt":
       return {
         fileName: `${baseName}_Activity_Log.txt`,
         mimeType: "text/plain;charset=utf-8",
-        content: buildAuditLogText(subject, snapshot)
+        content: buildAuditLogText(subject, snapshot, auditEvents, reviewIntelligence)
       };
     case "evidence-zip":
       return {
         fileName: `${baseName}_Review_Package.zip`,
         mimeType: "application/zip",
-        content: buildEvidenceZip(subject, snapshot)
+        content: buildEvidenceZip(subject, snapshot, options)
       };
   }
 }
@@ -110,7 +119,7 @@ export function downloadExportArtifact(artifact: ExportArtifact) {
 
 function buildComparableCsv(snapshot: PceAnalysisSnapshot) {
   const header = [
-    "Home ID",
+    "Comparable ID",
     "Address",
     "Neighbourhood",
     "City",
@@ -118,8 +127,8 @@ function buildComparableCsv(snapshot: PceAnalysisSnapshot) {
     "Sale Price",
     "Adjusted Value",
     "Distance Km",
-    "Match Score",
-    "Match Chance",
+    "Comparable Score",
+    "Comparable Probability",
     "Evidence Weight",
     "Review Flags"
   ];
@@ -142,12 +151,17 @@ function buildComparableCsv(snapshot: PceAnalysisSnapshot) {
   return [header, ...rows].map((row) => row.map(escapeCsv).join(",")).join("\n");
 }
 
-function buildSnapshotMarkdown(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
+function buildSnapshotMarkdown(
+  subject: SubjectProperty,
+  snapshot: PceAnalysisSnapshot,
+  reviewIntelligence?: ReturnType<typeof runEvidenceCourt>,
+  auditEvents: PceAuditEvent[] = snapshot.auditEvents
+) {
   const selectedRows = snapshot.valuation.adjustedComparables.map((comp, index) =>
     `| ${index + 1} | ${comp.address} | ${formatCurrency(comp.salePrice)} | ${formatCurrency(comp.adjustedValue)} | ${comp.distanceKm.toFixed(1)} km | ${Math.round(comp.totalScore)} |`
   ).join("\n");
 
-  const auditRows = snapshot.auditEvents.map((event) =>
+  const auditRows = auditEvents.map((event) =>
     `- ${event.timestamp} | ${event.type} | ${event.status.toUpperCase()} | ${event.summary}`
   ).join("\n");
 
@@ -155,7 +169,7 @@ function buildSnapshotMarkdown(subject: SubjectProperty, snapshot: PceAnalysisSn
     "# KV CompLens Review Summary",
     "",
     "> DEMO MODE ONLY. Local synthetic sales calibrated against public assessment content. Analyst review required.",
-    "> Deterministic internal engine. Detailed methods are not disclosed.",
+    "> Cross-platform evidence model. Proprietary methods are not disclosed.",
     "",
     "## Subject",
     `- Address: ${subject.address}, ${subject.city}, ${subject.province ?? "AB"}`,
@@ -168,33 +182,52 @@ function buildSnapshotMarkdown(subject: SubjectProperty, snapshot: PceAnalysisSn
     `- Value range: ${formatCurrency(snapshot.valuation.lowEstimate)} to ${formatCurrency(snapshot.valuation.highEstimate)}`,
     `- Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     `- Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}`,
-    `- Effective sample size: ${snapshot.valuation.effectiveSampleSize}`,
-    `- Evidence entropy: ${Math.round(snapshot.valuation.evidenceEntropy * 100)}%`,
-    `- Average match chance: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
+    `- Review depth: ${snapshot.valuation.effectiveSampleSize}`,
+    `- Evidence mix: ${Math.round(snapshot.valuation.evidenceEntropy * 100)}%`,
+    `- Average comparable probability: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
     `- Average source reliability: ${Math.round(snapshot.valuation.averageSourceReliability * 100)}%`,
-    `- Residual buffer: ${formatCurrency(snapshot.valuation.residualBuffer)}`,
-    `- Blend estimate: ${formatCurrency(snapshot.valuation.modelFusion.finalEstimate)} (variance ${Math.round(snapshot.valuation.modelFusion.finalVariance)})`,
+    `- Review buffer: ${formatCurrency(snapshot.valuation.residualBuffer)}`,
+    `- System estimate: ${formatCurrency(snapshot.valuation.modelFusion.finalEstimate)}`,
     "",
-    "## Selected Homes",
-    "| # | Address | Sale Price | Adjusted Value | Distance | Match |",
+    "## Selected Comparables",
+    "| # | Address | Sale Price | Adjusted Value | Distance | Score |",
     "| --- | --- | --- | --- | --- | --- |",
     selectedRows,
     "",
     "## Source Scan",
     `- Sources consolidated: ${snapshot.sourceScan.sourcesConsolidated}`,
     `- Records scanned: ${snapshot.sourceScan.recordsScanned}`,
-    `- Homes ranked: ${snapshot.sourceScan.candidatePoolCount}`,
-    `- Homes selected: ${snapshot.sourceScan.selectedCompCount}`,
+    `- Comparables ranked: ${snapshot.sourceScan.candidatePoolCount}`,
+    `- Comparables selected: ${snapshot.sourceScan.selectedCompCount}`,
     "",
     "## Memo",
     ...sanitizeMultiline(snapshot.memo).split("\n"),
+    ...(reviewIntelligence ? [
+      "",
+      "## Review Intelligence Summary",
+      `- Verdict: ${reviewIntelligence.verdict.label}`,
+      `- Strongest comparable: ${reviewIntelligence.strongestComparable.address}`,
+      `- Weakest comparable: ${reviewIntelligence.weakestSelectedComparable.address}`,
+      `- Audit status: ${reviewIntelligence.verification.ok ? "Verified" : "Needs review"}`,
+      "",
+      reviewIntelligence.memoReadySummary,
+      "",
+      "## Claim Ledger Appendix",
+      ...reviewIntelligence.signalAnalyst.strongestEvidence.map((claim) => `- ${claim.claim} [${claim.supportFactIds.join(", ")}]`),
+      ...reviewIntelligence.skepticAnalyst.concerns.map((claim) => `- ${claim.claim} [${claim.supportFactIds.join(", ")}]`)
+    ] : []),
     "",
     "## Review Activity",
     auditRows
   ].join("\n");
 }
 
-function buildAuditLogText(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
+function buildAuditLogText(
+  subject: SubjectProperty,
+  snapshot: PceAnalysisSnapshot,
+  auditEvents: PceAuditEvent[] = snapshot.auditEvents,
+  reviewIntelligence?: ReturnType<typeof runEvidenceCourt>
+) {
   return [
     "KV CompLens Review Activity Log",
     "DEMO MODE ONLY - Local synthetic evidence. Analyst review required.",
@@ -203,18 +236,22 @@ function buildAuditLogText(subject: SubjectProperty, snapshot: PceAnalysisSnapsh
     `Generated at: ${snapshot.generatedAt}`,
     `Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     `Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}`,
+    ...(reviewIntelligence ? [
+      `Review Intelligence verdict: ${reviewIntelligence.verdict.label}`,
+      `Review Intelligence attached summary: ${sanitizeInline(reviewIntelligence.memoReadySummary)}`
+    ] : []),
     "",
-    ...snapshot.auditEvents.map((event) =>
+    ...auditEvents.map((event) =>
       `[${event.timestamp}] ${event.type.toUpperCase()} | ${event.status.toUpperCase()} | ${event.source} | ${sanitizeInline(event.summary)}`
     )
   ].join("\n");
 }
 
-function buildMemoPdfLines(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
+function buildMemoPdfLines(subject: SubjectProperty, snapshot: PceAnalysisSnapshot, reviewIntelligence?: ReturnType<typeof runEvidenceCourt>) {
   return [
     "KV CompLens - Property Review Memo",
     "DEMO MODE ONLY - Local synthetic evidence. Analyst review required.",
-    "Deterministic internal engine. Detailed methods are not disclosed.",
+    "Cross-platform evidence model. Proprietary methods are not disclosed.",
     "",
     `Generated: ${snapshot.generatedAt}`,
     `Subject: ${subject.address}, ${subject.city}, ${subject.province ?? "AB"}`,
@@ -223,21 +260,29 @@ function buildMemoPdfLines(subject: SubjectProperty, snapshot: PceAnalysisSnapsh
     `Estimated value range: ${formatCurrency(snapshot.valuation.lowEstimate)} to ${formatCurrency(snapshot.valuation.highEstimate)}`,
     `Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     `Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}`,
-    `Effective sample size: ${snapshot.valuation.effectiveSampleSize}`,
-    `Evidence entropy: ${Math.round(snapshot.valuation.evidenceEntropy * 100)}%`,
-    `Average match chance: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
+    `Review depth: ${snapshot.valuation.effectiveSampleSize}`,
+    `Evidence mix: ${Math.round(snapshot.valuation.evidenceEntropy * 100)}%`,
+    `Average comparable probability: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
     `Average source reliability: ${Math.round(snapshot.valuation.averageSourceReliability * 100)}%`,
-    `Residual buffer: ${formatCurrency(snapshot.valuation.residualBuffer)}`,
-    `Blend estimate: ${formatCurrency(snapshot.valuation.modelFusion.finalEstimate)} (variance ${Math.round(snapshot.valuation.modelFusion.finalVariance)})`,
+    `Review buffer: ${formatCurrency(snapshot.valuation.residualBuffer)}`,
+    `System estimate: ${formatCurrency(snapshot.valuation.modelFusion.finalEstimate)}`,
     "",
-    "Selected homes:",
+    "Selected comparables:",
     ...snapshot.valuation.adjustedComparables.flatMap((comp, index) => [
       `${index + 1}. ${comp.address} | sale ${formatCurrency(comp.salePrice)} | adjusted ${formatCurrency(comp.adjustedValue)} | ${comp.distanceKm.toFixed(1)} km | match ${Math.round(comp.totalScore)}`,
-      `   Evidence weight ${Math.round((comp.normalizedEvidenceWeight ?? comp.evidenceWeight) * 100)}% | match chance ${Math.round(comp.comparableProbability * 100)}%`
+      `   Review support ${Math.round((comp.normalizedEvidenceWeight ?? comp.evidenceWeight) * 100)}% | comparable probability ${Math.round(comp.comparableProbability * 100)}%`
     ]),
     "",
     "Review summary:",
-    ...sanitizeMultiline(snapshot.memo).split("\n")
+    ...sanitizeMultiline(snapshot.memo).split("\n"),
+    ...(reviewIntelligence ? [
+      "",
+      "Review Intelligence Summary:",
+      `Verdict: ${reviewIntelligence.verdict.label}`,
+      `Strongest comparable: ${reviewIntelligence.strongestComparable.address}`,
+      `Weakest comparable: ${reviewIntelligence.weakestSelectedComparable.address}`,
+      sanitizeInline(reviewIntelligence.memoReadySummary)
+    ] : [])
   ];
 }
 
@@ -262,13 +307,13 @@ function buildAdjustmentAppendixLines(subject: SubjectProperty, snapshot: PceAna
   ];
 }
 
-function buildEvidenceZip(subject: SubjectProperty, snapshot: PceAnalysisSnapshot) {
+function buildEvidenceZip(subject: SubjectProperty, snapshot: PceAnalysisSnapshot, options: ExportArtifactBuildOptions = {}) {
   const entries = [
-    buildExportArtifact("memo-pdf", subject, snapshot),
-    buildExportArtifact("comparables-csv", subject, snapshot),
-    buildExportArtifact("adjustments-pdf", subject, snapshot),
-    buildExportArtifact("snapshot-md", subject, snapshot),
-    buildExportArtifact("audit-txt", subject, snapshot)
+    buildExportArtifact("memo-pdf", subject, snapshot, options),
+    buildExportArtifact("comparables-csv", subject, snapshot, options),
+    buildExportArtifact("adjustments-pdf", subject, snapshot, options),
+    buildExportArtifact("snapshot-md", subject, snapshot, options),
+    buildExportArtifact("audit-txt", subject, snapshot, options)
   ].map((artifact) => ({
     name: artifact.fileName,
     bytes: toUint8Array(artifact.content)

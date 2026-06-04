@@ -113,9 +113,9 @@ export function estimateValuationRange(subject: SubjectProperty, selectedCompara
 
   const riskFlags = Array.from(new Set([
     ...adjustedComparables.flatMap((comp) => comp.riskFlags),
-    adjustedComparables.length < 3 ? "Not enough homes selected." : "",
+    adjustedComparables.length < 3 ? "Not enough comparables selected." : "",
     valueSpreadPercent > 18 ? "Wide adjusted-value spread" : "",
-    staleSales > 0 ? "Stale sale dates in selected homes." : ""
+    staleSales > 0 ? "Stale sale dates in selected comparables." : ""
   ].filter(Boolean)));
 
   return {

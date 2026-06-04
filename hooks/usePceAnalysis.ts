@@ -2,13 +2,11 @@
 
 import { useReducer } from "react";
 import { syntheticComparables } from "../lib/mockData";
-import { formatCurrency } from "../lib/format";
-import { previewCandidateImpact } from "../lib/marginalImpact";
 import { runPcePipeline, type PceAnalysisSnapshot } from "../lib/pce/runPcePipeline";
-import type { AdjustedComparable, ComparableProperty, SubjectProperty } from "../lib/types";
-import { findHighestPositiveCandidate, formatSigned } from "../lib/selectors/pceSelectors";
+import type { ComparableProperty, SubjectProperty } from "../lib/types";
+import { findHighestPositiveCandidate } from "../lib/selectors/pceSelectors";
 
-export type PceViewMode = "network" | "discovery" | "table" | "adjustments" | "valuation" | "report" | "memo";
+export type PceViewMode = "network" | "discovery" | "table" | "adjustments" | "valuation" | "report" | "memo" | "sources";
 import type { ValuationDelta } from "../packages/core/types";
 export type PceToast = { title: string; detail: string; tone: "success" | "review"; delta?: ValuationDelta };
 
@@ -21,6 +19,8 @@ export type PceAnalysisState = {
   snapshot: PceAnalysisSnapshot;
   activeView: PceViewMode;
   analysisStarted: boolean;
+  reviewIntelligenceAttached: boolean;
+  uiAuditEvents: PceAnalysisSnapshot["auditEvents"];
   toast?: PceToast;
 };
 
@@ -34,6 +34,8 @@ export type PceAnalysisAction =
   | { type: "SELECT_COMPARABLE"; id: string }
   | { type: "EXCLUDE_COMPARABLE"; id: string; generatedAt?: string }
   | { type: "SET_VIEW"; view: PceViewMode }
+  | { type: "ATTACH_REVIEW_INTELLIGENCE"; generatedAt?: string }
+  | { type: "CLEAR_REVIEW_INTELLIGENCE_ATTACHMENT" }
   | { type: "CLEAR_TOAST" };
 
 export function createBlankSubjectProperty(): SubjectProperty {
@@ -158,7 +160,9 @@ export function createInitialPceState(subject: SubjectProperty, candidates: Comp
     activeComparableId: snapshot.activeComparableId,
     snapshot,
     activeView: "network",
-    analysisStarted: true
+    analysisStarted: true,
+    reviewIntelligenceAttached: false,
+    uiAuditEvents: []
   };
 }
 
@@ -172,7 +176,9 @@ export function createBlankPceState(candidates: ComparableProperty[] = synthetic
     newCandidateId: undefined,
     snapshot: createZeroSnapshot(subject, generatedAt),
     activeView: "network",
-    analysisStarted: false
+    analysisStarted: false,
+    reviewIntelligenceAttached: false,
+    uiAuditEvents: []
   };
 }
 
@@ -185,6 +191,8 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         selectedComparableIds: state.analysisStarted ? [] : state.selectedComparableIds,
         activeComparableId: state.analysisStarted ? undefined : state.activeComparableId,
         newCandidateId: state.analysisStarted ? undefined : state.newCandidateId,
+        reviewIntelligenceAttached: state.analysisStarted ? false : state.reviewIntelligenceAttached,
+        uiAuditEvents: state.analysisStarted ? [] : state.uiAuditEvents,
         snapshot: state.analysisStarted
           ? createZeroSnapshot({ ...state.subject, [action.key]: action.value })
           : {
@@ -208,6 +216,8 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         selectedComparableIds: [],
         activeComparableId: undefined,
         newCandidateId: undefined,
+        reviewIntelligenceAttached: false,
+        uiAuditEvents: [],
         snapshot: createZeroSnapshot(action.subject),
         activeView: "network",
         analysisStarted: false,
@@ -238,9 +248,11 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         snapshot,
         activeView: "network",
         analysisStarted: true,
+        reviewIntelligenceAttached: false,
+        uiAuditEvents: [],
         toast: {
           title: "Analysis complete",
-          detail: `${snapshot.valuation.includedCompCount} homes selected for review.`,
+          detail: `${snapshot.valuation.includedCompCount} comparables selected for review.`,
           tone: "success"
         }
       };
@@ -262,8 +274,8 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
           ...state,
           newCandidateId: undefined,
           toast: {
-            title: "No stronger home available",
-            detail: "The remaining homes did not improve the review set.",
+            title: "No stronger comparable available",
+            detail: "The remaining comparables did not improve the review set.",
             tone: "review"
           }
         };
@@ -273,7 +285,7 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         activeComparableId: candidate.id,
         newCandidateId: candidate.id,
         toast: {
-          title: "Home surfaced",
+          title: "Comparable surfaced",
           detail: `${candidate.address} is ready for review.`,
           tone: "review"
         }
@@ -292,7 +304,6 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         generatedAt: action.generatedAt
       });
       const added = snapshot.valuation.adjustedComparables.find((comp) => comp.id === state.newCandidateId);
-      const confidence = snapshot.valuationDelta?.confidenceDelta ?? 0;
       return {
         ...state,
         selectedComparableIds,
@@ -300,6 +311,8 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         newCandidateId: undefined,
         snapshot,
         activeView: "network",
+        reviewIntelligenceAttached: false,
+        uiAuditEvents: [],
         toast: {
           title: "New comparable found",
           detail: `${added?.address ?? "Home"} included.`,
@@ -329,9 +342,11 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         activeComparableId: snapshot.activeComparableId,
         newCandidateId: state.newCandidateId === action.id ? undefined : state.newCandidateId,
         snapshot,
+        reviewIntelligenceAttached: false,
+        uiAuditEvents: [],
         toast: {
-          title: "Home removed",
-          detail: `${snapshot.valuation.includedCompCount} homes remain in the review set.`,
+          title: "Comparable removed",
+          detail: `${snapshot.valuation.includedCompCount} comparables remain in the review set.`,
           tone: "review"
         }
       };
@@ -341,6 +356,41 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         return state;
       }
       return { ...state, activeView: action.view };
+    case "ATTACH_REVIEW_INTELLIGENCE": {
+      if (state.reviewIntelligenceAttached) {
+        return state;
+      }
+      const timestamp = action.generatedAt ?? new Date().toISOString();
+      return {
+        ...state,
+        reviewIntelligenceAttached: true,
+        uiAuditEvents: [
+          ...state.uiAuditEvents,
+          {
+            id: `review-intelligence-v2-added-to-memo-${timestamp}`,
+            timestamp,
+            type: "review_intelligence_v2_added_to_memo",
+            source: "Review Intelligence V2",
+            status: "ready",
+            summary: "Verified review intelligence summary attached to the memo and export package."
+          }
+        ],
+        toast: {
+          title: "Review Intelligence attached",
+          detail: "The verified summary is now included in the memo-ready export path.",
+          tone: "success"
+        }
+      };
+    }
+    case "CLEAR_REVIEW_INTELLIGENCE_ATTACHMENT":
+      if (!state.reviewIntelligenceAttached && !state.uiAuditEvents.length) {
+        return state;
+      }
+      return {
+        ...state,
+        reviewIntelligenceAttached: false,
+        uiAuditEvents: []
+      };
     case "CLEAR_TOAST":
       return { ...state, toast: undefined };
     default:
@@ -351,4 +401,4 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
 export function usePceAnalysis(candidates: ComparableProperty[] = syntheticComparables) {
   return useReducer(pceAnalysisReducer, undefined, () => createBlankPceState(candidates));
 }
-
+

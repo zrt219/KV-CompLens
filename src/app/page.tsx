@@ -23,6 +23,7 @@ import {
   ListChecks,
   Lock,
   MoreHorizontal,
+  RotateCcw,
   RefreshCw,
   Search,
   ShieldCheck,
@@ -34,10 +35,12 @@ import {
 } from "lucide-react";
 import { PropertyThumbnail } from "../components/PropertyThumbnail";
 import { EvidenceBoard } from "../components/evidence-board/EvidenceBoard";
+import { ReviewIntelligenceV2Button } from "../components/review-intelligence-v2/ReviewIntelligenceV2Button";
+import { ReviewIntelligenceV2Drawer } from "../components/review-intelligence-v2/ReviewIntelligenceV2Drawer";
 import { formatCurrency } from "../../lib/agent";
-import { createAssistantContext, type AssistantDraft } from "../../lib/assistant";
+import { buildEvidenceCourtPacket } from "../../lib/review-intelligence-v2/buildEvidenceCourtPacket";
+import { runEvidenceCourt } from "../../lib/review-intelligence-v2/runEvidenceCourt";
 import { dataProvenanceLabel, publicAssessmentSources } from "../../lib/provenance";
-import { tutorialIntro, tutorialSteps } from "../../lib/tutorial";
 import { buildExportArtifact, downloadExportArtifact, exportArtifactOptions, type ExportArtifactType } from "../../lib/pce/exportPackage";
 import {
   selectAdjustmentGridViewModel,
@@ -47,6 +50,7 @@ import {
   selectMemoViewModel
 } from "../../lib/selectors/pceSelectors";
 import {
+  createBlankSubjectProperty,
   isSubjectReadyForAnalysis,
   usePceAnalysis,
   type PceToast,
@@ -54,6 +58,7 @@ import {
 } from "../../hooks/usePceAnalysis";
 import type { PceAnalysisSnapshot, PceAuditEvent } from "../../lib/pce/runPcePipeline";
 import type { AdjustedComparable, CandidateImpact, PropertyCondition, PropertyType, ScoredComparable, SubjectProperty, ValuationDelta, ValuationRange } from "../../lib/types";
+import type { CounterfactualCheck, EvidenceCourtPacket, EvidenceCourtResult } from "../../lib/review-intelligence-v2/types";
 
 type ViewMode = PceViewMode;
 type ToastState = PceToast;
@@ -75,7 +80,7 @@ export default function Home() {
   const [reportPrepared, setReportPrepared] = useState(false);
   const [adjustmentsLocked, setAdjustmentsLocked] = useState(false);
   const [readabilityMode, setReadabilityMode] = useState(false);
-  const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [reviewIntelligenceOpen, setReviewIntelligenceOpen] = useState(false);
   const [workflowPulse, setWorkflowPulse] = useState<string>();
   const workflowPulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const subject = state.subject;
@@ -91,7 +96,26 @@ export default function Home() {
   const memoView = selectMemoViewModel(state);
   const exportView = selectExportViewModel(state);
   const candidate = civicGrid.candidate;
+  const reviewIntelligencePacket = useMemo<EvidenceCourtPacket | undefined>(
+    () => state.analysisStarted ? buildEvidenceCourtPacket(state.snapshot) : undefined,
+    [state.analysisStarted, state.snapshot]
+  );
+  const reviewIntelligenceResult = useMemo<EvidenceCourtResult | undefined>(
+    () => state.analysisStarted ? runEvidenceCourt(state.snapshot) : undefined,
+    [state.analysisStarted, state.snapshot]
+  );
+  const counterfactualsByComparableId = useMemo<Record<string, CounterfactualCheck | undefined>>(
+    () => Object.fromEntries((reviewIntelligenceResult?.counterfactuals ?? [])
+      .filter((check) => Boolean(check.comparableId))
+      .map((check) => [check.comparableId as string, check])),
+    [reviewIntelligenceResult]
+  );
   const workflowStep = getWorkflowStepId(viewMode, showForm, state.analysisStarted);
+  const reviewIntelligenceDrawerVisible = reviewIntelligenceOpen
+    && state.analysisStarted
+    && workflowStep === "review"
+    && Boolean(reviewIntelligencePacket)
+    && Boolean(reviewIntelligenceResult);
   const activeNavId = workflowStep;
   const candidateDrawerVisible = state.analysisStarted && !showForm && (viewMode === "network" || viewMode === "discovery") && Boolean(state.newCandidateId) && Boolean(candidate);
   const subjectDirty = useMemo(
@@ -151,22 +175,23 @@ export default function Home() {
       }
       return;
     }
-    const nextStep: Record<WorkflowStepId, ViewMode | "subject"> = {
-      intake: "subject",
+    if (workflowStep === "adjust") {
+      prepareReport();
+      return;
+    }
+    if (workflowStep === "export") {
+      setReportPrepared(true);
+      pulseWorkflowStatus("Export package generated");
+      return;
+    }
+    const nextStep: Record<WorkflowStepId, ViewMode> = {
+      intake: "table",
       sources: "network",
       review: "adjustments",
       adjust: "report",
       export: "report"
     };
-    if (workflowStep === "adjust" || workflowStep === "export") {
-      prepareReport();
-      return;
-    }
     const next = nextStep[workflowStep];
-    if (next === "subject") {
-      openSubjectIntake();
-      return;
-    }
     if (next) {
       openWorkspaceView(next);
     }
@@ -221,6 +246,14 @@ export default function Home() {
     setReportPrepared(false);
     setAdjustmentsLocked(false);
     setShowForm(true);
+  }
+
+  function resetSubject() {
+    dispatch({ type: "LOAD_SUBJECT", subject: createBlankSubjectProperty() });
+    setReportPrepared(false);
+    setAdjustmentsLocked(false);
+    setShowForm(true);
+    pulseWorkflowStatus("Property intake reset");
   }
 
   return (
@@ -293,14 +326,20 @@ export default function Home() {
             </div>
           </div>
           <div className="actions">
-            <button className="find-action tooltip-target" type="button" onClick={findMoreComparables} disabled={!state.analysisStarted} title={!state.analysisStarted ? "Run the analysis first to find more homes." : "Surface another candidate home for review."} data-tooltip={!state.analysisStarted ? "Run the analysis first to find more homes." : "Surface another candidate home for review."}><Search size={17} /> Find More Homes</button>
+            <button className="find-action tooltip-target" type="button" onClick={findMoreComparables} disabled={!state.analysisStarted} title={!state.analysisStarted ? "Run the analysis first to find more comparable candidates." : "Surface another comparable candidate for analyst review."} data-tooltip={!state.analysisStarted ? "Run the analysis first to find more comparable candidates." : "Surface another comparable candidate for analyst review."}><Search size={17} /> Find More Comparables</button>
+            {state.analysisStarted && workflowStep === "review" && reviewIntelligenceResult && (
+              <ReviewIntelligenceV2Button
+                attached={state.reviewIntelligenceAttached}
+                onClick={() => setReviewIntelligenceOpen(true)}
+              />
+            )}
             <button className="edit-action tooltip-target" type="button" onClick={() => setShowForm(true)} title="Return to intake and edit the current property details." data-tooltip="Return to intake and edit the current property details."><SlidersHorizontal size={17} /> Edit Property</button>
             <button className="tooltip-target" type="button" onClick={prepareReport} disabled={!state.analysisStarted || !adjustmentsLocked} title={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : "Open the local export package screen."} data-tooltip={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : "Open the local export package screen."}><FileDown size={17} /> Export</button>
             <button className={clsx("icon-action tooltip-target", readabilityMode && "active")} type="button" aria-pressed={readabilityMode} aria-label="Toggle readability mode" title="Toggle higher-contrast readability mode." data-tooltip="Toggle higher-contrast readability mode." onClick={() => setReadabilityMode((value) => !value)}><Eye size={18} /></button>
             <button className="icon-action tooltip-target" type="button" aria-label="More actions unavailable in demo mode" disabled title="More actions are unavailable in this local demo." data-tooltip="More actions are unavailable in this local demo."><MoreHorizontal size={18} /></button>
-            <button className="primary-action tooltip-target" type="button" onClick={goToNextStep} disabled={!canRunAnalysis && !state.analysisStarted} title={!canRunAnalysis && !state.analysisStarted ? "Fill in the property details first." : state.analysisStarted ? "Move to the next review step." : "Run the local property analysis."} data-tooltip={!canRunAnalysis && !state.analysisStarted ? "Fill in the property details first." : state.analysisStarted ? "Move to the next review step." : "Run the local property analysis."}>
+            <button className="primary-action tooltip-target" type="button" onClick={goToNextStep} disabled={!canRunAnalysis && !state.analysisStarted} title={primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).tooltip} data-tooltip={primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).tooltip}>
               {!state.analysisStarted ? <RefreshCw size={17} /> : <ChevronRight size={17} />}
-              {state.analysisStarted ? "Next Step" : "Run Analysis"}
+              {primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).label}
             </button>
           </div>
         </header>
@@ -312,11 +351,10 @@ export default function Home() {
             dirty={subjectDirty}
             canRunAnalysis={canRunAnalysis}
             analysisStarted={state.analysisStarted}
-            tutorialOpen={tutorialOpen}
-            onToggleTutorial={() => setTutorialOpen((value) => !value)}
             update={update}
             runAnalysis={runAnalysis}
             loadExample={loadExampleSubject}
+            resetSubject={resetSubject}
           />
         ) : (
           <>
@@ -328,6 +366,7 @@ export default function Home() {
                 activeComparableId={civicGrid.activeComparableId}
                 newCandidateId={state.newCandidateId}
                 valuation={state.snapshot.valuation}
+                counterfactualsByComparableId={counterfactualsByComparableId}
                 onSelectComparable={(id) => dispatch({ type: "SELECT_COMPARABLE", id })}
                 onFindCandidate={findMoreComparables}
                 onRunAnalysis={runAnalysis}
@@ -337,7 +376,7 @@ export default function Home() {
             {viewMode === "table" && <SourceScanView snapshot={state.snapshot} onRunAnalysis={runAnalysis} />}
             {viewMode === "adjustments" && <AdjustmentView viewModel={adjustmentGrid} adjustmentsLocked={adjustmentsLocked} onSelect={(id) => dispatch({ type: "SELECT_COMPARABLE", id })} onExclude={(id) => { dispatch({ type: "EXCLUDE_COMPARABLE", id }); setReportPrepared(false); setAdjustmentsLocked(false); }} onLock={() => { setAdjustmentsLocked(true); }} />}
             {viewMode === "valuation" && <ValuationSummary snapshot={state.snapshot} newCompId={state.newCandidateId} />}
-            {viewMode === "report" && <ReportReady viewModel={exportView} memoView={memoView} subject={state.snapshot.subject} snapshot={state.snapshot} reportPrepared={reportPrepared} subjectDirty={subjectDirty} adjustmentsLocked={adjustmentsLocked} onOpenIntake={openSubjectIntake} onOpenAdjustments={() => openWorkspaceView("adjustments")} onGenerate={() => { setReportPrepared(true); pulseWorkflowStatus("Export package generated"); }} />}
+            {viewMode === "report" && <ReportReady viewModel={exportView} memoView={memoView} subject={state.snapshot.subject} snapshot={state.snapshot} reportPrepared={reportPrepared} subjectDirty={subjectDirty} adjustmentsLocked={adjustmentsLocked} reviewIntelligenceResult={reviewIntelligenceResult} onOpenIntake={openSubjectIntake} onOpenAdjustments={() => openWorkspaceView("adjustments")} onGenerate={() => { setReportPrepared(true); pulseWorkflowStatus("Export package generated"); }} />}
           </>
         )}
 
@@ -356,6 +395,18 @@ export default function Home() {
           {state.toast && <Toast toast={state.toast} onClose={() => dispatch({ type: "CLEAR_TOAST" })} />}
         </AnimatePresence>
 
+        <AnimatePresence>
+          {reviewIntelligenceDrawerVisible && reviewIntelligencePacket && reviewIntelligenceResult && (
+            <ReviewIntelligenceV2Drawer
+              packet={reviewIntelligencePacket}
+              result={reviewIntelligenceResult}
+              attached={state.reviewIntelligenceAttached}
+              onAddToMemo={() => dispatch({ type: "ATTACH_REVIEW_INTELLIGENCE" })}
+              onClose={() => setReviewIntelligenceOpen(false)}
+            />
+          )}
+        </AnimatePresence>
+
       </section>
 
       <InsightsRail
@@ -370,13 +421,14 @@ export default function Home() {
 function titleForView(viewMode: ViewMode, showForm: boolean) {
   if (showForm) return "Property Intake";
   const titles: Record<ViewMode, string> = {
-    network: "Review Homes",
-    discovery: "Review Homes",
+    network: "Review Comparables",
+    discovery: "Review Comparables",
     table: "Source Scan",
     adjustments: "Adjustments",
     valuation: "Adjustments",
     report: "Export Package",
-    memo: "Export Package"
+    memo: "Export Package",
+    sources: "Source Scan"
   };
   return titles[viewMode];
 }
@@ -408,6 +460,29 @@ function workflowStepToView(step: WorkflowStepId): ViewMode {
   return mapping[step];
 }
 
+function primaryActionCopy(workflowStep: WorkflowStepId, analysisStarted: boolean, canRunAnalysis: boolean, adjustmentsLocked: boolean) {
+  if (!analysisStarted) {
+    return canRunAnalysis
+      ? { label: "Run Analysis", tooltip: "Run the local source scan and comparable review." }
+      : { label: "Run Analysis", tooltip: "Fill in the property details first." };
+  }
+  if (workflowStep === "sources") {
+    return { label: "Go to Review", tooltip: "Open the comparable review board." };
+  }
+  if (workflowStep === "review") {
+    return { label: "Go to Adjustments", tooltip: "Open the adjustment review for the selected comparables." };
+  }
+  if (workflowStep === "adjust") {
+    return adjustmentsLocked
+      ? { label: "Go to Export", tooltip: "Open the local export package screen." }
+      : { label: "Go to Export", tooltip: "Confirm and lock the adjustments before exporting." };
+  }
+  if (workflowStep === "export") {
+    return { label: "Export Report", tooltip: "Generate the local demo export package." };
+  }
+  return { label: "Go to Sources", tooltip: "Open the source scan summary." };
+}
+
 
 
 function getWorkflowStatus({
@@ -430,7 +505,7 @@ function getWorkflowStatus({
   if (workflowPulse) {
     return {
       label: workflowPulse,
-      detail: "The system is refreshing the home review now.",
+      detail: "The system is refreshing the comparable review now.",
       tone: "review" as const,
       icon: RefreshCw
     };
@@ -462,15 +537,15 @@ function getWorkflowStatus({
   if (workflowStep === "sources") {
     return {
       label: "Source scan ready",
-      detail: "Check the source summary before moving into home review.",
+      detail: "Check the source summary before moving into comparable review.",
       tone: "review" as const,
       icon: ListChecks
     };
   }
   if (workflowStep === "review") {
     return {
-      label: "Review homes",
-      detail: "Inspect the selected homes and surface a stronger comp if needed.",
+      label: "Review comparables",
+      detail: "Inspect the selected comparables and surface a stronger comp if needed.",
       tone: "review" as const,
       icon: Layers3
     };
@@ -497,7 +572,7 @@ function getWorkflowStatus({
   }
   return {
     label: "Ready to move forward",
-    detail: "Homes are loaded. Review them, then confirm adjustments before export.",
+    detail: "Comparables are loaded. Review them, then confirm adjustments before export.",
     tone: "confirmed" as const,
     icon: CheckCircle2
   };
@@ -507,7 +582,13 @@ function formatConfidenceLevel(level: string) {
   return level === "Review Required" ? "Review needed" : level;
 }
 
-function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorialOpen, onToggleTutorial, update, runAnalysis, loadExample }: { subject: SubjectProperty; dirty: boolean; canRunAnalysis: boolean; analysisStarted: boolean; tutorialOpen: boolean; onToggleTutorial: () => void; update: <K extends keyof SubjectProperty>(key: K, value: SubjectProperty[K]) => void; runAnalysis: () => void; loadExample: () => void }) {
+function confidenceRingClass(score: number) {
+  if (score >= 70) return "confidence-high-ring";
+  if (score >= 60) return "confidence-balanced-ring";
+  return "confidence-review-ring";
+}
+
+function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, update, runAnalysis, loadExample, resetSubject }: { subject: SubjectProperty; dirty: boolean; canRunAnalysis: boolean; analysisStarted: boolean; update: <K extends keyof SubjectProperty>(key: K, value: SubjectProperty[K]) => void; runAnalysis: () => void; loadExample: () => void; resetSubject: () => void }) {
   const subjectTitle = subject.address.trim() || "No property entered";
   const locationLine = subject.city.trim()
     ? [subject.city, subject.province, subject.neighbourhood].filter(Boolean).join(" / ")
@@ -530,53 +611,11 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
 
   return (
     <section className="subject-intake-view">
-      <section className="tutorial-panel" aria-labelledby="tutorial-title">
-        <div className="tutorial-panel-head">
-          <div>
-            <span className="card-label">Quick tutorial</span>
-            <h3 id="tutorial-title">How to use KV CompLens</h3>
-            <p>{tutorialIntro}</p>
-          </div>
-          <button
-            className="tutorial-toggle tooltip-target"
-            type="button"
-            aria-expanded={tutorialOpen}
-            aria-controls="tutorial-steps"
-            title={tutorialOpen ? "Hide the tutorial cards." : "Show the full tutorial walkthrough."}
-            data-tooltip={tutorialOpen ? "Hide the tutorial cards." : "Show the full tutorial walkthrough."}
-            onClick={onToggleTutorial}
-          >
-            {tutorialOpen ? "Hide walkthrough" : "Show walkthrough"}
-          </button>
-        </div>
-        {tutorialOpen ? (
-          <div className="tutorial-steps" id="tutorial-steps">
-            {tutorialSteps.map((step, index) => {
-              const Icon = tutorialStepIcons[step.id] ?? Info;
-              return (
-                <article key={step.id} className="tutorial-step">
-                  <div className="tutorial-step-head">
-                    <span className="tutorial-step-index">{index + 1}</span>
-                    <Icon size={16} aria-hidden />
-                  </div>
-                  <h4>{step.title}</h4>
-                  <p>{step.detail}</p>
-                  <small>{step.note}</small>
-                </article>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="tutorial-collapsed">
-            <p>Tutorial hidden. Use the button above to show the walkthrough again.</p>
-          </div>
-        )}
-      </section>
       <div className="success-banner subject-intake-banner">
         <ShieldCheck size={34} />
         <div>
           <strong>Property details</strong>
-          <p>Enter the property details before homes or value results appear.</p>
+          <p>Enter the property details before comparable or value results appear.</p>
         </div>
       </div>
       <div className="subject-intake-layout">
@@ -616,8 +655,9 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
             <Field label="Longitude" type="number" step="0.0001" value={numberFieldValue(subject.longitude)} onChange={(value) => update("longitude", Number(value))} />
           </div>
           <div className="form-actions subject-actions">
+            <button className="reset-action tooltip-target" type="button" title="Clear the intake form and reset the current review." data-tooltip="Clear the intake form and reset the current review." onClick={resetSubject}><RotateCcw size={16} /> Reset</button>
             <button className="tooltip-target" type="button" title="Load a complete demo property so you can review the full workflow." data-tooltip="Load a complete demo property so you can review the full workflow." onClick={() => { update("address", "12345 109 St NW"); update("propertyType", "Detached"); update("city", "Edmonton"); loadExample(); }}>Use Example Property</button>
-            <button className="primary-action tooltip-target" type="submit" disabled={!canRunAnalysis} title={!canRunAnalysis ? "Enter the property details first." : "Run the local source scan and home review."} data-tooltip={!canRunAnalysis ? "Enter the property details first." : "Run the local source scan and home review."}>Run Analysis</button>
+            <button className="primary-action tooltip-target" type="submit" disabled={!canRunAnalysis} title={!canRunAnalysis ? "Enter the property details first." : "Run the local source scan and comparable review."} data-tooltip={!canRunAnalysis ? "Enter the property details first." : "Run the local source scan and comparable review."}>Run Analysis</button>
           </div>
         </form>
         <aside className="subject-preview-stack">
@@ -656,14 +696,6 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
   );
 }
 
-const tutorialStepIcons: Record<string, ComponentType<{ size?: number; "aria-hidden"?: boolean }>> = {
-  "enter-details": ClipboardCheck,
-  "run-analysis": RefreshCw,
-  "source-scan": ListChecks,
-  "review-homes": Target,
-  "confirm-export": FileDown
-};
-
 function WorkflowProgress({
   viewModel,
   workflowStep,
@@ -691,13 +723,13 @@ function WorkflowProgress({
     {
       label: "Review",
       short: "Review",
-      value: analysisStarted ? viewModel.candidateSummary : "No homes ranked yet",
+      value: analysisStarted ? viewModel.candidateSummary : "No comparables ranked yet",
       state: currentIndex === 2 ? "active" : currentIndex > 2 ? "complete" : "pending"
     },
     {
       label: "Adjust",
       short: "Adjust",
-      value: analysisStarted ? viewModel.adjustmentSummary : "No homes confirmed yet",
+      value: analysisStarted ? viewModel.adjustmentSummary : "No comparables confirmed yet",
       state: currentIndex === 3 ? "active" : currentIndex > 3 ? "complete" : "pending"
     },
     {
@@ -727,8 +759,8 @@ function ComparableDrawer({ candidate, impact, onClose, onAdd }: { candidate: Sc
       <motion.section className="comp-drawer" initial={{ x: 420 }} animate={{ x: 0 }} exit={{ x: 420 }} transition={{ duration: 0.2 }}>
         <div className="drawer-head">
           <div>
-            <span className="status-chip review">New home found</span>
-            <h3>Review the home before adding it</h3>
+            <span className="status-chip review">New comparable found</span>
+            <h3>Review the comparable before adding it</h3>
           </div>
           <button aria-label="Close drawer" type="button" onClick={onClose}><X size={20} /></button>
         </div>
@@ -742,7 +774,7 @@ function ComparableDrawer({ candidate, impact, onClose, onAdd }: { candidate: Sc
             <small>{candidate.sourceName ?? "Simulated home sales dataset"} / {candidate.daysSinceSale} days since sale</small>
           </div>
         </div>
-        <h4>Why this home surfaced</h4>
+        <h4>Why this comparable surfaced</h4>
         <ul className="check-list">
           {candidate.reasons?.map((reason) => <li key={reason}><CheckCircle2 size={17} /> {sentenceCase(reason)}</li>)}
           <li><CheckCircle2 size={17} /> Sold on {candidate.saleDate}, {candidate.daysSinceSale} days before the review date.</li>
@@ -761,10 +793,10 @@ function ComparableDrawer({ candidate, impact, onClose, onAdd }: { candidate: Sc
           <Metric label="Confidence" value={impact ? formatSigned(impact.delta.confidenceDelta) + " pts" : "Pending"} />
           <Metric label="Midpoint" value={impact ? formatSignedCurrency(impact.delta.pointDelta) : "Pending"} />
           <Metric label="Range width" value={impact ? formatSignedCurrency(impact.delta.rangeWidthDelta) : "Pending"} />
-          <Metric label="Home count" value={impact ? formatSigned(impact.delta.compCountDelta) : "Pending"} />
-          <Metric label="Information gain" value={impact ? impact.marginalInformationGain.toFixed(3) : "Pending"} />
-          <Metric label="Effective sample" value={impact ? formatSigned(impact.deltaEffectiveSampleSize) : "Pending"} />
-          <Metric label="Evidence balance" value={impact ? formatSigned(impact.deltaEntropy) : "Pending"} />
+          <Metric label="Comparable count" value={impact ? formatSigned(impact.delta.compCountDelta) : "Pending"} />
+          <Metric label="Review impact" value={impact ? formatReviewImpact(impact.marginalInformationGain) : "Pending"} />
+          <Metric label="Review depth" value={impact ? formatSigned(impact.deltaEffectiveSampleSize) : "Pending"} />
+          <Metric label="Evidence mix" value={impact ? formatEvidenceMix(impact.deltaEntropy) : "Pending"} />
           <Metric label="Risk change" value={impact ? formatSigned(impact.riskChange) : "Pending"} />
           <Metric label="Result" value={impact ? (impact.delta.rangeNarrowed ? "Narrows range" : "Expands range") : "Pending"} />
         </div>
@@ -803,7 +835,7 @@ function InsightsRail({
           <section className="insight-card confidence-card">
             <span className="card-label">Confidence</span>
             <div className="confidence-row">
-              <div className="ring" style={{ "--score": "0deg" } as CSSProperties}>N/A</div>
+              <div className="ring confidence-waiting-ring" style={{ "--score": "0deg" } as CSSProperties}>N/A</div>
               <div>
                 <strong>Waiting for property details</strong>
                 <p>Confidence appears after the review set is built.</p>
@@ -811,12 +843,12 @@ function InsightsRail({
             </div>
           </section>
           <section className="insight-card selected-card">
-            <span className="card-label">Selected home</span>
-            <div className="zero-state-note">No home selected yet. Run the analysis to populate the review set.</div>
+            <span className="card-label">Selected comparable</span>
+            <div className="zero-state-note">No comparable selected yet. Run the analysis to populate the review set.</div>
           </section>
           <section className="insight-card">
-            <span className="card-label">Why these homes fit</span>
-            <div className="zero-state-note">Run the analysis to see how the selected homes compare.</div>
+            <span className="card-label">Why these comparables fit</span>
+            <div className="zero-state-note">Run the analysis to see how the selected comparables compare.</div>
           </section>
           <section className="insight-card">
             <span className="card-label">Source check summary</span>
@@ -827,7 +859,7 @@ function InsightsRail({
             <span className="card-label">Review flags</span>
             <div className="zero-state-note">No review flags yet. They appear after the analysis runs.</div>
           </section>
-          <section className="insight-card">
+          <section className="insight-card recent-updates-card">
             <span className="card-label">Recent updates</span>
             <ActivityTimeline items={[]} emptyMessage="Waiting for the analysis to start." />
             <button className="rail-action" type="button" onClick={onReport} disabled title="Run the analysis first to open the export preview."><FileDown size={16} /> Open export preview</button>
@@ -841,54 +873,56 @@ function InsightsRail({
         <p>{analysisStarted ? <>Current estimate <b>{viewModel.pointEstimate}</b></> : "Enter the property details and run the analysis to see the value range."}</p>
         <div className="range-track"><i /></div>
         <div className="range-labels"><span>{viewModel.lowEstimate}</span><span>{viewModel.highEstimate}</span></div>
+        <small className="rail-method-note">Cross-platform evidence model, local demo data.</small>
       </section>
       <section className="insight-card confidence-card">
         <span className="card-label">Confidence</span>
         <div className="confidence-row">
-          <div className="ring" style={{ "--score": `${Math.round(viewModel.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(viewModel.confidenceScore)}%</div>
+          <div className={clsx("ring", confidenceRingClass(viewModel.confidenceScore))} style={{ "--score": `${Math.round(viewModel.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(viewModel.confidenceScore)}%</div>
           <div>
             <strong>{analysisStarted ? `${viewModel.confidenceLevel} confidence` : "Waiting for property details"}</strong>
             <p>{viewModel.confidenceRationale}</p>
           </div>
         </div>
+        <small className="rail-method-note">Snapshot-driven from review depth, evidence spread, source reliability, and review flags.</small>
       </section>
       <section className="insight-card selected-card">
-        <span className="card-label">Selected home</span>
+        <span className="card-label">Selected comparable</span>
         {selectedComp && (
           <>
             <strong>{selectedComp.address}</strong>
             <p>{selectedComp.city} / {selectedComp.neighbourhood}</p>
-            <div className="selected-risk"><Info size={15} /> {selectedComp.riskFlags[0] ?? "No major review flags for this home."}</div>
+            <div className="selected-risk"><Info size={15} /> {selectedComp.riskFlags[0] ?? "No major review flags for this comparable."}</div>
             <div className="selected-metrics">
               <Metric label="Score" value={`${selectedComp.totalScore}/100`} />
               <Metric label="Adjusted" value={formatCurrency(selectedComp.adjustedValue)} />
               <Metric label="Distance" value={`${selectedComp.distanceKm.toFixed(1)} km`} />
-              <Metric label="Match chance" value={`${selectedComp.comparableProbabilityPercent}%`} />
+              <Metric label="Comparable probability" value={`${selectedComp.comparableProbabilityPercent}%`} />
             </div>
           </>
         )}
         {!selectedComp && (
           <div className="zero-state-note">
-            No home selected yet. Run the analysis to populate the review set.
+            No comparable selected yet. Run the analysis to populate the review set.
           </div>
         )}
       </section>
       <section className="insight-card">
-        <span className="card-label">Why these homes fit</span>
+        <span className="card-label">Why these comparables fit</span>
         <Factor label="Location fit" value={viewModel.distanceRange} state={analysisStarted ? "High" : "Review"} />
         <Factor label="Average Match" value={viewModel.averageMatch} state={analysisStarted && (viewModel.confidenceSupportsReview || viewModel.averageScore >= viewModel.valuation.averageSimilarity) ? "High" : "Review"} />
-        <Factor label="Match chance" value={viewModel.averageComparableProbability} state={analysisStarted && viewModel.valuation.normalizedRiskSeverity === 0 ? "High" : "Review"} />
-        <Factor label="Review size" value={viewModel.effectiveSampleSize} state={analysisStarted && !viewModel.valuationRiskFlags.has("Not enough homes selected.") ? "High" : "Review"} />
+        <Factor label="Comparable probability" value={viewModel.averageComparableProbability} state={analysisStarted && viewModel.valuation.normalizedRiskSeverity === 0 ? "High" : "Review"} />
+        <Factor label="Review size" value={viewModel.effectiveSampleSize} state={analysisStarted && !viewModel.valuationRiskFlags.has("Not enough comparables selected.") ? "High" : "Review"} />
         <Factor label="Source quality" value={viewModel.averageSourceReliability} state={analysisStarted && viewModel.valuation.averageSourceReliability >= viewModel.valuation.averageComparableProbability ? "High" : "Review"} />
         <Factor label="Value range width" value={viewModel.valueSpread} state={analysisStarted && !viewModel.valuationRiskFlags.has("Wide adjusted-value spread") ? "High" : "Review"} />
       </section>
       <section className="insight-card">
         <span className="card-label">Source check summary</span>
-        <Metric label="Homes scanned" value={`${viewModel.sourceScan.syntheticRecentSalesScanned} simulated records`} />
+        <Metric label="Comparables scanned" value={`${viewModel.sourceScan.syntheticRecentSalesScanned} simulated records`} />
         <Metric label="Public records matched" value={`${viewModel.sourceScan.municipalAssessmentReferences} matched`} />
-        <Metric label="Homes to review" value={`${viewModel.sourceScan.candidatePoolCount} ranked / ${viewModel.sourceScan.rejectedCount} lower-ranked`} />
+        <Metric label="Comparables to review" value={`${viewModel.sourceScan.candidatePoolCount} ranked / ${viewModel.sourceScan.rejectedCount} lower-ranked`} />
         <Metric label="Estimated time saved" value={`${viewModel.sourceScan.estimatedManualTimeSavedHours} hrs`} />
-        <small>{viewModel.sourceScan.dataBoundaryNote}</small>
+        <small className="rail-method-note">{viewModel.sourceScan.dataBoundaryNote}</small>
       </section>
       <section className="insight-card">
         <span className="card-label">Review flags</span>
@@ -898,7 +932,7 @@ function InsightsRail({
           <div className="zero-state-note">No review flags yet. They appear after the analysis runs.</div>
         )}
       </section>
-      <section className="insight-card">
+      <section className="insight-card recent-updates-card">
         <span className="card-label">Recent updates</span>
         <ActivityTimeline
           items={viewModel.auditEvents.slice(0, 6)}
@@ -918,7 +952,7 @@ function DiscoveryView({ subject, ranked, rejected, selectedIds, activeComparabl
   return (
     <section className="discovery-layout">
       <div className="discovery-list">
-        <div className="section-title"><h3>Top Home Matches</h3><button type="button" onClick={onFindMore}><Search size={16} /> Find More Homes</button></div>
+        <div className="section-title"><h3>Top Comparable Matches</h3><button type="button" onClick={onFindMore}><Search size={16} /> Find More Comparables</button></div>
         {topCandidates.length ? topCandidates.map((comp, index) => (
           <button
             key={comp.id}
@@ -937,9 +971,9 @@ function DiscoveryView({ subject, ranked, rejected, selectedIds, activeComparabl
             <div><strong>{comp.address}</strong><small>{comp.city}, AB / {comp.distanceKm.toFixed(1)} km / sold {comp.daysSinceSale} days ago</small></div>
             <em>{`Score ${Math.round(comp.totalScore)}`}</em>
           </button>
-        )) : <div className="empty-state">All of the strongest homes are already selected. Find more homes to widen the review set.</div>}
+        )) : <div className="empty-state">All of the strongest comparables are already selected. Find candidates to widen the review set.</div>}
         <div className="rejected-list">
-          <strong>Excluded / lower-ranked homes</strong>
+          <strong>Excluded / lower-ranked comparables</strong>
           {rejected.slice(0, 4).map((comp) => <small key={comp.id}>{comp.address}: {comp.rejectionReason}</small>)}
         </div>
       </div>
@@ -963,18 +997,18 @@ function DiscoveryView({ subject, ranked, rejected, selectedIds, activeComparabl
             <strong>{comp.address}</strong>
             <small>{comp.distanceKm.toFixed(1)} km / Score {Math.round(comp.totalScore)}</small>
           </button>
-        )) : <div className="candidate-board-empty">No new home cards to plot on the discovery board.</div>}
+        )) : <div className="candidate-board-empty">No new comparable cards to plot on the discovery board.</div>}
       </div>
       <div className="discovery-insight">
         <span className="status-chip review"><Star size={14} /> Best match found</span>
-        <h3>{bestCandidate?.address ?? "No home available"}</h3>
-        <p>{bestCandidate ? `${bestCandidate.address} improves coverage across similarity, timing, and location.` : "All of the strongest homes are already in the selected set. Find more homes to widen coverage."}</p>
+        <h3>{bestCandidate?.address ?? "No comparable available"}</h3>
+        <p>{bestCandidate ? `${bestCandidate.address} improves coverage across similarity, timing, and location.` : "All of the strongest comparables are already in the selected set. Find candidates to widen coverage."}</p>
         {bestCandidate && <PropertyThumbnail propertyType={bestCandidate.propertyType} seed={bestCandidate.address} isNew={newCompId === bestCandidate.id} />}
         <Factor label="Best available match" value={bestCandidate ? `${Math.round(bestCandidate.totalScore)}/100 score` : "None"} state={bestCandidate ? "High" : "Review"} />
         <Factor label="Distance" value={bestCandidate ? `${bestCandidate.distanceKm.toFixed(1)} km` : "N/A"} state="Review" />
         <Factor label="Recency" value={bestCandidate ? `${bestCandidate.daysSinceSale} days since sale` : "N/A"} state={bestCandidate && !bestCandidate.riskFlags.includes("Stale sale date") ? "High" : "Review"} />
-        <Factor label="Coverage" value={`${selectedIds.size} homes selected`} state="High" />
-        <button className="primary-action" type="button" onClick={onFindMore}><Target size={16} /> Surface strongest home</button>
+        <Factor label="Coverage" value={`${selectedIds.size} comparables selected`} state="High" />
+        <button className="primary-action" type="button" onClick={onFindMore}><Target size={16} /> Surface strongest comparable</button>
       </div>
     </section>
   );
@@ -996,7 +1030,7 @@ function SourceScanView({ snapshot, onRunAnalysis }: { snapshot: PceAnalysisSnap
       <div className="source-scan-head">
         <div>
           <h3>Data Check</h3>
-          <p>Review, clean, and score local demo sources before homes are ranked.</p>
+          <p>Review, clean, and score local demo sources before comparables are ranked.</p>
         </div>
         <div className="scan-actions">
           <button className="primary-action" type="button" onClick={onRunAnalysis}><RefreshCw size={16} /> Run data check</button>
@@ -1008,7 +1042,7 @@ function SourceScanView({ snapshot, onRunAnalysis }: { snapshot: PceAnalysisSnap
           <div key={step} className={clsx(index === 4 && "active")}>
             <CheckCircle2 size={18} />
             <strong>{step}</strong>
-            <span>{index === 1 ? `${scan.recordsScanned.toLocaleString()} records` : index === 4 ? `${scan.candidatePoolCount.toLocaleString()} homes` : "Complete"}</span>
+            <span>{index === 1 ? `${scan.recordsScanned.toLocaleString()} records` : index === 4 ? `${scan.candidatePoolCount.toLocaleString()} comps` : "Complete"}</span>
           </div>
         ))}
       </div>
@@ -1016,8 +1050,8 @@ function SourceScanView({ snapshot, onRunAnalysis }: { snapshot: PceAnalysisSnap
         <Metric label="Sources checked" value={String(scan.sourcesConsolidated)} />
         <Metric label="Records found" value={scan.recordsScanned.toLocaleString()} />
         <Metric label="Matches found" value={(scan.syntheticRecentSalesMatched + scan.assessmentRecordsMatched + scan.listingRecordsMatched).toLocaleString()} />
-        <Metric label="Homes to review" value={scan.candidatePoolCount.toLocaleString()} />
-        <Metric label="Homes selected" value={scan.selectedCompCount.toLocaleString()} />
+        <Metric label="Comparables to review" value={scan.candidatePoolCount.toLocaleString()} />
+        <Metric label="Comparables selected" value={scan.selectedCompCount.toLocaleString()} />
       </div>
       <section className="scan-results-card">
         <div className="section-title">
@@ -1077,7 +1111,7 @@ function SourceScanView({ snapshot, onRunAnalysis }: { snapshot: PceAnalysisSnap
         <section className="insight-card source-quality-card">
           <h3>Source quality summary</h3>
           <div className="confidence-row">
-            <div className="ring" style={{ "--score": "302deg" } as CSSProperties}>84%</div>
+            <div className="ring source-quality-ring" style={{ "--score": "302deg" } as CSSProperties}>84%</div>
             <div><strong>Good coverage</strong><p>Weighted by matched records and reliability.</p></div>
           </div>
           <DeltaRow label="Completeness" value="88%" />
@@ -1135,7 +1169,7 @@ function AdjustmentView({ viewModel, adjustmentsLocked, onSelect, onExclude, onL
     <section className="adjustment-shell">
       <div className="adjustment-card">
         <div className="success-banner"><CheckCircle2 size={34} /><div><strong>Adjustments ready</strong><p>Adjustments are transparent and reviewable. The system proposes them, and the analyst confirms them before export.</p></div></div>
-        <div className="adjustment-comp-strip" style={{ "--comp-strip-cols": comps.length + 1 } as CSSProperties} aria-label="Selected home adjustment set">
+        <div className="adjustment-comp-strip" style={{ "--comp-strip-cols": comps.length + 1 } as CSSProperties} aria-label="Selected comparable adjustment set">
           <article className="adjustment-strip-subject">
             <span>Property</span>
             <PropertyThumbnail propertyType={viewModel.subject.propertyType} seed={viewModel.subject.address} isSubject compact />
@@ -1149,7 +1183,7 @@ function AdjustmentView({ viewModel, adjustmentsLocked, onSelect, onExclude, onL
               type="button"
               onClick={() => onSelect(comp.id)}
             >
-              <span>Home {index + 1}</span>
+              <span>Comp {index + 1}</span>
               <PropertyThumbnail propertyType={comp.propertyType} seed={comp.address} compact />
               <strong>{comp.address}</strong>
               <small>{formatCurrency(comp.salePrice)} / Adj. {formatCurrency(comp.adjustedValue)}</small>
@@ -1162,9 +1196,9 @@ function AdjustmentView({ viewModel, adjustmentsLocked, onSelect, onExclude, onL
           {comps.map((comp, index) => (
             <div key={comp.id} className={clsx("grid-head", viewModel.activeComparableId === comp.id && "selected", viewModel.newCandidateId === comp.id && "new-column")} role="columnheader">
               <button type="button" onClick={() => onSelect(comp.id)}>
-                <span>{viewModel.newCandidateId === comp.id ? "New home" : `Home ${index + 1}`}</span><strong>{comp.address}</strong>
+                <span>{viewModel.newCandidateId === comp.id ? "New comp" : `Comp ${index + 1}`}</span><strong>{comp.address}</strong>
               </button>
-              <button className="table-action" type="button" onClick={() => onExclude(comp.id)} disabled={adjustmentsLocked} title={adjustmentsLocked ? "Unlock the review set before removing a home." : undefined}>Exclude</button>
+              <button className="table-action" type="button" onClick={() => onExclude(comp.id)} disabled={adjustmentsLocked} title={adjustmentsLocked ? "Unlock the review set before removing a comparable." : undefined}>Exclude</button>
             </div>
           ))}
           {rows.map(({ label, compValue, subjectValue }) => {
@@ -1214,10 +1248,10 @@ function AdjustmentView({ viewModel, adjustmentsLocked, onSelect, onExclude, onL
             <article className={clsx("adjustment-mobile-card", viewModel.activeComparableId === comp.id && "selected", viewModel.newCandidateId === comp.id && "new-column")} key={comp.id}>
               <header>
                 <button type="button" onClick={() => onSelect(comp.id)}>
-                  <span>{viewModel.newCandidateId === comp.id ? "New home" : `Home ${index + 1}`}</span>
+                  <span>{viewModel.newCandidateId === comp.id ? "New comp" : `Comp ${index + 1}`}</span>
                   <strong>{comp.address}</strong>
                 </button>
-                <button className="table-action" type="button" onClick={() => onExclude(comp.id)} disabled={adjustmentsLocked} title={adjustmentsLocked ? "Unlock the review set before removing a home." : undefined}>Exclude</button>
+                <button className="table-action" type="button" onClick={() => onExclude(comp.id)} disabled={adjustmentsLocked} title={adjustmentsLocked ? "Unlock the review set before removing a comparable." : undefined}>Exclude</button>
               </header>
               <dl>
                 {rows.map(({ label, compValue }) => {
@@ -1249,14 +1283,14 @@ function ImpactPanel({ delta, valuation, locked, onLock }: { delta?: ValuationDe
     <aside className="impact-panel">
       <h3>Impact on value range</h3>
       <Metric label="Current range" value={`${formatCurrency(valuation.lowEstimate)} - ${formatCurrency(valuation.highEstimate)}`} />
-      <Metric label="Basis" value="Adjusted home sales" />
+      <Metric label="Basis" value="Adjusted comparable sales" />
       <Metric label="Midpoint change" value={delta ? formatSignedCurrency(delta.pointDelta) : "Baseline"} />
       <Metric label="Confidence change" value={delta ? `${formatSigned(delta.confidenceDelta)} pts` : "Baseline"} />
       <Metric label="Range width" value={delta ? (delta.rangeNarrowed ? "Narrowed" : "Expanded") : "Baseline"} />
-      <Metric label="Evidence gain" value={delta?.marginalInformationGain ? delta.marginalInformationGain.toFixed(3) : "Baseline"} />
-      <Metric label="Range method" value="Adjusted home sales" />
+      <Metric label="Review impact" value={delta?.marginalInformationGain ? formatReviewImpact(delta.marginalInformationGain) : "Baseline"} />
+      <Metric label="Review method" value="Adjusted comparable sales" />
       <button className={clsx("primary-action", locked && "locked-action")} type="button" onClick={onLock} disabled={locked} aria-disabled={locked}><Lock size={16} /> {locked ? "Adjustments Locked" : "Confirm and Lock"}</button>
-      <div className="impact-note"><RefreshCw size={16} /> The value range updates automatically when the home set changes.</div>
+      <div className="impact-note"><RefreshCw size={16} /> The value range updates automatically when the comparable set changes.</div>
     </aside>
   );
 }
@@ -1269,158 +1303,50 @@ function ValuationSummary({ snapshot, newCompId }: { snapshot: PceAnalysisSnapsh
         <div>
           <span className="card-label">Estimated value</span>
           <strong>{formatCurrency(snapshot.valuation.pointEstimate)}</strong>
-          <p>Derived from adjusted home sales, not a guess.</p>
+          <p>Derived from adjusted comparable sales, not a guess.</p>
         </div>
         <div className="confidence-row">
-          <div className="ring" style={{ "--score": `${Math.round(snapshot.valuation.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(snapshot.valuation.confidenceScore)}%</div>
+          <div className={clsx("ring", confidenceRingClass(snapshot.valuation.confidenceScore))} style={{ "--score": `${Math.round(snapshot.valuation.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(snapshot.valuation.confidenceScore)}%</div>
           <div><h3>{formatConfidenceLevel(snapshot.valuation.confidenceLevel)} confidence</h3><p>{snapshot.valuation.confidenceRationale}</p></div>
         </div>
       </div>
       <div className="improvement-chips">
-        <span className={delta ? "confirmed" : "neutral"}>{delta ? <CheckCircle2 size={16} /> : <Info size={16} />} {delta ? `${formatSigned(delta.compCountDelta)} home count change` : "Baseline home set"}</span>
+        <span className={delta ? "confirmed" : "neutral"}>{delta ? <CheckCircle2 size={16} /> : <Info size={16} />} {delta ? `${formatSigned(delta.compCountDelta)} comparable count change` : "Baseline comparable set"}</span>
         <span className={delta ? "confirmed" : "neutral"}>{delta ? <CheckCircle2 size={16} /> : <Info size={16} />} {delta ? `${formatSigned(delta.confidenceDelta)} confidence pts` : "No prior confidence delta"}</span>
-        <span><CheckCircle2 size={16} /> Effective sample {snapshot.valuation.effectiveSampleSize}</span>
-        <span><CheckCircle2 size={16} /> Model fusion {formatCurrency(snapshot.valuation.modelFusion.finalEstimate)}</span>
+        <span><CheckCircle2 size={16} /> Review depth {snapshot.valuation.effectiveSampleSize}</span>
+        <span><CheckCircle2 size={16} /> Cross-platform estimate {formatCurrency(snapshot.valuation.modelFusion.finalEstimate)}</span>
         <span><CheckCircle2 size={16} /> Average match {snapshot.valuation.averageSimilarity}/100</span>
       </div>
       <div className="summary-grid">
         <section className="insight-card">
-          <h3>{delta ? "What changed after the new home?" : "Baseline review"}</h3>
+          <h3>{delta ? "What changed after the new comparable?" : "Baseline review"}</h3>
           <DeltaRow label="Estimated value" value={delta ? formatSignedCurrency(delta.pointDelta) : "Baseline"} />
           <DeltaRow label="Value Range" value={delta ? formatSignedCurrency(delta.rangeWidthDelta) : "Baseline"} />
           <DeltaRow label="Confidence Score" value={delta ? `${formatSigned(delta.confidenceDelta)} pts` : "Baseline"} />
-          <DeltaRow label="Home Count" value={delta ? formatSigned(delta.compCountDelta) : "Baseline"} />
-          <DeltaRow label="Effective Sample" value={delta?.effectiveSampleSizeDelta ? formatSigned(delta.effectiveSampleSizeDelta) : "Baseline"} />
-          <DeltaRow label="Evidence Balance" value={delta?.entropyDelta ? formatSigned(delta.entropyDelta) : "Baseline"} />
-          <DeltaRow label="Information Gain" value={delta?.marginalInformationGain ? delta.marginalInformationGain.toFixed(3) : "Baseline"} />
+          <DeltaRow label="Comparable Count" value={delta ? formatSigned(delta.compCountDelta) : "Baseline"} />
+          <DeltaRow label="Review Depth" value={delta?.effectiveSampleSizeDelta ? formatSigned(delta.effectiveSampleSizeDelta) : "Baseline"} />
+          <DeltaRow label="Evidence Mix" value={delta?.entropyDelta ? formatEvidenceMix(delta.entropyDelta) : "Baseline"} />
+          <DeltaRow label="Review Impact" value={delta?.marginalInformationGain ? formatReviewImpact(delta.marginalInformationGain) : "Baseline"} />
         </section>
         <section className="insight-card">
           <h3>Estimate blend</h3>
-          <DeltaRow label="Blend estimate" value={formatCurrency(snapshot.valuation.modelFusion.finalEstimate)} />
+          <DeltaRow label="System estimate" value={formatCurrency(snapshot.valuation.modelFusion.finalEstimate)} />
           {snapshot.valuation.modelFusion.modelWeights.map((model) => (
             <DeltaRow key={model.id} label={model.label.replace("Model", "")} value={`${Math.round(model.weight * 100)}% weight`} />
           ))}
         </section>
         <section className="insight-card">
-          <h3>Homes in the review set</h3>
+          <h3>Comparables in the review set</h3>
           {snapshot.valuation.adjustedComparables.map((comp) => (
             <div className="summary-comp" key={comp.id}>
               <span>{newCompId === comp.id ? "New" : "Included"}</span>
               <strong>{comp.address}</strong>
-              <em>{formatCurrency(comp.adjustedValue)} / Match {Math.round(comp.totalScore)}</em>
+            <em>{formatCurrency(comp.adjustedValue)} / Score {Math.round(comp.totalScore)}</em>
             </div>
           ))}
         </section>
       </div>
     </section>
-  );
-}
-
-function AssistantDraftPanel({ subject, snapshot }: { subject: SubjectProperty; snapshot: PceAnalysisSnapshot }) {
-  const [draft, setDraft] = useState<AssistantDraft>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>();
-
-  const requestKey = `${subject.address}|${subject.city}|${snapshot.generatedAt}|${snapshot.valuation.includedCompCount}|${snapshot.valuation.pointEstimate}`;
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let active = true;
-
-    async function loadDraft() {
-      try {
-        setLoading(true);
-        setError(undefined);
-        const response = await fetch("/api/assistant", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: controller.signal,
-          body: JSON.stringify(createAssistantContext(subject, snapshot))
-        });
-
-        if (!response.ok) {
-          throw new Error(`Assistant request failed with status ${response.status}.`);
-        }
-
-        const nextDraft = await response.json() as AssistantDraft;
-        if (active) {
-          setDraft(nextDraft);
-        }
-      } catch (err) {
-        if (!controller.signal.aborted && active) {
-          setError(err instanceof Error ? err.message : "Assistant draft unavailable.");
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    loadDraft();
-
-    return () => {
-      active = false;
-      controller.abort();
-    };
-  }, [requestKey, snapshot, subject]);
-
-  if (loading && !draft) {
-    return <div className="assistant-empty">Drafting the trace against the current review set.</div>;
-  }
-
-  const currentDraft = draft;
-
-  if (!currentDraft) {
-    return <div className="assistant-empty">{error ?? "Assistant draft unavailable."}</div>;
-  }
-
-  const sourceLabel = currentDraft.source === "openai" ? "MODEL ASSISTED" : "LOCAL FALLBACK";
-
-  return (
-    <div className="assistant-panel">
-      <div className="assistant-panel-head">
-        <span className={clsx("status-chip", currentDraft.source === "openai" ? "confirmed" : "review")}>{sourceLabel}</span>
-        <small>{currentDraft.model}</small>
-      </div>
-      <p>{currentDraft.summary}</p>
-      <div className="assistant-trace">
-        {currentDraft.trace.map((step) => (
-          <article className={clsx("assistant-trace-step", step.state)} key={step.label}>
-            <span>{step.label}</span>
-            <strong>{step.detail}</strong>
-          </article>
-        ))}
-      </div>
-      <div className="assistant-bullets">
-        {currentDraft.memoBullets.map((bullet) => (
-          <div key={bullet}>
-            <SquareCheck size={14} aria-hidden />
-            <span>{bullet}</span>
-          </div>
-        ))}
-      </div>
-      <div className="assistant-recommendation">
-        <strong>Recommendation</strong>
-        <p>{currentDraft.recommendation}</p>
-      </div>
-      <div className="assistant-question">
-        <strong>Reviewer question</strong>
-        <p>{currentDraft.question}</p>
-      </div>
-      {currentDraft.missingFields.length ? (
-        <div className="assistant-missing">
-          <strong>Missing intake fields</strong>
-          <p>{currentDraft.missingFields.join(", ")}</p>
-        </div>
-      ) : (
-        <div className="assistant-missing">
-          <strong>Missing intake fields</strong>
-          <p>No missing fields flagged for this review snapshot.</p>
-        </div>
-      )}
-      {error && <p className="assistant-error">{error}</p>}
-    </div>
   );
 }
 
@@ -1432,6 +1358,7 @@ function ReportReady({
   reportPrepared,
   subjectDirty,
   adjustmentsLocked,
+  reviewIntelligenceResult,
   onOpenIntake,
   onOpenAdjustments,
   onGenerate
@@ -1443,6 +1370,7 @@ function ReportReady({
   reportPrepared: boolean;
   subjectDirty: boolean;
   adjustmentsLocked: boolean;
+  reviewIntelligenceResult?: EvidenceCourtResult;
   onOpenIntake: () => void;
   onOpenAdjustments: () => void;
   onGenerate: () => void;
@@ -1452,15 +1380,19 @@ function ReportReady({
   const [exportError, setExportError] = useState<string>();
   const sections = [
     "Executive Summary",
-    "Home Summary",
+    "Comparable Summary",
     "Adjustment Grid",
     "Value Reconciliation",
+    "Review Intelligence Summary",
     "Review Activity",
     "Assumptions and Limits"
   ];
   const artifact = useMemo(
-    () => buildExportArtifact(selectedExportType, subject, snapshot),
-    [selectedExportType, snapshot, subject]
+    () => buildExportArtifact(selectedExportType, subject, snapshot, {
+      includeReviewIntelligence: viewModel.reviewIntelligenceAttached,
+      auditEvents: viewModel.auditEvents
+    }),
+    [selectedExportType, snapshot, subject, viewModel.auditEvents, viewModel.reviewIntelligenceAttached]
   );
   const heading = subjectDirty
     ? "Review update required"
@@ -1491,15 +1423,17 @@ function ReportReady({
       setIsGenerating(true);
       setExportError(undefined);
 
-      const response = await fetch("/api/export", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: selectedExportType,
-          subject,
-          snapshot
-        })
-      });
+        const response = await fetch("/api/export", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            type: selectedExportType,
+            subject,
+            snapshot,
+            reviewIntelligenceAttached: viewModel.reviewIntelligenceAttached,
+            auditEvents: viewModel.auditEvents
+          })
+        });
 
       if (!response.ok) {
         throw new Error(`Export failed with status ${response.status}.`);
@@ -1529,7 +1463,7 @@ function ReportReady({
         <Metric label="Estimated value" value={viewModel.pointEstimate} />
         <Metric label="Estimated range" value={viewModel.valueRange} />
         <Metric label="Confidence" value={viewModel.confidence} />
-        <Metric label="Homes included" value={viewModel.includedCompCount} />
+        <Metric label="Comparables included" value={viewModel.includedCompCount} />
       </div>
       <section className="insight-card">
         <h3>Export notes</h3>
@@ -1540,27 +1474,48 @@ function ReportReady({
         <DeltaRow label="Data" value="Simulated home sales" />
       </section>
       <section className="insight-card">
-        <h3>Homes included</h3>
+        <h3>Comparables included</h3>
         {viewModel.adjustedComparables.length ? viewModel.adjustedComparables.map((comp, index) => (
           <div className="report-row" key={comp.id}>
             <span>{index + 1}</span>
             <strong>{comp.address}</strong>
-            <em>{viewModel.newCandidateId === comp.id ? "Newly added" : "Included"} / {comp.distanceKm.toFixed(1)} km / Match {Math.round(comp.totalScore)}</em>
+            <em>{viewModel.newCandidateId === comp.id ? "Newly added" : "Included"} / {comp.distanceKm.toFixed(1)} km / Score {Math.round(comp.totalScore)}</em>
           </div>
         )) : (
-          <div className="zero-state-note">No homes are included yet.</div>
+          <div className="zero-state-note">No comparables are included yet.</div>
         )}
       </section>
-      <section className="insight-card assistant-card">
-        <details className="assistant-trace-collapsible">
-          <summary className="assistant-trace-summary">
-            <span className="card-label">Agent reasoning trace</span>
-            <span className="trace-toggle-label">Show / hide</span>
-          </summary>
-          <AssistantDraftPanel subject={subject} snapshot={snapshot} />
-        </details>
+      <section className="insight-card audit-packet-card">
+        <h3>Review Intelligence Summary</h3>
+        {reviewIntelligenceResult ? (
+          <>
+            <DeltaRow label="Verdict" value={reviewIntelligenceResult.verdict.label} />
+            <DeltaRow label="Strongest comp" value={reviewIntelligenceResult.strongestComparable.address} />
+            <DeltaRow label="Weakest comp" value={reviewIntelligenceResult.weakestSelectedComparable.address} />
+            <DeltaRow label="Audit status" value={viewModel.reviewIntelligenceAttached ? "Attached to memo/export" : "Not yet attached"} />
+            <p className="report-note">{reviewIntelligenceResult.memoReadySummary}</p>
+            <div className="report-limitations">
+              {reviewIntelligenceResult.limitations.slice(0, 3).map((limitation) => (
+                <div className="report-limitations-item" key={limitation}>
+                  <Info size={14} aria-hidden />
+                  <span>{limitation}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
+            <DeltaRow label="Review method" value="Cross-platform evidence model" />
+            <DeltaRow label="Audit boundary" value="Analyst review required" />
+          </>
+        )}
       </section>
-      <MemoView viewModel={memoView} embedded />
+      <MemoView
+        viewModel={memoView}
+        embedded
+        reviewIntelligenceSummary={viewModel.reviewIntelligenceAttached ? reviewIntelligenceResult?.memoReadySummary : undefined}
+        reviewIntelligenceLimitations={viewModel.reviewIntelligenceAttached ? reviewIntelligenceResult?.limitations : undefined}
+      />
       <section className="insight-card export-control-card">
         <div className="export-section export-section-wide">
           <h3>Format</h3>
@@ -1584,7 +1539,7 @@ function ReportReady({
           <Metric label="File name" value={artifact.fileName} />
           <Metric label="Value range" value={viewModel.valueRange} />
           <Metric label="Confidence" value={viewModel.confidence} />
-          <Metric label="Homes" value={viewModel.includedCompCount} />
+          <Metric label="Comparables" value={viewModel.includedCompCount} />
         </div>
         <div className="export-section export-section-wide">
           <h3>Included sections</h3>
@@ -1600,7 +1555,7 @@ function ReportReady({
         <div className="export-section export-section-wide export-generate">
           <div>
             <h3>Generate export</h3>
-            <p>This export will be marked local only, simulated data, and analyst review required.</p>
+            <p>This export will be marked local only, simulated data, and analyst review required. Review Intelligence exports only after Add to Memo.</p>
           </div>
           <button
             className="primary-action"
@@ -1613,12 +1568,22 @@ function ReportReady({
           {exportError && <p className="report-note">{exportError}</p>}
         </div>
       </section>
-      <p className="report-note">Exports include the review path, selected homes, adjustments, activity, memo, and analyst notes. Local demo only.</p>
+      <p className="report-note">Exports include the review path, selected comparables, adjustments, memo, audit activity, and attached review intelligence when explicitly added to the memo. Local demo only.</p>
     </section>
   );
 }
 
-function MemoView({ viewModel, embedded = false }: { viewModel: ReturnType<typeof selectMemoViewModel>; embedded?: boolean }) {
+function MemoView({
+  viewModel,
+  embedded = false,
+  reviewIntelligenceSummary,
+  reviewIntelligenceLimitations
+}: {
+  viewModel: ReturnType<typeof selectMemoViewModel>;
+  embedded?: boolean;
+  reviewIntelligenceSummary?: string;
+  reviewIntelligenceLimitations?: string[];
+}) {
   const sections = parseMemoSections(viewModel.memo);
 
   return (
@@ -1638,6 +1603,17 @@ function MemoView({ viewModel, embedded = false }: { viewModel: ReturnType<typeo
           </article>
         )) : (
           <div className="empty-state">Run the analysis to generate the summary.</div>
+        )}
+        {reviewIntelligenceSummary && (
+          <article className="memo-section-card">
+            <h3>Review Intelligence Summary</h3>
+            <p>{reviewIntelligenceSummary}</p>
+            {reviewIntelligenceLimitations?.length ? (
+              <ul>
+                {reviewIntelligenceLimitations.map((limitation) => <li key={limitation}>{limitation}</li>)}
+              </ul>
+            ) : null}
+          </article>
         )}
       </div>
     </section>
@@ -1703,12 +1679,16 @@ function ActivityTimeline({ items, emptyMessage = "No activity yet." }: { items:
       {items.map((item) => (
         <div className={clsx("activity-item", item.status)} key={item.id}>
           <span>{item.status === "confirmed" ? "Confirmed" : item.status === "ready" ? "Ready" : "Review"}</span>
-          <div><strong>{item.type.replace("_", " ")}</strong><small>{item.summary}</small></div>
+          <div><strong>{formatAuditEventType(item.type)}</strong><small>{item.summary}</small></div>
           <em>{new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</em>
         </div>
       ))}
     </div>
   );
+}
+
+function formatAuditEventType(value: PceAuditEvent["type"]) {
+  return value.replace(/_/g, " ");
 }
 
 function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
@@ -1719,9 +1699,9 @@ function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
         <strong>{toast.title}</strong>
         {toast.delta ? (
           <div className="gameplay-stats">
-            <p>Information gain: {(toast.delta.marginalInformationGain ?? 0) > 0 ? "+" : ""}{(toast.delta.marginalInformationGain ?? 0).toFixed(1)}</p>
+            <p>Review impact: {formatReviewImpact(toast.delta.marginalInformationGain ?? 0)}</p>
             <p>Confidence: {(toast.delta.confidenceDelta ?? 0) > 0 ? "+" : ""}{(toast.delta.confidenceDelta ?? 0).toFixed(1)} pts</p>
-            <p>Effective comps: {(toast.delta.effectiveSampleSizeDelta ?? 0) > 0 ? "+" : ""}{(toast.delta.effectiveSampleSizeDelta ?? 0).toFixed(1)}</p>
+            <p>Review depth: {(toast.delta.effectiveSampleSizeDelta ?? 0) > 0 ? "+" : ""}{(toast.delta.effectiveSampleSizeDelta ?? 0).toFixed(1)}</p>
             <p>Range width: {(toast.delta.rangeWidthDelta ?? 0) < 0 ? "-" : "+"}${Math.abs(toast.delta.rangeWidthDelta ?? 0).toLocaleString()}</p>
             <p>Risk: {(toast.delta.riskSeverityDelta ?? 0) === 0 ? "unchanged" : ((toast.delta.riskSeverityDelta ?? 0) > 0 ? "+" : "") + (toast.delta.riskSeverityDelta ?? 0)}</p>
           </div>
@@ -1780,4 +1760,16 @@ function formatSigned(value: number) {
 
 function formatSignedCurrency(value: number) {
   return `${value >= 0 ? "+" : "-"}${formatCurrency(Math.abs(value))}`;
+}
+
+function formatReviewImpact(value: number) {
+  if (value > 0.25) return "Improves review";
+  if (value < -0.25) return "Needs review";
+  return "Neutral";
+}
+
+function formatEvidenceMix(value: number) {
+  if (value > 0.03) return "More balanced";
+  if (value < -0.03) return "Less balanced";
+  return "Stable";
 }

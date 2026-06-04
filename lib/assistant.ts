@@ -68,6 +68,7 @@ export function buildAssistantPrompt(context: AssistantContext) {
   const { subject, snapshot } = context;
   const selectedComparables = snapshot.valuation.adjustedComparables.slice(0, 5);
   const auditTrail = snapshot.auditEvents.slice(-4);
+  const globalRiskFlags = snapshot.valuation.riskFlags;
 
   return [
     "You are drafting a concise review-support memo for KV CompLens.",
@@ -84,24 +85,37 @@ export function buildAssistantPrompt(context: AssistantContext) {
     "",
     "Review facts:",
     `- Source scan: ${snapshot.sourceScan.sourcesConsolidated} sources, ${snapshot.sourceScan.recordsScanned} records`,
-    `- Selected homes: ${snapshot.valuation.includedCompCount}`,
+    `- Selected comparables: ${snapshot.valuation.includedCompCount}`,
     `- Value range: ${formatCurrency(snapshot.valuation.lowEstimate)} to ${formatCurrency(snapshot.valuation.highEstimate)}`,
     `- Point estimate: ${formatCurrency(snapshot.valuation.pointEstimate)}`,
     `- Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}`,
-    `- Average match chance: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
+    `- Average comparable probability: ${Math.round(snapshot.valuation.averageComparableProbability * 100)}%`,
     `- Average source reliability: ${Math.round(snapshot.valuation.averageSourceReliability * 100)}%`,
     `- Effective sample size: ${snapshot.valuation.effectiveSampleSize}`,
     "",
-    "Selected homes:",
-    ...selectedComparables.map((comp, index) =>
-      `${index + 1}. ${comp.address} | sale ${formatCurrency(comp.salePrice)} | adjusted ${formatCurrency(comp.adjustedValue)} | ${comp.distanceKm.toFixed(1)} km | score ${Math.round(comp.totalScore)}`
-    ),
+    "Overall Risk Flags:",
+    globalRiskFlags.length ? globalRiskFlags.map(flag => `- ${flag}`).join("\n") : "None detected.",
+    "",
+    "Selected comparables with Adjustments:",
+    ...selectedComparables.map((comp, index) => {
+      const adjustments = [
+        comp.adjustments.squareFootage ? `Size: ${formatCurrency(comp.adjustments.squareFootage)}` : "",
+        comp.adjustments.condition ? `Condition: ${formatCurrency(comp.adjustments.condition)}` : "",
+        comp.adjustments.time ? `Time: ${formatCurrency(comp.adjustments.time)}` : "",
+        comp.adjustments.bedroomsBathrooms ? `Beds/Baths: ${formatCurrency(comp.adjustments.bedroomsBathrooms)}` : ""
+      ].filter(Boolean).join(", ");
+
+      return `${index + 1}. ${comp.address} | sale ${formatCurrency(comp.salePrice)} | adjusted ${formatCurrency(comp.adjustedValue)} | ${comp.distanceKm.toFixed(1)} km | score ${Math.round(comp.totalScore)}
+    - Adjustments applied: ${adjustments || "None"}
+    - Property Risk Flags: ${comp.riskFlags?.length ? comp.riskFlags.join(", ") : "None"}`;
+    }),
     "",
     "Latest audit events:",
     ...auditTrail.map((event) => `- ${event.timestamp} | ${event.type} | ${event.status} | ${event.summary}`),
     "",
     "Memo reminder:",
-    "Explain why the selected homes support the range, mention any visible review flags, and keep the final export boundary truthful."
+    "Provide a professional 'summary' explaining why these comparables support the valuation range, using the specific adjustments and risk flags provided above.",
+    "Ensure 'memoBullets' are analytical (e.g. 'Comparable 1 was adjusted +$X for condition')."
   ].join("\n");
 }
 
@@ -112,7 +126,7 @@ export function buildLocalAssistantDraft(context: AssistantContext): AssistantDr
   const model = "LOCAL_FALLBACK";
   const source: AssistantDraft["source"] = "local";
   const summary = snapshot.analysisStatus === "complete"
-    ? `Local draft prepared for ${subject.address || "the current property"}. It can summarize ${snapshot.valuation.includedCompCount} homes without changing the deterministic valuation.`
+    ? `Local draft prepared for ${subject.address || "the current property"}. It can summarize ${snapshot.valuation.includedCompCount} comparables without changing the deterministic valuation.`
     : "Run the analysis to generate the assistant draft.";
   const recommendation = snapshot.analysisStatus === "complete"
     ? snapshot.valuation.confidenceScore >= 70
@@ -137,7 +151,7 @@ export function buildLocalAssistantDraft(context: AssistantContext): AssistantDr
       },
       {
         label: "Retrieve",
-        detail: `Load the subject, source scan, and ${snapshot.valuation.includedCompCount} selected homes.`,
+        detail: `Load the subject, source scan, and ${snapshot.valuation.includedCompCount} selected comparables.`,
         state: snapshot.analysisStatus === "complete" ? "confirmed" : "review"
       },
       {
@@ -169,7 +183,7 @@ export function buildLocalAssistantDraft(context: AssistantContext): AssistantDr
         `Confidence: ${snapshot.valuation.confidenceScore}% ${snapshot.valuation.confidenceLevel}.`,
         selectedComparables.length
           ? `Best anchor: ${selectedComparables[0].address} at ${formatCurrency(selectedComparables[0].adjustedValue)} adjusted value.`
-          : "No comparable homes selected yet."
+          : "No comparables selected yet."
       ]
       : [
         "No assistant memo yet.",

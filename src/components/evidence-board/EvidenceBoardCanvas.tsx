@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import clsx from "clsx";
 import type { AdjustedComparable } from "../../../lib/types";
 import type { EvidenceBoardProps } from "./EvidenceBoard";
@@ -16,9 +17,11 @@ export function EvidenceBoardCanvas({
   activeComparableId,
   newCandidateId,
   valuation,
+  counterfactualsByComparableId,
   onSelectComparable,
-  onFindCandidate
-}: EvidenceBoardProps) {
+  autoArrange = true,
+  zoomLevel = 100
+}: EvidenceBoardProps & { autoArrange?: boolean; zoomLevel?: number }) {
   const [searchTerm, setSearchTerm] = useState("");
   const sortedComps = sortComparables(selectedComparables);
   const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -30,10 +33,10 @@ export function EvidenceBoardCanvas({
   const activeId = activeComparableId ?? visibleComps[0]?.id;
 
   return (
-    <div className="evidence-board-canvas" aria-label="Home discovery board">
+    <div className="evidence-board-canvas" aria-label="Comparable evidence board">
       <div className="evidence-board-actions">
         <label className="evidence-search">
-          <span>Search homes</span>
+          <span>Search comparables</span>
           <input
             type="search"
             value={searchTerm}
@@ -41,29 +44,34 @@ export function EvidenceBoardCanvas({
             placeholder="Address, area, match"
           />
         </label>
-        <span className="evidence-subject-filter">Subject home</span>
-        <button className="canvas-find" type="button" onClick={onFindCandidate}>Find more homes</button>
+        <span className="evidence-subject-filter">Subject property</span>
       </div>
-      <EvidenceLinkLayer comps={visibleComps} activeComparableId={activeId} newCandidateId={newCandidateId} />
-      <div className="evidence-subject-slot">
-        <EvidenceSubjectCard subject={subject} valuation={valuation} />
+      <div
+        className={clsx("evidence-board-map", !autoArrange && "manual-layout")}
+        style={{ "--board-zoom": String(zoomLevel / 100) } as CSSProperties}
+      >
+        <EvidenceLinkLayer comps={visibleComps} activeComparableId={activeId} newCandidateId={newCandidateId} />
+        <div className="evidence-subject-slot">
+          <EvidenceSubjectCard subject={subject} valuation={valuation} />
+        </div>
+        {visibleComps.length ? visibleComps.map((comp, index) => (
+          <div className={clsx("evidence-comp-slot", `slot-${slots[index]}`)} key={comp.id}>
+            <EvidenceComparableCard
+              comp={comp}
+              rank={index + 1}
+              active={activeId === comp.id}
+              isNew={newCandidateId === comp.id}
+              counterfactual={counterfactualsByComparableId?.[comp.id]}
+              onSelect={() => onSelectComparable(comp.id)}
+            />
+          </div>
+        )) : (
+          <div className="evidence-empty-state evidence-search-empty">
+            No selected comparables match <strong>{searchTerm}</strong>.
+          </div>
+        )}
+        {hiddenCount > 0 && <div className="evidence-more-pill">+{hiddenCount} more selected comparables</div>}
       </div>
-      {visibleComps.length ? visibleComps.map((comp, index) => (
-        <div className={clsx("evidence-comp-slot", `slot-${slots[index]}`)} key={comp.id}>
-          <EvidenceComparableCard
-            comp={comp}
-            rank={index + 1}
-            active={activeId === comp.id}
-            isNew={newCandidateId === comp.id}
-            onSelect={() => onSelectComparable(comp.id)}
-          />
-        </div>
-      )) : (
-        <div className="evidence-empty-state evidence-search-empty">
-          No selected homes match <strong>{searchTerm}</strong>.
-        </div>
-      )}
-      {hiddenCount > 0 && <div className="evidence-more-pill">+{hiddenCount} more selected homes</div>}
     </div>
   );
 }

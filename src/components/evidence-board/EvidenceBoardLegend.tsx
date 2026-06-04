@@ -11,11 +11,11 @@ export function EvidenceBoardLegend() {
       </span>
       <span>
         <CheckCircle2 size={14} aria-hidden="true" />
-        Selected home
+        Selected comparable
       </span>
       <span>
         <Sparkles size={14} aria-hidden="true" />
-        New home
+        New comparable
       </span>
     </div>
   );

@@ -20,7 +20,7 @@ import type {
 export type PceAuditEvent = {
   id: string;
   timestamp: string;
-  type: "source_scan" | "ranking" | "selection" | "valuation" | "memo";
+  type: "source_scan" | "ranking" | "selection" | "valuation" | "memo" | "review_intelligence_v2_added_to_memo";
   source: string;
   status: "confirmed" | "review" | "ready";
   summary: string;
@@ -117,17 +117,17 @@ export function buildAuditEvents(snapshot: Omit<PceAnalysisSnapshot, "auditEvent
       id: `ranking-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "ranking",
-      source: "Home ranking",
+      source: "Comparable ranking",
       status: "confirmed",
-      summary: `${snapshot.rankedComparables.length} homes ranked; ${snapshot.remainingCandidates.length} remain outside the review set.`
+      summary: `${snapshot.rankedComparables.length} comparables ranked; ${snapshot.remainingCandidates.length} remain outside the review set.`
     },
     {
       id: `selection-${snapshot.generatedAt}`,
       timestamp: snapshot.generatedAt,
       type: "selection",
-      source: "Home selection",
+      source: "Comparable selection",
       status: snapshot.selectedComparables.length ? "confirmed" : "review",
-      summary: `${snapshot.selectedComparables.length} homes selected for review.`
+      summary: `${snapshot.selectedComparables.length} comparables selected for review.`
     },
     {
       id: `valuation-${snapshot.generatedAt}`,
@@ -170,7 +170,7 @@ export function runPcePipeline(input: PcePipelineInput): PceAnalysisSnapshot {
       ...comp,
       status: "rejected" as const,
       wasRejected: true,
-      rejectionReason: comp.rejectionReason ?? comp.penalties[0] ?? "Lower match than the homes already selected."
+      rejectionReason: comp.rejectionReason ?? comp.penalties[0] ?? "Lower match than the comparables already selected."
     }));
   const valuation = calculateValuation(subject, selectedComparables);
   const sourceScan = runSourceScan(subject, candidates, rankedComparables.length, selectedComparables.length, rejectedComparables.length);

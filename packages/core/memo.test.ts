@@ -20,15 +20,15 @@ const subject: SubjectProperty = {
 };
 
 describe("underwriting memo", () => {
-  it("includes subject, source scan, selected homes, value range, and risk sections from computed facts", () => {
+  it("includes subject, source scan, selected comparables, value range, and risk sections from computed facts", () => {
     const analysis = runCompAnalysis(subject);
 
     expect(analysis.memo).toContain("Subject Details");
     expect(analysis.memo).toContain(subject.address);
     expect(analysis.memo).toContain("Review Set");
     expect(analysis.memo).toContain(`${analysis.sourceScanSummary.recordsScanned} local demo records scanned`);
-    expect(analysis.memo).toContain("Selected Homes");
-    expect(analysis.memo).toContain("Homes Not Selected");
+    expect(analysis.memo).toContain("Selected Comparables");
+    expect(analysis.memo).toContain("Comparables Not Selected");
     expect(analysis.memo).toContain("Review Summary");
     expect(analysis.memo).toContain("Final range");
     expect(analysis.memo).toContain("evidence weight");

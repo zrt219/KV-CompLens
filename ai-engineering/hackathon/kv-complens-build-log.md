@@ -36,11 +36,11 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 ## Prompt Sequence Checklist
 
 - [x] 2026-06-01 finishing prompt logged: make KV CompLens a winning comp-analysis workflow demo, keep current layout, no dragging/auth/database, add neutral hackathon IP/usage README note, and keep all major business values deterministic.
-- [x] 2026-06-01 PCE-V1 prompt logged: upgrade core math into a deterministic Probabilistic Comparable Evidence Engine with probability utilities, robust outliers, precision fusion, confidence model, marginal impact, and README methodology/IP notes.
-- [x] 2026-06-01 PCE-V1 implementation pass started: wire eligibility gates, similarity kernels, robust PPSF outlier probabilities, precision-weighted valuation, confidence logits, marginal information gain, UI evidence fields, tests, and README sections.
-- [x] 2026-06-01 PCE-V1 core math pass implemented: scoring now emits eligibility/probability/reliability/outlier/precision fields; valuation now uses evidence-weighted posterior fusion; candidate impact now includes effective sample size and marginal information gain.
-- [x] 2026-06-01 PCE-V2 prompt logged: extend deterministic evidence fusion with energy quality, Bayesian source reliability, residual-buffered posterior range, model-fusion diagnostics, MIG-based candidate selection, UI evidence fields, tests, and README equations.
-- [x] 2026-06-01 PCE-V2 implementation pass: added source reliability priors, evidence energy, PCE-V2 probability formula, comparable uncertainty, normalized evidence weights, residual-buffered posterior range, model-fusion diagnostics, MIG ranking, UI evidence labels, and README equations.
+- [x] 2026-06-01 Evidence Model V1 prompt logged: upgrade core math into a deterministic Probabilistic Comparable Evidence Engine with probability utilities, robust outliers, precision fusion, confidence model, marginal impact, and README methodology/IP notes.
+- [x] 2026-06-01 Evidence Model V1 implementation pass started: wire eligibility gates, similarity kernels, robust PPSF outlier probabilities, precision-weighted valuation, confidence logits, review impact ranking, UI evidence fields, tests, and README sections.
+- [x] 2026-06-01 Evidence Model V1 core math pass implemented: scoring now emits eligibility/probability/reliability/outlier/precision fields; valuation now uses evidence-weighted posterior fusion; candidate impact now includes effective sample size and review impact ranking.
+- [x] 2026-06-01 cross-platform evidence model prompt logged: extend deterministic evidence fusion with energy quality, Bayesian source reliability, residual-buffered posterior range, model-fusion diagnostics, review-impact candidate selection, UI evidence fields, tests, and README equations.
+- [x] 2026-06-01 cross-platform evidence model implementation pass: added source reliability priors, evidence energy, cross-platform evidence model probability formula, comparable uncertainty, normalized evidence weights, residual-buffered posterior range, model-fusion diagnostics, review-impact ranking, UI evidence labels, and README equations.
 - [x] Documentation ledger created.
 - [x] Public assessment-source provenance registry planned.
 - [x] Deterministic scoring and valuation engines exist.
@@ -83,16 +83,16 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - 2026-06-01 domain-alignment gate: `npm run lint`, `npm test` (17 tests), and `npm run build` passed.
 - 2026-06-01 runtime gate: HTTP 200 smoke check passed at `http://localhost:3000/`.
 - Final domain-aligned screenshot captured: `artifacts/kv-complens-final-3000-domain-aligned-1440-v2.png`.
-- 2026-06-01 PCE-V1 gate: `npm run lint` passed.
-- 2026-06-01 PCE-V1 gate: `npm test` passed with 23 tests across probability, outliers, scoring, adjustments, valuation, confidence, marginal impact, workflow, provenance, geo, source scan, and memo.
-- 2026-06-01 PCE-V1 gate: `npm run build` passed with static `/` route generation.
-- 2026-06-01 PCE-V1 runtime gate: HTTP 200 smoke check passed at `http://localhost:3000/`.
-- PCE-V1 screenshots captured: `artifacts/kv-complens-pce-v1-1366-final-v2.png` and `artifacts/kv-complens-pce-v1-1440-final-v3.png`.
-- 2026-06-01 PCE-V2 gate: `npm test` passed with 28 tests across probability, outliers, scoring, adjustments, valuation, confidence, marginal impact, model fusion, workflow, provenance, geo, source scan, and memo.
-- 2026-06-01 PCE-V2 gate: `npm run lint` passed.
-- 2026-06-01 PCE-V2 gate: `npm run build` passed with static `/` route generation.
-- 2026-06-01 PCE-V2 runtime gate: HTTP 200 smoke check passed at `http://localhost:3000/`.
-- PCE-V2 screenshots captured: `artifacts/kv-complens-pce-v2-1366.png` and `artifacts/kv-complens-pce-v2-1440.png`.
+- 2026-06-01 Evidence Model V1 gate: `npm run lint` passed.
+- 2026-06-01 Evidence Model V1 gate: `npm test` passed with 23 tests across probability, outliers, scoring, adjustments, valuation, confidence, marginal impact, workflow, provenance, geo, source scan, and memo.
+- 2026-06-01 Evidence Model V1 gate: `npm run build` passed with static `/` route generation.
+- 2026-06-01 Evidence Model V1 runtime gate: HTTP 200 smoke check passed at `http://localhost:3000/`.
+- Evidence Model V1 screenshots captured: `artifacts/kv-complens-Evidence Model V1-1366-final-v2.png` and `artifacts/kv-complens-Evidence Model V1-1440-final-v3.png`.
+- 2026-06-01 cross-platform evidence model gate: `npm test` passed with 28 tests across probability, outliers, scoring, adjustments, valuation, confidence, marginal impact, model fusion, workflow, provenance, geo, source scan, and memo.
+- 2026-06-01 cross-platform evidence model gate: `npm run lint` passed.
+- 2026-06-01 cross-platform evidence model gate: `npm run build` passed with static `/` route generation.
+- 2026-06-01 cross-platform evidence model runtime gate: HTTP 200 smoke check passed at `http://localhost:3000/`.
+- cross-platform evidence model screenshots captured: `artifacts/kv-complens-cross-platform evidence model-1366.png` and `artifacts/kv-complens-cross-platform evidence model-1440.png`.
 - 2026-06-01 publication gate: `npm run lint`, `npm test` (46 tests across 17 files), and `npm run build` passed before GitHub push.
 - 2026-06-01 GitHub publication: `main` pushed to `https://github.com/zrt219/KV-CompLens` with commit `8f77cdc`.
 - 2026-06-01 Vercel deployment repair: Browser found `404: NOT_FOUND` on `https://kv-complens.vercel.app`; SSO protection was disabled, explicit Next.js config was added in `vercel.json`, project `kv-complens` was redeployed, and Browser verified `https://kv-complens.vercel.app` rendered `KV CompLens`.
@@ -110,27 +110,27 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - Built a deterministic comparable-property workflow for Alberta residential underwriting support, including candidate discovery, add-to-analysis review controls, valuation deltas, activity trace, adjustment grid, valuation summary, and report-ready state.
 - Hardened a deterministic AI underwriting-support demo with computed source-scan provenance, fact-constrained memo generation, adjustment breakdown tests, and verified Next.js build/runtime evidence.
 - Reframed and verified KV CompLens as a deterministic agentic underwriting workflow that retrieves synthetic comps, scores them transparently, applies reviewable adjustments, estimates a defensible range, and generates a facts-only analyst memo.
-- Upgraded KV CompLens into a deterministic probabilistic comparable-evidence engine with eligibility gates, smooth similarity kernels, MAD outlier detection, precision-weighted valuation, confidence logits, marginal information gain, and facts-only memo evidence.
-- Extended KV CompLens to PCE-V2 with evidence energy, Bayesian-style source reliability, residual-buffered posterior valuation, model-fusion diagnostics, MIG-ranked candidate review, and verified methodology/test/build evidence.
-- Refactored KV CompLens into a deterministic PCE-V2 snapshot architecture with reducer-driven UI state, selector-based view models, audit events, and verified pipeline/UI state tests.
+- Upgraded KV CompLens into a deterministic probabilistic comparable-evidence engine with eligibility gates, smooth similarity kernels, MAD outlier detection, precision-weighted valuation, confidence logits, review impact ranking, and facts-only memo evidence.
+- Extended KV CompLens to cross-platform evidence model with evidence energy, Bayesian-style source reliability, residual-buffered posterior valuation, model-fusion diagnostics, review-impact-ranked candidate review, and verified methodology/test/build evidence.
+- Refactored KV CompLens into a deterministic cross-platform evidence model snapshot architecture with reducer-driven UI state, selector-based view models, audit events, and verified pipeline/UI state tests.
 
 ## 2026-06-01 — Verified Engineering Work
 
-- Built/changed: Added the PCE-V2 snapshot pipeline, reducer-driven UI state, selector-backed page view models, deterministic audit events, and minimal exclude controls for selected comparables.
-- Systems involved: `lib/pce/runPcePipeline.ts`, `hooks/usePceAnalysis.ts`, `src/app/page.tsx`, Vitest configuration, PCE pipeline/UI state tests.
+- Built/changed: Added the cross-platform evidence model snapshot pipeline, reducer-driven UI state, selector-backed page view models, deterministic audit events, and minimal exclude controls for selected comparables.
+- Systems involved: `review snapshot pipeline`, `analysis state hook`, `src/app/page.tsx`, Vitest configuration, review pipeline/UI state tests.
 - Technical skills demonstrated: Deterministic pipeline orchestration, React reducer state modeling, selector-driven UI wiring, valuation-engine preservation, audit/event modeling, regression test design.
 - Verification performed: `npm run lint`, `npm test` (41 tests), `npm run build`, Browser smoke check at `http://localhost:3000/`, and Browser interaction check for the Find More Comparables drawer.
-- Evidence/files: `tests/pcePipeline.test.ts`, `tests/pceUiState.test.ts`, `vitest.config.ts`, `lib/pce/runPcePipeline.ts`, `hooks/usePceAnalysis.ts`, `src/app/page.tsx`.
-- Resume-safe bullet: Refactored KV CompLens into a deterministic PCE-V2 snapshot architecture with reducer-driven UI state, selector-based view models, audit events, and verified pipeline/UI state tests.
+- Evidence/files: `pipeline tests`, `UI state tests`, `vitest.config.ts`, `review snapshot pipeline`, `analysis state hook`, `src/app/page.tsx`.
+- Resume-safe bullet: Refactored KV CompLens into a deterministic cross-platform evidence model snapshot architecture with reducer-driven UI state, selector-based view models, audit events, and verified pipeline/UI state tests.
 
 ## 2026-06-01 — Verified Engineering Work
 
 - Built/changed: Replaced the default CivicGrid comparable-analysis canvas with a blank Evidence Board, added board card/link/legend/empty-state components, added an export package modal, and corrected responsive board spacing to use the full viewport height.
-- Systems involved: `src/components/evidence-board/`, `src/app/page.tsx`, `src/app/globals.css`, `tests/pceUiState.test.ts`.
-- Technical skills demonstrated: Product UI simplification, responsive CSS slot layout, deterministic PCE view-model wiring, modal export workflow, Browser-driven visual QA, regression test hardening.
+- Systems involved: `src/components/evidence-board/`, `src/app/page.tsx`, `src/app/globals.css`, `UI state tests`.
+- Technical skills demonstrated: Product UI simplification, responsive CSS slot layout, deterministic review view-model wiring, modal export workflow, Browser-driven visual QA, regression test hardening.
 - Verification performed: `npm run lint`, `npm test` (41 tests), `npm run build`, Browser DOM/layout check at `http://localhost:3000/` confirming Evidence Board rendered, no default CivicGrid element, no CivicGrid copy, fixed thumbnail SVG sizing, and no console errors.
 - Evidence/files: `src/components/evidence-board/EvidenceBoard.tsx`, `src/components/evidence-board/EvidenceBoardCanvas.tsx`, `src/components/evidence-board/EvidenceSubjectCard.tsx`, `src/components/evidence-board/EvidenceComparableCard.tsx`, `src/components/evidence-board/EvidenceLinkLayer.tsx`, `src/app/page.tsx`, `src/app/globals.css`.
-- Resume-safe bullet: Replaced a distracting map-style comparable visualization with a verified Evidence Board that keeps PCE-V2 valuation facts central, preserves selected-comparable interactions, and improves viewport-scaled underwriting review.
+- Resume-safe bullet: Replaced a distracting map-style comparable visualization with a verified Evidence Board that keeps cross-platform evidence model valuation facts central, preserves selected-comparable interactions, and improves viewport-scaled underwriting review.
 
 ## 2026-06-01 — Verified Engineering Work
 
@@ -145,20 +145,20 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 
 - Built/changed: Reworked Subject Intake, Source Scan, Comp Discovery, and Adjustment Review layout rules to fix squished text, workflow-step overlap, stale absolute candidate-board positioning, and missing subject preview structure.
 - Systems involved: `src/app/page.tsx`, `src/app/globals.css`, Browser visual QA at `http://localhost:3000/`.
-- Technical skills demonstrated: Browser-measured CSS debugging, responsive grid repair, underwriting UI polish, accessibility-preserving status labels, deterministic PCE-V2 page wiring preservation.
+- Technical skills demonstrated: Browser-measured CSS debugging, responsive grid repair, underwriting UI polish, accessibility-preserving status labels, deterministic cross-platform evidence model page wiring preservation.
 - Verification performed: `npm run lint`, `npm test` (41 tests), `npm run build`, Browser layout checks across Subject Intake, Comp Discovery, Source Scan, Adjustment Review, Value Reconciliation, Report Ready, and Memo / Report.
 - Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, Browser measured workflow/panel gaps with no horizontal body overflow.
-- Resume-safe bullet: Stabilized KV CompLens PCE-V2 review screens with Browser-verified layout fixes for source scan, candidate discovery, subject intake, and adjustment review while preserving deterministic snapshot-driven valuation state.
+- Resume-safe bullet: Stabilized KV CompLens cross-platform evidence model review screens with Browser-verified layout fixes for source scan, candidate discovery, subject intake, and adjustment review while preserving deterministic snapshot-driven valuation state.
 
 ## 2026-06-01 -- Final Verification Repair
 
 - Verified failure: left-rail navigation could render Subject Intake and Comparable Analysis as simultaneously active when the intake form was open over a non-subject view.
 - Verified failure: export modal presented download types but did not persist real document artifacts from the current snapshot.
 - Fix applied: derived nav highlight from a single active nav id and added `aria-current` for the selected item.
-- Fix applied: added `lib/pce/exportPackage.ts` for real PDF/CSV/Markdown/TXT/ZIP artifact generation and `src/app/api/export/route.ts` to persist generated files under `artifacts/exports`.
+- Fix applied: added `export package generator` for real PDF/CSV/Markdown/TXT/ZIP artifact generation and `src/app/api/export/route.ts` to persist generated files under `artifacts/exports`.
 - Fix applied: added `tests/exportPackage.test.ts` to cover the six export outputs and ZIP contents.
 - Verification performed: `npm run lint`, `npm test` (46 tests), `npm run build`, Browser nav-state click checks, Browser six-option export cycle, filesystem verification of six generated artifacts, PDF `%PDF-1.4` signature checks, ZIP entry inspection.
-- Export evidence: `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Comparable_Set.csv`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Adjustment_Appendix.pdf`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Snapshot_Memo.md`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Audit_Log.txt`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Evidence_Package.zip`.
+- Export evidence: `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Comparable_Set.csv`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Adjustment_Appendix.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Snapshot_Memo.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Audit_Log.txt`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Evidence_Package.zip`.
 - Resume-safe bullet: Implemented and verified persisted multi-format underwriting exports from a deterministic comparable-evidence snapshot, with browser-proven UI generation and on-disk artifact validation.
 
 ## 2026-06-01 -- Follow-up Verification Repair
@@ -170,7 +170,7 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - Verified failure: `Adjustments Locked` and `Report Export Prepared` could remain stale after the selected comparable set changed.
 - Fix applied: restored visible stage-header copy, added selected-row discovery styling, disabled the non-functional `Table` control, replaced the fake recalculation button with a factual status note, removed the failing response header, and reset report/lock state on comparable-set changes.
 - Verification performed: `npm run lint`, `npm test` (46 tests), `npm run build`, Browser checks for single-active left-rail state, visible stage-title copy, disabled Evidence Board `Table` button, successful modal export completion, automatic reset of adjustment locking after exclusion, and automatic reset from `Report Export Prepared` to `Report Ready` after exclusion.
-- Export evidence: Browser-generated underwriting memo updated on disk at `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf` with `%PDF-1.4` header validation after the live export route repair.
+- Export evidence: Browser-generated underwriting memo updated on disk at `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf` with `%PDF-1.4` header validation after the live export route repair.
 - Resume-safe bullet: Hardened a snapshot-driven underwriting review workspace by removing stale UI state, fixing a live export-route failure, and verifying end-to-end report generation and reset behavior through Browser-driven QA.
 
 ## 2026-06-01 -- Navigation Active-State Repair
@@ -193,7 +193,7 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - Fix applied: added a readability mode toggle with explicit `aria-pressed` state and higher-contrast shell styling.
 - Fix applied: made `Next step` advance through the workflow, disabled the unavailable demo action, gated export behind adjustment confirmation, and raised the header stacking order above the workflow strip.
 - Verification performed: `npm test` (46 tests), `npm run lint`, `npm run build`, Browser checks for page identity, no runtime overlay, no console errors/warnings, search match/empty states, readability toggle, Next-step progression, export gating, adjustment lock, six export types, and successful report export generation.
-- Export evidence: Browser-generated underwriting memo updated on disk at `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf` with `LastWriteTime` `2026-06-01 11:13`.
+- Export evidence: Browser-generated underwriting memo updated on disk at `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf` with `LastWriteTime` `2026-06-01 11:13`.
 - Resume-safe bullet: Hardened KV CompLens with browser-verified workflow controls, comparable search, readability mode, export gating, and persisted report-generation proof.
 
 ## 2026-06-01 -- Ralphplan Header Fit And Six-Export Verification
@@ -214,7 +214,7 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - Fix applied: corrected the memo parser so numeric addresses and record counts remain intact; only real dash bullets or `1.` numbered rows become list items.
 - Verification performed: `npm test` (46 tests), `npm run lint`, `npm run build`, Browser verification of structured memo rendering.
 - Browser evidence: `.memo-workspace pre` count is `0`, `.memo-reader` count is `1`, memo section count is `10`, first paragraph begins with `12345 109 St NW`, and Source Scan paragraph begins with `125 local demo records`.
-- Resume-safe bullet: Improved KV CompLens memo readability with structured section rendering, browser-verified parser behavior, and preserved deterministic PCE snapshot facts.
+- Resume-safe bullet: Improved KV CompLens memo readability with structured section rendering, browser-verified parser behavior, and preserved deterministic review snapshot facts.
 
 ## 2026-06-01 -- Report Ready Alignment And Repository Link QA
 
@@ -258,7 +258,7 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 - Fix applied: workflow summary strings were shortened to compact snapshot abbreviations, Subject Intake preview checklist copy was made more truthful, and the comparable drawer backdrop now uses visual-only hit testing while the drawer remains interactive.
 - Verification performed: `npm run lint`, `npm test` (46 tests), `npm run build`, Browser verification of Export flow, Find More flow, Subject Intake re-entry with drawer open, and workflow-summary overflow checks.
 - Browser evidence: Export from Subject Intake produced `Report Ready`; Find More from Subject Intake produced `Comp Discovery` with `drawerOpen: true`; returning to Subject Intake closed the drawer and restored one active nav item; `.workflow-strip small` overflow findings were empty on the tested desktop viewport.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `hooks/usePceAnalysis.ts`, `.ralphplan/final-verification.md`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `analysis state hook`, `.ralphplan/final-verification.md`.
 - Resume-safe bullet: Hardened KV CompLens shell interaction by fixing action-bar routing, non-blocking surfaced-comparable drawers, and browser-verified workflow-summary fit in the deterministic underwriting flow.
 
 ## 2026-06-01 -- Brand Mark Refresh QA
@@ -294,8 +294,17 @@ User requested implementation of the KV CompLens Production-Grade Hackathon Comp
 ## 2026-06-03 — Verified Engineering Work
 
 - Built/changed: Refactored KV CompLens into a canonical 5-step intake-to-export flow (`Intake -> Sources -> Review -> Adjust -> Export`), added a truthful local-first assistant trace with optional OpenAI-backed drafting, merged the report/export preview into the final export screen, regenerated the canonical Review-base export bundle, and updated the final handoff index to match the live artifacts.
-- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `lib/tutorial.ts`, `lib/pce/exportPackage.ts`, `tests/assistant.test.ts`, `tests/tutorial.test.ts`, `tests/exportPackage.test.ts`, `ai-engineering/hackathon/kv-complens-final-handoff.md`.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `lib/tutorial.ts`, `export package generator`, `tests/assistant.test.ts`, `tests/tutorial.test.ts`, `tests/exportPackage.test.ts`, `ai-engineering/hackathon/kv-complens-final-handoff.md`.
 - Technical skills demonstrated: Workflow-state refactoring, assistant prompt normalization, local-fallback AI design, export artifact packaging, responsive shell repair, browser-driven QA, evidence-led documentation.
 - Verification performed: `npm run lint`, `npm test` (55 tests), `npm run build`, Playwright browser smoke on `http://127.0.0.1:3002` at 1440x900 and 390x844, with zero console/page errors and no horizontal overflow; verified the path `Use Example Property -> Run Analysis -> Review Homes -> Adjustments -> Confirm and Lock -> Export preview`.
 - Evidence/files: `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Property_Review_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Home_List.csv`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Adjustment_Notes.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Review_Summary.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Activity_Log.txt`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Review_Package.zip`, `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `tests/exportPackage.test.ts`.
 - Resume-safe bullet: Implemented a judge-friendly 5-step comparable-review workflow with a truthful local-first assistant trace and canonical Review-base export artifacts, then verified the full path with Playwright desktop/mobile smoke checks.
+
+## 2026-06-04 - Verified Engineering Work
+
+- Built/changed: Shipped Review Intelligence V2 as a deterministic, verifier-gated reasoning layer for the five-step comparable-review workflow; attached verified review summaries to export only after explicit analyst action; cleaned the remaining lint debt; added a real favicon asset; and refreshed the README, QA docs, and final handoff copy to reflect the shipped reviewer-facing flow.
+- Systems involved: `src/app/page.tsx`, `src/app/layout.tsx`, `src/app/api/export/route.ts`, `lib/review-intelligence-v2/*`, `lib/pce/exportPackage.ts`, `hooks/usePceAnalysis.ts`, `hooks/usePracticeMode.tsx`, `src/components/review-intelligence-v2/*`, `src/components/evidence-board/*`, `README.md`, `.ralphplan/*`, `ai-engineering/*`.
+- Technical skills demonstrated: deterministic reasoning-layer design, export-pipeline integration, lint remediation, metadata and asset hygiene, browser-driven regression QA, and evidence-first handoff documentation.
+- Verification performed: `npm run lint` passed cleanly; `npm test` passed with 64 tests across 19 files; `npm run build` passed; browser smoke on `http://localhost:3000/` confirmed no `Agent Reasoning Trace`, no favicon 404, no overflow, and successful intake-to-review progression.
+- Evidence/files: `public/favicon.svg`, `qa-screenshots/2026-06-04-browser-qa.json`, `qa-screenshots/2026-06-04-review-drawer.png`, `qa-screenshots/2026-06-04-export.png`, `.ralphplan/browser-qa.md`, `.ralphplan/final-verification.md`, `ai-engineering/hackathon/kv-complens-final-handoff.md`.
+- Resume-safe bullet: Delivered a verifier-gated review-intelligence layer for a deterministic property-review workflow, then closed the remaining lint and browser issues and documented the final handoff with evidence-backed QA artifacts.

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -33,30 +33,20 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: process.env.OPENAI_ASSISTANT_MODEL?.trim() || "gpt-4o-mini",
-        input: [
+        messages: [
           {
             role: "system",
-            content: [
-              {
-                type: "input_text",
-                text: "You draft concise review-support memos for KV CompLens. Keep the deterministic valuation unchanged. Return only JSON that matches the supplied schema."
-              }
-            ]
+            content: "You draft concise review-support memos for KV CompLens. Keep the deterministic valuation unchanged. Return only JSON that matches the supplied schema."
           },
           {
             role: "user",
-            content: [
-              {
-                type: "input_text",
-                text: buildAssistantPrompt(context)
-              }
-            ]
+            content: buildAssistantPrompt(context)
           }
         ],
-        max_output_tokens: 700,
-        text: {
-          format: {
-            type: "json_schema",
+        max_tokens: 700,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
             name: "kv_complens_assistant_draft",
             strict: true,
             schema: assistantDraftSchema
@@ -99,31 +89,15 @@ export async function POST(request: Request) {
 }
 
 function parseOpenAIAssistantDraft(payload: Record<string, unknown>) {
-  const direct = typeof payload.output_text === "string" ? payload.output_text : undefined;
-  if (direct) {
-    return safeParseJson(direct);
-  }
-
-  const output = Array.isArray(payload.output) ? payload.output : [];
-  for (const item of output) {
-    if (!item || typeof item !== "object") {
-      continue;
-    }
-    const entry = item as { type?: unknown; content?: unknown };
-    if (entry.type !== "message" || !Array.isArray(entry.content)) {
-      continue;
-    }
-    for (const content of entry.content) {
-      if (!content || typeof content !== "object") {
-        continue;
-      }
-      const message = content as { type?: unknown; text?: unknown };
-      if (message.type === "output_text" && typeof message.text === "string") {
-        return safeParseJson(message.text);
+  if (Array.isArray(payload.choices) && payload.choices.length > 0) {
+    const firstChoice = payload.choices[0] as Record<string, unknown>;
+    if (firstChoice.message && typeof firstChoice.message === "object") {
+      const message = firstChoice.message as Record<string, unknown>;
+      if (typeof message.content === "string") {
+        return safeParseJson(message.content);
       }
     }
   }
-
   return undefined;
 }
 

@@ -18,19 +18,19 @@ export const tutorialSteps: TutorialStep[] = [
     id: "run-analysis",
     title: "Run the analysis",
     detail: "Click Run Analysis to move from intake into the source scan. The app stays local and does not export anything yet.",
-    note: "The analysis creates a local demo review set from the synthetic home data and keeps the next steps locked until results exist."
+    note: "The analysis creates a local demo review set from the synthetic comparable data and keeps the next steps locked until results exist."
   },
   {
     id: "source-scan",
     title: "Check sources",
-    detail: "Review the source scan summary before moving into homes. The app keeps source counts and records visible.",
+    detail: "Review the source scan summary before moving into comparables. The app keeps source counts and records visible.",
     note: "Use this step to confirm how many demo records were scanned and which source groups need review."
   },
   {
     id: "review-homes",
-    title: "Review homes",
-    detail: "Check the selected homes, surface a stronger comp if needed, and keep the review set transparent.",
-    note: "Use Find More Homes when you want the app to surface another candidate for analyst review."
+    title: "Review comparables",
+    detail: "Check the selected comparables, surface a stronger comp if needed, and keep the review set transparent.",
+    note: "Use Find More Comparables when you want the app to surface another candidate for analyst review."
   },
   {
     id: "confirm-export",

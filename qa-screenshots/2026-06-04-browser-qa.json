@@ -1,0 +1,117 @@
+{
+  "generatedAt": "2026-06-04T22:01:38.168Z",
+  "desktop": {
+    "desktop": {
+      "intakeMetrics": {
+        "label": "intake",
+        "title": "KV CompLens | AI Comparable Property Valuation",
+        "tutorialVisible": false,
+        "hasAgentReasoningTrace": false,
+        "hasReviewIntelligenceSummary": false,
+        "hasExplainReviewSet": false,
+        "hasExportButton": false,
+        "bodyScrollWidth": 1440,
+        "viewportWidth": 1440,
+        "horizontalOverflow": false,
+        "brokenImages": 0,
+        "buttonCount": 14,
+        "bodyTextSample": "KV CompLens\n\nProperty review\n\nCURRENT PROPERTY\nNo property entered\nEnter property details to unlock the source scan\nIntake\nSources\nReview\nAdjust\nExport\nLOCAL ONLY\nSIMULATED HOME SALES\nLocal synthetic home sales calibrated against public assessment context. Not MLS sold data.\n3 public assessment references documented.\nRepository\nzrt219/KV-CompLens\nProperty Intake\nWaiting for property details\n\nFill in the property details to unlock the analysis.\n\nFind More Comparables\nEdit Property\nExport\nRun Analysis\n1\nIntake\nWaiting for property details\n2\nSources\nNo sources checked yet\n3\nReview\nNo comparables ranked yet\n4\nAdjust\nNo comparables confirmed yet\n5\nExport\nNot ready yet\nProperty details\n\nEnter the property details before comparable or value results appear.\n\nProperty Details\n\nAll fields stay local. Run the analysis once the required property details are in place.\n\nWaiting for details\nAddress\nReview Name\nClient / Project\nCity\nEdmonton\nCalgary\nAirdrie\nSherwood Park\nSt. Albert\nProvince\nReview Date\nNeighbourhood\nProperty Type\nDetached\nSemiDetached\nTownhouse\nCondo\nYear Built\nBedrooms\nBathrooms\nLiving Area Sqft\nLot Size Sqft\nParking Stalls\nCondition\nPoor\nAverage\nGood\nRenovated\nNew\nTarget Price\nLatitude\nLongitude\nReset\nUse Example Property\nRun Analysis\nProperty Preview\nWaiting for details\nWaiting for property details\nNo property entered\n\nEnter the property details to preview the home.\n\nBeds\nN/A\nBaths\nN/A\nSq Ft\nN/A\nBlank numeric fields stay empty until entered\nEnter the property details to unlock the source scan\nNo value estimate appears yet\nExport stays locked until review\nParcel Snapshot\nWaiting for details\nLot size\nN/A\nParking\nN/A\nCondition\nWaiting for details\nUse\nWaiting for details\nReview Summary\nWAITING FOR DETAILS\nVALUE RANGE\nAwaiting analysis\nNo value estimate appears until the"
+      },
+      "sourcesMetrics": {
+        "label": "sources",
+        "title": "KV CompLens | AI Comparable Property Valuation",
+        "tutorialVisible": false,
+        "hasAgentReasoningTrace": false,
+        "hasReviewIntelligenceSummary": false,
+        "hasExplainReviewSet": false,
+        "hasExportButton": false,
+        "bodyScrollWidth": 1440,
+        "viewportWidth": 1440,
+        "horizontalOverflow": false,
+        "brokenImages": 0,
+        "buttonCount": 12,
+        "bodyTextSample": "KV CompLens\n\nProperty review\n\nCURRENT PROPERTY\n12345 109 St NW\nReady for the source scan\nIntake\nSources\nReview\nAdjust\nExport\nLOCAL ONLY\nSIMULATED HOME SALES\nLocal synthetic home sales calibrated against public assessment context. Not MLS sold data.\n3 public assessment references documented.\nRepository\nzrt219/KV-CompLens\nSource Scan\n\n12345 109 St NW / local demo snapshot\n\nSource scan ready\n\nCheck the source summary before moving into comparable review.\n\nFind More Comparables\nEdit Property\nExport\nGo to Review\n1\nIntake\n12345 109 St NW\n2\nSources\n5 sources / 125 records\n3\nReview\n80 comparables ranked\n4\nAdjust\n5 comparables confirmed\n5\nExport\n$551,000 - $748,000\nData Check\n\nReview, clean, and score local demo sources before comparables are ranked.\n\nRun data check\nData check ready\nCollect\nComplete\nClean\n125 records\nScore\nComplete\nReview\nComplete\nRemove duplicates\n80 comps\nSOURCES CHECKED\n5\nRECORDS FOUND\n125\nMATCHES FOUND\n121\nCOMPARABLES TO REVIEW\n80\nCOMPARABLES SELECTED\n5\nSource details\n2 sources need review\nSOURCE\tRECORDS\tSTANDARDIZED\tDISTINCT\tRELIABILITY\tRECENCY\tSTATUS\n\nMunicipal assessment\nCity of Edmonton\n\t17\t17\t15\t\n92\t2 days ago\t\nCompleted\n\nSimulated home sales\nKV simulated dataset\n\t80\t80\t80\t\n86\t1 day ago\t\nCompleted\n\nListing references\nActive listings\n\t24\t24\t21\t\n68\t6 hours ago\t\nCompleted\n\nSaved review history\nLocal review history\n\t1\t1\t1\t\n78\t5 days ago\t\nCompleted\n\nMarket trend context\nPublic trend context\n\t3\t3\t3\t\n74\t3 days ago\t\nCompleted\nSource quality summary\n84%\nGood coverage\n\nWeighted by matched records and reliability.\n\nCompleteness\n88%\nConsistency\n82%\nTimeliness\n90%\nStandardized key fields\nAddress\n99% coverage\nProperty type\n100% coverage\nYear built\n96% coverage\nLiving area\n94% coverage\nLot size\n93% coverage\nDuplicate check\nExact matches\n40\nProbable matches\n26\nPossible"
+      },
+      "reviewMetrics": {
+        "label": "review",
+        "title": "KV CompLens | AI Comparable Property Valuation",
+        "tutorialVisible": false,
+        "hasAgentReasoningTrace": false,
+        "hasReviewIntelligenceSummary": false,
+        "hasExplainReviewSet": true,
+        "hasExportButton": false,
+        "bodyScrollWidth": 1440,
+        "viewportWidth": 1440,
+        "horizontalOverflow": false,
+        "brokenImages": 0,
+        "buttonCount": 25,
+        "bodyTextSample": "KV CompLens\n\nProperty review\n\nCURRENT PROPERTY\n12345 109 St NW\nReady for the source scan\nIntake\nSources\nReview\nAdjust\nExport\nLOCAL ONLY\nSIMULATED HOME SALES\nLocal synthetic home sales calibrated against public assessment context. Not MLS sold data.\n3 public assessment references documented.\nRepository\nzrt219/KV-CompLens\nReview Comparables\n\n12345 109 St NW / local demo snapshot\n\nReview comparables\n\nInspect the selected comparables and surface a stronger comp if needed.\n\nFind More Comparables\nExplain Review Set\nEdit Property\nExport\nGo to Adjustments\n1\nIntake\n12345 109 St NW\n2\nSources\n5 sources / 125 records\n3\nReview\n80 comparables ranked\n4\nAdjust\n5 comparables confirmed\n5\nExport\n$551,000 - $748,000\nEvidence Board\nSelected comparables and source support\nFind More\nAuto Arrange\n100%\nBoard\nTable\nSubject\nSelected comparable\nNew comparable\nSearch comparables\nSubject property\nSUBJECT\nPROPERTY\n12345 109 St NW\n\nCentral McDougall / Detached\n\nReview target\nDETACHED\n#1\nSELECTED COMPARABLE\n12310 108 St NW\nCentral McDougall / 0.3 km\n61 Match / 64% strength\nWHY THIS COMPARABLE?\nDETACHED\n#2\nSELECTED COMPARABLE\n236 Larch Drive\nGlenora / 2.4 km\n47 Match / 21% strength\nWHY THIS COMPARABLE?\nSEMI\n#3\nSELECTED COMPARABLE\n253 Juniper Drive\nWindermere / 0.3 km\n40 Match / 14% strength\nWHY THIS COMPARABLE?\nDETACHED\n#4\nSELECTED COMPARABLE\n253 Prairie Drive\nSummerwood / 12.9 km\n43 Match / 0% strength\nWHY THIS COMPARABLE?\nDETACHED\n#5\nSELECTED COMPARABLE\n236 Prairie Drive\nLacombe Park / 13.2 km\n38 Match / 0% strength\nWHY THIS COMPARABLE?\nAnalysis complete\n\n5 comparables selected for review.\n\nReview Summary\nLOCAL ONLY\nESTIMATED VALUE RANGE\n$551,000 - $748,000\n\nCurrent estimate $650,000\n\n$551,000\n$748,000\nCross-platform evidence model, local demo data.\nCONFIDENCE\n64%\nLow confidence\n\n5 comparables reviewe"
+      },
+      "whyComparableVisible": true,
+      "drawerMetrics": {
+        "safeModeVisible": false,
+        "readyToAttachVisible": true,
+        "addToMemoVisible": true,
+        "claimLedgerVisible": true
+      },
+      "adjustMetrics": {
+        "label": "adjust",
+        "title": "KV CompLens | AI Comparable Property Valuation",
+        "tutorialVisible": false,
+        "hasAgentReasoningTrace": false,
+        "hasReviewIntelligenceSummary": false,
+        "hasExplainReviewSet": false,
+        "hasExportButton": false,
+        "bodyScrollWidth": 1440,
+        "viewportWidth": 1440,
+        "horizontalOverflow": false,
+        "brokenImages": 0,
+        "buttonCount": 37,
+        "bodyTextSample": "KV CompLens\n\nProperty review\n\nCURRENT PROPERTY\n12345 109 St NW\nReady for the source scan\nIntake\nSources\nReview\nAdjust\nExport\nLOCAL ONLY\nSIMULATED HOME SALES\nLocal synthetic home sales calibrated against public assessment context. Not MLS sold data.\n3 public assessment references documented.\nRepository\nzrt219/KV-CompLens\nAdjustments\n\n12345 109 St NW / local demo snapshot\n\nAdjustments ready\n\nConfirm the adjustments before opening export.\n\nFind More Comparables\nEdit Property\nExport\nGo to Export\n1\nIntake\n12345 109 St NW\n2\nSources\n5 sources / 125 records\n3\nReview\n80 comparables ranked\n4\nAdjust\n5 comparables confirmed\n5\nExport\n$551,000 - $748,000\nAdjustments ready\n\nAdjustments are transparent and reviewable. The system proposes them, and the analyst confirms them before export.\n\nPROPERTY\nSUBJECT\n12345 109 St NW\nCentral McDougall / $650,000\nCOMP 1\nDETACHED\n12310 108 St NW\n$530,000 / Adj. $619,000\nCOMP 2\nDETACHED\n236 Larch Drive\n$626,000 / Adj. $677,000\nCOMP 3\nDETACHED\n253 Prairie Drive\n$727,000 / Adj. $726,000\nCOMP 4\nSEMI\n253 Juniper Drive\n$538,000 / Adj. $607,000\nCOMP 5\nDETACHED\n236 Prairie Drive\n$708,000 / Adj. $714,000\nPROPERTY\nAttributes\nSUBJECT\n12345 109 St NW\nCOMP 1\n12310 108 St NW\nExclude\nCOMP 2\n236 Larch Drive\nExclude\nCOMP 3\n253 Prairie Drive\nExclude\nCOMP 4\n253 Juniper Drive\nExclude\nCOMP 5\n236 Prairie Drive\nExclude\nPRICE\n—\n$530,000\n$626,000\n$727,000\n$538,000\n$708,000\nDISTANCE\nSubject\n0.3 km\n2.4 km\n12.9 km\n0.3 km\n13.2 km\nBEDS\n4\n4\n3\n4\n4\n3\nBATHS\n3\n2\n3\n2\n2\n3\nSQ FT\n2,180\n1,765\n1,860\n2,157\n1,585\n2,359\nLOT SIZE\n5,800\n4,677\n4,929\n5,716\n2,457\n6,251\nYEAR BUILT\n2014\n1978\n1989\n2011\n1996\n2009\nCONDITION\nGood\nPoor\nAverage\nAverage\nRenovated\nPoor\nPARKING\n2\n2\n2\n2\n2\n2\nTIME ADJUSTMENT\n—\n+$2,000\n+$2,000\n+$19,000\n+$6,000\n+$17,000\nLOCATION ADJUSTMENT\n—\n-$1,000\n-$9,000\n-$47,000\n-$1,000\n-$48,0"
+      },
+      "adjustmentsLocked": true,
+      "exportMetricsBeforeGenerate": {
+        "label": "export-before-generate",
+        "title": "KV CompLens | AI Comparable Property Valuation",
+        "tutorialVisible": false,
+        "hasAgentReasoningTrace": false,
+        "hasReviewIntelligenceSummary": true,
+        "hasExplainReviewSet": false,
+        "hasExportButton": true,
+        "bodyScrollWidth": 1440,
+        "viewportWidth": 1440,
+        "horizontalOverflow": false,
+        "brokenImages": 0,
+        "buttonCount": 18,
+        "bodyTextSample": "KV CompLens\n\nProperty review\n\nCURRENT PROPERTY\n12345 109 St NW\nReady for the source scan\nIntake\nSources\nReview\nAdjust\nExport\nLOCAL ONLY\nSIMULATED HOME SALES\nLocal synthetic home sales calibrated against public assessment context. Not MLS sold data.\n3 public assessment references documented.\nRepository\nzrt219/KV-CompLens\nExport Package\n\n12345 109 St NW / local demo snapshot\n\nReady to export\n\nGenerate the final package from the current review set.\n\nFind More Comparables\nEdit Property\nExport\nExport Report\n1\nIntake\n12345 109 St NW\n2\nSources\n5 sources / 125 records\n3\nReview\n80 comparables ranked\n4\nAdjust\n5 comparables confirmed\n5\nExport\n$551,000 - $748,000\nReady to export\n\nThe review is locked and ready to export as a local demo package.\n\nESTIMATED VALUE\n$650,000\nESTIMATED RANGE\n$551,000 - $748,000\nCONFIDENCE\n64% Low\nCOMPARABLES INCLUDED\n5\nExport notes\nUse\nReview support only\nDecisioning\nNot a credit decision\nValuation\nNot an appraisal\nReview\nAnalyst approval required\nData\nSimulated home sales\nComparables included\n1\n12310 108 St NW\nIncluded / 0.3 km / Score 61\n2\n236 Larch Drive\nIncluded / 2.4 km / Score 47\n3\n253 Prairie Drive\nIncluded / 12.9 km / Score 43\n4\n253 Juniper Drive\nIncluded / 0.3 km / Score 40\n5\n236 Prairie Drive\nIncluded / 13.2 km / Score 38\nReview Intelligence Summary\nVerdict\nReview set is weak\nStrongest comp\n12310 108 St NW\nWeakest comp\n236 Prairie Drive\nAudit status\nAttached to memo/export\n\nReview Intelligence V2 indicates the current review set needs explicit analyst review around $650,000 with 5 selected comparables and 64% confidence. 12310 108 St NW is the strongest support. 236 Prairie Drive is the weakest selected comparable and should be reviewed. Removing 12310 108 St NW materially shifts the midpoint or confidence, which indicates that the comp is impo"
+      },
+      "exportMetricsAfterGenerate": {
+        "reviewIntelligenceAttached": true,
+        "hasReviewIntelligenceSummary": true,
+        "hasAgentReasoningTrace": false,
+        "exportGeneratedToast": false
+      }
+    },
+    "consoleIssues": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      }
+    ]
+  },
+  "mobile": {
+    "label": "mobile-export",
+    "title": "KV CompLens | AI Comparable Property Valuation",
+    "tutorialVisible": false,
+    "hasAgentReasoningTrace": false,
+    "hasReviewIntelligenceSummary": true,
+    "hasExplainReviewSet": false,
+    "hasExportButton": true,
+    "bodyScrollWidth": 392,
+    "viewportWidth": 392,
+    "horizontalOverflow": false,
+    "brokenImages": 0,
+    "buttonCount": 18,
+    "bodyTextSample": "KV CompLens\n\nProperty review\n\nCURRENT PROPERTY\n12345 109 St NW\nReady for the source scan\nIntake\nSources\nReview\nAdjust\nExport\nLOCAL ONLY\nSIMULATED HOME SALES\nLocal synthetic home sales calibrated against public assessment context. Not MLS sold data.\n3 public assessment references documented.\nRepository\nzrt219/KV-CompLens\nExport Package\n\n12345 109 St NW / local demo snapshot\n\nReady to export\n\nGenerate the final package from the current review set.\n\nFind More Comparables\nEdit Property\nExport\nExport Report\n1\nIntake\n12345 109 St NW\n2\nSources\n5 sources / 125 records\n3\nReview\n80 comparables ranked\n4\nAdjust\n5 comparables confirmed\n5\nExport\n$551,000 - $748,000\nReady to export\n\nThe review is locked and ready to export as a local demo package.\n\nESTIMATED VALUE\n$650,000\nESTIMATED RANGE\n$551,000 - $748,000\nCONFIDENCE\n64% Low\nCOMPARABLES INCLUDED\n5\nExport notes\nUse\nReview support only\nDecisioning\nNot a credit decision\nValuation\nNot an appraisal\nReview\nAnalyst approval required\nData\nSimulated home sales\nComparables included\n1\n12310 108 St NW\nIncluded / 0.3 km / Score 61\n2\n236 Larch Drive\nIncluded / 2.4 km / Score 47\n3\n253 Prairie Drive\nIncluded / 12.9 km / Score 43\n4\n253 Juniper Drive\nIncluded / 0.3 km / Score 40\n5\n236 Prairie Drive\nIncluded / 13.2 km / Score 38\nReview Intelligence Summary\nVerdict\nReview set is weak\nStrongest comp\n12310 108 St NW\nWeakest comp\n236 Prairie Drive\nAudit status\nAttached to memo/export\n\nReview Intelligence V2 indicates the current review set needs explicit analyst review around $650,000 with 5 selected comparables and 64% confidence. 12310 108 St NW is the strongest support. 236 Prairie Drive is the weakest selected comparable and should be reviewed. Removing 12310 108 St NW materially shifts the midpoint or confidence, which indicates that the comp is impo"
+  }
+}

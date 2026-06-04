@@ -22,8 +22,8 @@ export function createInitialActivity(analysis: CompAnalysisResult): ActivityIte
   return [
     {
       id: "analysis-created",
-      label: "Initial home set created",
-      detail: `${analysis.valuation.includedCompCount} homes selected for review.`,
+      label: "Comparable review set created",
+      detail: `${analysis.valuation.includedCompCount} comparables selected for review.`,
       time: "Start",
       status: "confirmed"
     },
@@ -49,7 +49,7 @@ export function addCandidateToAnalysis(subject: SubjectProperty, current: CompAn
   const nextActivity: ActivityItem[] = [
     {
       id: `comp-added-${candidate.id}`,
-      label: `Home ${selectedIds.length} added`,
+      label: `Comparable ${selectedIds.length} added`,
       detail: `${candidate.address} added to the selected review set.`,
       time: "Just now",
       status: "confirmed"
@@ -57,7 +57,7 @@ export function addCandidateToAnalysis(subject: SubjectProperty, current: CompAn
     {
       id: `confidence-${candidate.id}`,
       label: "Confidence recalculated",
-      detail: delta ? `${formatSigned(delta.confidenceDelta)} pts confidence change.` : "Review confidence recalculated from the selected homes.",
+      detail: delta ? `${formatSigned(delta.confidenceDelta)} pts confidence change.` : "Review confidence recalculated from the selected comparables.",
       time: "Just now",
       status: "confirmed"
     },
@@ -71,7 +71,7 @@ export function addCandidateToAnalysis(subject: SubjectProperty, current: CompAn
     {
       id: `report-${candidate.id}`,
       label: "Report draft refreshed",
-      detail: "Review summary refreshed from the selected homes.",
+      detail: "Review summary refreshed from the selected comparables.",
       time: "Just now",
       status: "ready"
     },

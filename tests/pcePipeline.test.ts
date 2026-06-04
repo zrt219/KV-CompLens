@@ -69,7 +69,7 @@ describe("runPcePipeline", () => {
     expect(snapshot.memo).toContain(String(snapshot.sourceScan.selectedCompCount));
     expect(snapshot.memo).toContain(snapshot.selectedComparables[0].address);
     expect(snapshot.memo).toContain(snapshot.valuation.effectiveSampleSize.toString());
-    expect(snapshot.memo).toContain("Selected Homes");
+    expect(snapshot.memo).toContain("Selected Comparables");
     expect(snapshot.memo).toContain("Review Summary");
   });
 

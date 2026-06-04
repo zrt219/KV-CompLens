@@ -48,7 +48,7 @@ describe("exportPackage", () => {
       "12345_109_St_NW_Review_2026-06-01_Property_Review_Memo.pdf"
     );
     expect(buildExportArtifact("comparables-csv", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Home_List.csv"
+      "12345_109_St_NW_Review_2026-06-01_Comparable_List.csv"
     );
     expect(buildExportArtifact("adjustments-pdf", subject, snapshot).fileName).toBe(
       "12345_109_St_NW_Review_2026-06-01_Adjustment_Notes.pdf"
@@ -72,8 +72,9 @@ describe("exportPackage", () => {
     expect(artifact.mimeType).toBe("application/pdf");
     expect(content.startsWith("%PDF-1.4")).toBe(true);
     expect(content).toContain("Property Review Memo");
-    expect(content).toContain("Deterministic internal engine");
-    expect(content).not.toMatch(/equations|coefficients|derivations|posterior/i);
+    expect(content).toContain("Cross-platform evidence model");
+    expect(content).toContain("Proprietary methods are not disclosed");
+    expect(content).not.toMatch(/equations|coefficients|derivations|posterior|variance|entropy|model fusion/i);
   });
 
   it("builds a csv comparable set", () => {
@@ -81,7 +82,7 @@ describe("exportPackage", () => {
 
     expect(artifact.fileName.endsWith(".csv")).toBe(true);
     expect(typeof artifact.content).toBe("string");
-    expect(artifact.content).toContain("Home ID,Address,Neighbourhood");
+    expect(artifact.content).toContain("Comparable ID,Address,Neighbourhood");
     expect(artifact.content).toContain(snapshot.valuation.adjustedComparables[0].address);
   });
 
@@ -93,7 +94,8 @@ describe("exportPackage", () => {
 
     expect(markdown.fileName.endsWith(".md")).toBe(true);
     expect(markdownContent).toContain("# KV CompLens Review Summary");
-    expect(markdownContent).toContain("Deterministic internal engine. Detailed methods are not disclosed.");
+    expect(markdownContent).toContain("Cross-platform evidence model. Proprietary methods are not disclosed.");
+    expect(markdownContent).not.toMatch(/equations|coefficients|derivations|posterior|variance|entropy|model fusion/i);
     expect(markdownContent).toContain(snapshot.selectedComparables[0].address);
     expect(auditLog.fileName.endsWith(".txt")).toBe(true);
     expect(auditLogContent).toContain("KV CompLens Review Activity Log");
@@ -108,7 +110,7 @@ describe("exportPackage", () => {
     expect(artifact.mimeType).toBe("application/zip");
     expect(zipText.startsWith("PK")).toBe(true);
     expect(zipText).toContain("Property_Review_Memo.pdf");
-    expect(zipText).toContain("Home_List.csv");
+    expect(zipText).toContain("Comparable_List.csv");
     expect(zipText).toContain("Adjustment_Notes.pdf");
     expect(zipText).toContain("Review_Summary.md");
     expect(zipText).toContain("Activity_Log.txt");

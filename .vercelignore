@@ -22,3 +22,15 @@ Starminer.v*.zip
 /browser-*.png
 /startup.png
 /kv_capital_sam_call_cheat_sheet_zhane.pdf
+
+# Local prompt packs, QA evidence, and helper scripts should not be uploaded.
+/.ralphplan/
+/qa-screenshots/
+/pics/
+/pass*.png
+/complete-sources.js
+/fix-*.js
+/remove-tutorial.js
+/llm prompt.md
+/llm2 prompt.md
+/last qa prompt.md

@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildExportArtifact, isExportReady, type ExportArtifactType } from "../../../../lib/pce/exportPackage";
-import type { PceAnalysisSnapshot } from "../../../../lib/pce/runPcePipeline";
+import type { PceAnalysisSnapshot, PceAuditEvent } from "../../../../lib/pce/runPcePipeline";
 import type { SubjectProperty } from "../../../../lib/types";
 
 export const runtime = "nodejs";
@@ -10,6 +10,8 @@ type ExportRequestBody = {
   type: ExportArtifactType;
   subject: SubjectProperty;
   snapshot: PceAnalysisSnapshot;
+  reviewIntelligenceAttached?: boolean;
+  auditEvents?: PceAuditEvent[];
 };
 
 export async function POST(request: Request) {
@@ -25,7 +27,10 @@ export async function POST(request: Request) {
     return new Response("Analysis must run before export.", { status: 409 });
   }
 
-  const artifact = buildExportArtifact(body.type, body.subject, snapshot);
+  const artifact = buildExportArtifact(body.type, body.subject, snapshot, {
+    includeReviewIntelligence: body.reviewIntelligenceAttached,
+    auditEvents: body.auditEvents
+  });
   const bytes = typeof artifact.content === "string"
     ? new TextEncoder().encode(artifact.content)
     : artifact.content;

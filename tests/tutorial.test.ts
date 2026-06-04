@@ -9,7 +9,7 @@ describe("tutorial content", () => {
       "Enter property details",
       "Run the analysis",
       "Check sources",
-      "Review homes",
+      "Review comparables",
       "Confirm and export"
     ]);
     expect(tutorialSteps[0].note).toContain("example property");

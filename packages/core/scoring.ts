@@ -108,7 +108,7 @@ export function evaluateEligibility(subject: SubjectProperty, comp: ComparablePr
     reasons.push(`Too far away at ${distanceKm.toFixed(1)} km.`);
   } else if (distanceKm > 18) {
     penalty += 12;
-    reasons.push(`Farther than preferred at ${distanceKm.toFixed(1)} km from the subject home.`);
+    reasons.push(`Farther than preferred at ${distanceKm.toFixed(1)} km from the subject property.`);
   }
   if (daysSinceSale > 730) {
     failed = true;
@@ -120,7 +120,7 @@ export function evaluateEligibility(subject: SubjectProperty, comp: ComparablePr
   }
   if (scorePropertyType(subject, comp) < 35) {
     penalty += 16;
-    reasons.push("Property type does not match the subject home.");
+    reasons.push("Property type does not match the subject property.");
   }
   if (sizeVariance > 0.4) {
     penalty += 10;
@@ -258,10 +258,10 @@ export function scoreComparableProperty(subject: SubjectProperty, comp: Comparab
 
   const reasonParts = [
     subject.propertyType === comp.propertyType ? `Same property type: ${comp.propertyType}.` : `Property type differs: ${comp.propertyType}.`,
-    distanceKm <= 3 ? `Within the preferred distance at ${distanceKm.toFixed(1)} km.` : `${distanceKm.toFixed(1)} km from the subject home.`,
-    sizeVariance <= 0.25 ? `Home size is within tolerance.` : `${Math.round(sizeVariance * 100)}% home-size difference.`,
+    distanceKm <= 3 ? `Within the preferred distance at ${distanceKm.toFixed(1)} km.` : `${distanceKm.toFixed(1)} km from the subject property.`,
+    sizeVariance <= 0.25 ? `Comparable size is within tolerance.` : `${Math.round(sizeVariance * 100)}% comparable-size difference.`,
     daysSinceSale <= 180 ? `Recent sale within ${daysSinceSale} days.` : `Sale age is ${daysSinceSale} days.`,
-    `Match chance ${Math.round(comparableProbability * 100)}%, evidence strength ${Math.round(energy.energyQuality * 100)}%, source reliability ${Math.round(sourceReliability * 100)}%.`
+    `Comparable probability ${Math.round(comparableProbability * 100)}%, evidence strength ${Math.round(energy.energyQuality * 100)}%, source reliability ${Math.round(sourceReliability * 100)}%.`
   ];
   const status = !eligibility.passed || totalScore < 48 || comparableProbability < 0.28 ? "rejected" : "candidate";
 
@@ -269,7 +269,7 @@ export function scoreComparableProperty(subject: SubjectProperty, comp: Comparab
     ...comp,
     status,
     wasRejected: status === "rejected",
-    rejectionReason: status === "rejected" ? (basePenalties[0] ?? "Lower match than the homes already selected.") : comp.rejectionReason,
+    rejectionReason: status === "rejected" ? (basePenalties[0] ?? "Lower match than the comparables already selected.") : comp.rejectionReason,
     totalScore: Math.round(totalScore * 10) / 10,
     rawScore: Math.round(rawScore * 10) / 10,
     breakdown,

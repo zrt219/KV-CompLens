@@ -1,4 +1,4 @@
-import { scoreComparableProperty, rankComparables, selectTopComparables } from "../packages/core/scoring";
+import { rankComparables, selectTopComparables } from "../packages/core/scoring";
 import { estimateValuationRange } from "../packages/core/valuation";
 import { defaultMockSubject, syntheticComparables } from "../lib/mockData";
 import type { SubjectProperty, ComparableProperty } from "../packages/core/types";

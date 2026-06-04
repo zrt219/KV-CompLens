@@ -36,35 +36,35 @@
 
 ## 2026-06-01 - Verified Engineering Work
 
-- Built/changed: Upgraded KV CompLens into PCE-V1, a deterministic probabilistic comparable-evidence engine with eligibility gates, smooth similarity kernels, robust price-per-square-foot outlier probabilities, source reliability, per-comp uncertainty variance, precision-weighted posterior valuation, confidence logits, marginal information gain, UI evidence labels, README methodology/IP notes, and expanded unit tests.
+- Built/changed: Upgraded KV CompLens into Evidence Model V1, a deterministic probabilistic comparable-evidence engine with eligibility gates, smooth similarity kernels, robust price-per-square-foot outlier probabilities, source reliability, per-comp uncertainty variance, precision-weighted posterior valuation, confidence logits, review impact ranking, UI evidence labels, README methodology/IP notes, and expanded unit tests.
 - Systems involved: Next.js app router, TypeScript core domain modules, deterministic probability utilities, MAD outlier detection, valuation/confidence/marginal-impact engines, facts-only underwriting memo, Vitest, Chrome headless visual evidence.
 - Technical skills demonstrated: Explainable probabilistic evidence modeling, deterministic underwriting workflow design, robust outlier handling, precision-weighted valuation reconciliation, confidence calibration, human-in-the-loop safety documentation, regression verification.
 - Verification performed: `npm run lint`, `npm test` (23 tests), `npm run build`, HTTP 200 smoke check at `http://localhost:3000`, Chrome headless screenshots at 1366x768 and 1440x900.
-- Evidence/files: `packages/core/probability.ts`, `packages/core/outliers.ts`, `packages/core/confidence.ts`, `packages/core/marginalImpact.ts`, `packages/core/scoring.ts`, `packages/core/valuation.ts`, `packages/core/adjustments.ts`, `packages/core/memo.ts`, `src/app/page.tsx`, `src/app/globals.css`, `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `artifacts/kv-complens-pce-v1-1366-final-v2.png`, `artifacts/kv-complens-pce-v1-1440-final-v3.png`.
-- Resume-safe bullet: Upgraded a deterministic AI underwriting-support prototype with probabilistic comparable evidence scoring, MAD outlier detection, precision-weighted valuation, marginal information gain, and verified tests/build/runtime evidence.
+- Evidence/files: `packages/core/probability.ts`, `packages/core/outliers.ts`, `packages/core/confidence.ts`, `packages/core/marginalImpact.ts`, `packages/core/scoring.ts`, `packages/core/valuation.ts`, `packages/core/adjustments.ts`, `packages/core/memo.ts`, `src/app/page.tsx`, `src/app/globals.css`, `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `artifacts/kv-complens-Evidence Model V1-1366-final-v2.png`, `artifacts/kv-complens-Evidence Model V1-1440-final-v3.png`.
+- Resume-safe bullet: Upgraded a deterministic AI underwriting-support prototype with probabilistic comparable evidence scoring, MAD outlier detection, precision-weighted valuation, review impact ranking, and verified tests/build/runtime evidence.
 
 ## 2026-06-01 - Verified Engineering Work
 
-- Built/changed: Extended KV CompLens from PCE-V1 to PCE-V2 with evidence energy, Bayesian-style source reliability priors, PCE-V2 comparable probability, comparable uncertainty variance, normalized evidence weights, residual-buffered posterior valuation, model-fusion diagnostics, MIG-ranked candidate selection, UI evidence labels, facts-only memo methodology, README equations, and expanded tests.
+- Built/changed: Extended KV CompLens from Evidence Model V1 to cross-platform evidence model with evidence energy, Bayesian-style source reliability priors, cross-platform evidence model comparable probability, comparable uncertainty variance, normalized evidence weights, residual-buffered posterior valuation, model-fusion diagnostics, review-impact-ranked candidate selection, UI evidence labels, facts-only memo methodology, README equations, and expanded tests.
 - Systems involved: Next.js app router, TypeScript scoring/valuation modules, probability utilities, source reliability module, model fusion module, marginal impact workflow, deterministic adjustment engine, Vitest, Chrome headless runtime screenshots.
 - Technical skills demonstrated: Probabilistic evidence-fusion architecture, uncertainty-aware comparable ranking, robust residual-buffered range estimation, deterministic source-quality modeling, model diagnostic design, explainable underwriting memo generation, regression verification.
 - Verification performed: `npm test` (28 tests), `npm run lint`, `npm run build`, HTTP 200 smoke check at `http://localhost:3000`, Chrome headless screenshots at 1366x768 and 1440x900.
-- Evidence/files: `packages/core/sourceReliability.ts`, `packages/core/modelFusion.ts`, `packages/core/scoring.ts`, `packages/core/valuation.ts`, `packages/core/marginalImpact.ts`, `packages/core/confidence.ts`, `packages/core/probability.ts`, `packages/core/adjustments.ts`, `packages/core/memo.ts`, `src/app/page.tsx`, `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `artifacts/kv-complens-pce-v2-1366.png`, `artifacts/kv-complens-pce-v2-1440.png`.
-- Resume-safe bullet: Extended a deterministic underwriting-support prototype into a PCE-V2 evidence-fusion framework with source reliability priors, evidence energy, residual-buffered posterior valuation, model-fusion diagnostics, and verified tests/build/runtime evidence.
+- Evidence/files: `packages/core/sourceReliability.ts`, `packages/core/modelFusion.ts`, `packages/core/scoring.ts`, `packages/core/valuation.ts`, `packages/core/marginalImpact.ts`, `packages/core/confidence.ts`, `packages/core/probability.ts`, `packages/core/adjustments.ts`, `packages/core/memo.ts`, `src/app/page.tsx`, `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `artifacts/kv-complens-cross-platform evidence model-1366.png`, `artifacts/kv-complens-cross-platform evidence model-1440.png`.
+- Resume-safe bullet: Extended a deterministic underwriting-support prototype into a cross-platform evidence model evidence-fusion framework with source reliability priors, evidence energy, residual-buffered posterior valuation, model-fusion diagnostics, and verified tests/build/runtime evidence.
 
 ## 2026-06-01 - Verified Engineering Work
 
-- Built/changed: Strengthened PCE UI state tests around Evidence Board-facing reducer and selector behavior for finding more comparables, adding a candidate into the selected set, and propagating the active selected comparable through view models.
-- Systems involved: Vitest, PCE reducer state, CivicGrid/Evidence Board selector contract, deterministic synthetic comparable dataset.
+- Built/changed: Strengthened review UI state tests around Evidence Board-facing reducer and selector behavior for finding more comparables, adding a candidate into the selected set, and propagating the active selected comparable through view models.
+- Systems involved: Vitest, review reducer state, CivicGrid/Evidence Board selector contract, deterministic synthetic comparable dataset.
 - Technical skills demonstrated: Regression test hardening, selector contract verification, deterministic candidate-selection workflow testing, UI state safety for component replacement.
 - Verification performed: `npm test` (41 tests across 16 files).
-- Evidence/files: `tests/pceUiState.test.ts`.
+- Evidence/files: `UI state tests`.
 - Resume-safe bullet: Hardened reducer and selector tests for a deterministic comparable-evidence workflow, covering candidate surfacing, selected-set inclusion, valuation recalculation, and active comparable propagation after UI replacement work.
 
 ## 2026-06-01 - Verified Engineering Work
 
 - Built/changed: Added CSS-only Evidence Board calm-canvas overrides with blank #050b14/#07111f surfaces, subtle dot-matrix texture, deterministic comparable/subject slots, grouped active-link styling, and responsive slot widths for 1280/1440/1536/1920 layouts.
-- Systems involved: Next.js global CSS, Evidence Board component styling surface, deterministic PCE comparable evidence UI.
+- Systems involved: Next.js global CSS, Evidence Board component styling surface, deterministic review comparable evidence UI.
 - Technical skills demonstrated: CSS-only UI integration, responsive absolute layout constraints, visual hierarchy reduction, accessible non-color-only active states, build-safe styling overrides.
 - Verification performed: `npm run lint`, `npm run build`.
 - Evidence/files: `src/app/globals.css`.
@@ -73,19 +73,19 @@
 ## 2026-06-01 - Verified Engineering Work
 
 - Built/changed: Fixed the left-rail active-state bug so Subject Intake and Comparable Analysis no longer render as simultaneously selected, replaced the placeholder export modal behavior with real artifact generation, added server-side export persistence, and added coverage for PDF/CSV/Markdown/TXT/ZIP export generation.
-- Systems involved: Next.js app router, client-side export modal workflow, `artifacts/exports` persistence, deterministic PCE snapshot exports, Vitest.
+- Systems involved: Next.js app router, client-side export modal workflow, `artifacts/exports` persistence, deterministic review snapshot exports, Vitest.
 - Technical skills demonstrated: Targeted state bug isolation, binary/text artifact generation, minimal PDF/ZIP construction without new dependencies, server route implementation, browser-driven runtime verification, filesystem evidence validation.
 - Verification performed: `npm run lint`, `npm test` (46 tests), `npm run build`, Browser nav-state check at `http://localhost:3000/`, Browser six-option export cycle, filesystem validation of generated artifacts under `artifacts/exports`, PDF header checks, ZIP entry inspection.
-- Evidence/files: `src/app/page.tsx`, `lib/pce/exportPackage.ts`, `src/app/api/export/route.ts`, `tests/exportPackage.test.ts`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Comparable_Set.csv`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Adjustment_Appendix.pdf`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Snapshot_Memo.md`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Audit_Log.txt`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Evidence_Package.zip`.
+- Evidence/files: `src/app/page.tsx`, `export package generator`, `src/app/api/export/route.ts`, `tests/exportPackage.test.ts`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Comparable_Set.csv`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Adjustment_Appendix.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Snapshot_Memo.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Audit_Log.txt`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Evidence_Package.zip`.
 - Resume-safe bullet: Implemented and verified a deterministic underwriting export pipeline that produces persisted PDF, CSV, Markdown, TXT, and ZIP artifacts from a snapshot-driven comparable analysis workflow.
 
 ## 2026-06-01 - Verified Engineering Work
 
 - Built/changed: Repaired the live verification failures in the workspace shell by restoring visible stage-title copy, correcting selected-row treatment in Comp Discovery, disabling the non-functional Evidence Board `Table` control, replacing the fake adjustment recalculation button with a factual status note, and fixing the export route so Browser-driven report generation no longer fails with HTTP 500.
 - Systems involved: Next.js app shell, Evidence Board controls, discovery-list styling, adjustment review state handling, `src/app/api/export/route.ts`, Browser-driven export flow.
-- Technical skills demonstrated: Browser-based UI verification, state invalidation after comp-set changes, HTTP response debugging with non-ASCII path constraints, truthful control design, targeted UI hardening without changing the underlying PCE math.
+- Technical skills demonstrated: Browser-based UI verification, state invalidation after comp-set changes, HTTP response debugging with non-ASCII path constraints, truthful control design, targeted UI hardening without changing the underlying review math.
 - Verification performed: `npm run lint`, `npm test` (46 tests), `npm run build`, Browser checks for single-active navigation state, visible stage-title rendering, disabled placeholder controls, successful modal export completion, reset of `Adjustments Locked` after exclusion, and reset from `Report Export Prepared` back to `Report Ready` after exclusion.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoard.tsx`, `src/app/api/export/route.ts`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoard.tsx`, `src/app/api/export/route.ts`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf`.
 - Resume-safe bullet: Hardened a deterministic underwriting review workspace by removing stale UI state, fixing a live export-route failure, and verifying end-to-end report generation and reset behavior through Browser-driven QA.
 
 ## 2026-06-01 - Verified Engineering Work
@@ -100,19 +100,19 @@
 ## 2026-06-01 - Verified Engineering Work
 
 - Built/changed: Completed a Ralphplan Browser QA repair pass for the KV CompLens shell by wiring Evidence Board search, adding readability mode, disabling the demo-only more-actions control, making `Next step` advance the workflow, gating report export behind adjustment confirmation, and fixing the header/workflow stacking conflict.
-- Systems involved: Next.js app shell, Evidence Board canvas, export/report workflow gating, Browser-driven interaction QA, deterministic PCE snapshot UI.
+- Systems involved: Next.js app shell, Evidence Board canvas, export/report workflow gating, Browser-driven interaction QA, deterministic review snapshot UI.
 - Technical skills demonstrated: Frontend interaction debugging, accessible control states, workflow-state truthfulness, search filtering, readability/contrast tuning, Browser-based regression verification.
 - Verification performed: `npm test` (46 tests), `npm run lint`, `npm run build`, Browser checks for page identity, no runtime overlay, no console errors/warnings, single active nav item, search match and empty states, readability toggle state, Next-step progression, export gating, adjustment lock, six-type export modal, and successful report export generation.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoardCanvas.tsx`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoardCanvas.tsx`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf`.
 - Resume-safe bullet: Hardened a deterministic underwriting workspace with browser-verified workflow controls, comparable search, readability mode, export gating, and report-generation proof.
 
 ## 2026-06-01 - Verified Engineering Work
 
 - Built/changed: Repaired the remaining Browser-visible header/workflow collision across analysis pages, improved Adjustment Review comparable-column fit, and generated all six export artifact types through the UI.
-- Systems involved: Next.js app shell, global layout CSS, Adjustment Review grid, Browser-driven page sweep, server-backed export route, deterministic PCE export artifacts.
+- Systems involved: Next.js app shell, global layout CSS, Adjustment Review grid, Browser-driven page sweep, server-backed export route, deterministic review export artifacts.
 - Technical skills demonstrated: Visual regression triage, responsive shell layout repair, browser-based UI flow testing, multi-format document export verification, evidence-first QA documentation.
 - Verification performed: `npm test` (46 tests), `npm run lint`, `npm run build`, Browser sweep across all eight workspace pages, Browser export cycle for PDF memo, CSV comparable set, PDF adjustment appendix, Markdown snapshot memo, TXT audit log, and ZIP evidence package, plus filesystem signature/size checks.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Underwriting_Memo.pdf`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Comparable_Set.csv`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Adjustment_Appendix.pdf`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Snapshot_Memo.md`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Audit_Log.txt`, `artifacts/exports/12345_109_St_NW_PCE_2026-06-01_Evidence_Package.zip`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Underwriting_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Comparable_Set.csv`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Adjustment_Appendix.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Snapshot_Memo.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Audit_Log.txt`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Evidence_Package.zip`.
 - Resume-safe bullet: Verified and hardened a snapshot-driven underwriting workspace with full-page Browser QA, corrected header/workflow layout, improved adjustment-review fit, and persisted six-format export evidence.
 
 ## 2026-06-01 - Verified Engineering Work
@@ -157,7 +157,7 @@
 - Systems involved: Next.js app shell, left-rail navigation, header action routing, surfaced comparable drawer overlay, workflow summary selectors, Subject Intake preview messaging, Browser-driven interaction QA.
 - Technical skills demonstrated: UI state-flow debugging, overlay hit-testing repair, deterministic workflow truthfulness, concise snapshot-driven summary design, Browser-based regression verification.
 - Verification performed: `npm run lint`, `npm test` (46 tests), `npm run build`, Browser checks for Subject Intake -> Export -> Report Ready, Subject Intake -> Find More -> Comp Discovery with visible drawer, Subject Intake re-entry while the drawer is open, and zero `.workflow-strip small` overflow findings.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `hooks/usePceAnalysis.ts`, `.ralphplan/final-verification.md`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `analysis state hook`, `.ralphplan/final-verification.md`.
 - Resume-safe bullet: Hardened a deterministic underwriting workspace by fixing action-bar routing, non-blocking comparable review drawers, and browser-verified workflow summary fit across the snapshot-driven shell.
 
 ## 2026-06-01 - Verified Engineering Work
@@ -172,7 +172,7 @@
 ## 2026-06-01 — Verified Engineering Work
 
 - Built/changed: Published KV CompLens to GitHub, fixed a Vercel 404/protection deployment issue by adding explicit Next.js project config, disabled SSO deployment protection, and redeployed the app to a Browser-verified public URL.
-- Systems involved: GitHub source publication, Vercel production deployment, Vercel project protection/settings, Next.js app router, TypeScript/Vitest validation, deterministic PCE underwriting workspace.
+- Systems involved: GitHub source publication, Vercel production deployment, Vercel project protection/settings, Next.js app router, TypeScript/Vitest validation, deterministic review underwriting workspace.
 - Technical skills demonstrated: Release preparation, deployment debugging, public URL verification, large-artifact exclusion, validation-first publishing, Vercel project setup, production build verification.
 - Verification performed: `npm run lint`, `npm test` (46 tests across 17 files), `npm run build`; Browser confirmed the initial Vercel URL returned `404: NOT_FOUND`, then confirmed `https://kv-complens.vercel.app` rendered `KV CompLens` after redeploy `dpl_J4HfWmMeZFXyQoq27XobLQNPpTdM`.
 - Evidence/files: `.gitignore`, `.vercelignore`, `vercel.json`, `package.json`, `src/app/page.tsx`, `packages/core/*.ts`, `tests/*.test.ts`, `ai-engineering/daily-engineering-log.md`, `https://github.com/zrt219/KV-CompLens`, `https://kv-complens.vercel.app`.
@@ -189,30 +189,30 @@
 
 ## 2026-06-01 — Verified Engineering Work
 
-- Built/changed: Reworked the README into a reviewer-facing project brief with live app/repository links, canonical hackathon build-log linkage, architecture summary, PCE-V2 workflow explanation, deployment guardrails, verification status, limitations, resume-safe summary, and a footer matching the existing repository README convention.
-- Systems involved: README portfolio documentation, hackathon build-log evidence, AI engineering source-of-truth, Vercel deployment evidence, deterministic PCE-V2 underwriting workspace.
+- Built/changed: Reworked the README into a reviewer-facing project brief with live app/repository links, canonical hackathon build-log linkage, architecture summary, cross-platform evidence model workflow explanation, deployment guardrails, verification status, limitations, resume-safe summary, and a footer matching the existing repository README convention.
+- Systems involved: README portfolio documentation, hackathon build-log evidence, AI engineering source-of-truth, Vercel deployment evidence, deterministic cross-platform evidence model underwriting workspace.
 - Technical skills demonstrated: Technical documentation architecture, employer-facing evidence curation, scope-bound claim writing, deployment evidence integration, hackathon proof packaging.
 - Verification performed: README content checks for hackathon log link, public deployment link, source-of-truth link, verified test count, Vercel guardrail wording, and matching `Deployment`/`Notes` footer pattern; local lint/test/build gate rerun for repository integrity.
 - Evidence/files: `README.md`, `ai-engineering/hackathon/kv-complens-build-log.md`, `ai-engineering/source-of-truth.md`, `ai-engineering/daily-engineering-log.md`.
-- Resume-safe bullet: Rebuilt the project README as a reviewer-facing AI engineering brief that links the canonical hackathon build log, documents deterministic PCE-V2 architecture, and grounds deployment claims in Browser-verified evidence.
+- Resume-safe bullet: Rebuilt the project README as a reviewer-facing AI engineering brief that links the canonical hackathon build log, documents deterministic cross-platform evidence model architecture, and grounds deployment claims in Browser-verified evidence.
 
 ## 2026-06-03 — Verified Engineering Work
 
 - Built/changed: Clarified the visible property-review flow with plain-language state text, helper copy, export wording, demo/provenance labels, and a responsive mobile shell repair that restores a single-column layout on narrow screens.
-- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `hooks/usePceAnalysis.ts`, `lib/pce/exportPackage.ts`, `lib/pce/runPcePipeline.ts`, `packages/core/*.ts`, `tests/*.test.ts`.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `analysis state hook`, `export package generator`, `review snapshot pipeline`, `packages/core/*.ts`, `tests/*.test.ts`.
 - Technical skills demonstrated: UI copy simplification, workflow-state feedback design, responsive layout repair, deterministic demo labeling, browser-based regression verification.
 - Verification performed: `npm run lint`, `npm run test`, `npm run build`, production-browser checks on desktop review state and mobile intake-to-analysis flow, plus a mobile `scrollWidth` check confirming no horizontal overflow.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `hooks/usePceAnalysis.ts`, `lib/pce/exportPackage.ts`, `packages/core/memo.ts`, `packages/core/provenance.ts`, `packages/core/sourceScan.ts`, `browser-analysis-desktop.png`, `browser-analysis-mobile.png`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `analysis state hook`, `export package generator`, `packages/core/memo.ts`, `packages/core/provenance.ts`, `packages/core/sourceScan.ts`, `browser-analysis-desktop.png`, `browser-analysis-mobile.png`.
 - Resume-safe bullet: Clarified a deterministic property-review workspace with plain-language status messaging, calmer export/memo copy, and a browser-verified mobile layout fix that preserves the intake-to-review flow.
 
 ## 2026-06-03 — Verified Engineering Work
 
-- Built/changed: Sealed the PCE-V2 review path behind intake-first zero-state behavior, cleared computed outputs on subject edits until rerun, removed visible zero placeholders from the intake form, and tightened memo/export wording so the public UI stays free of formulas or derivations.
-- Systems involved: `hooks/usePceAnalysis.ts`, `src/app/page.tsx`, `lib/pce/exportPackage.ts`, `packages/core/memo.ts`, `packages/core/modelFusion.ts`, `packages/core/valuation.ts`, `tests/pceUiState.test.ts`, `tests/pcePipeline.test.ts`, `tests/exportPackage.test.ts`.
+- Built/changed: Sealed the cross-platform evidence model review path behind intake-first zero-state behavior, cleared computed outputs on subject edits until rerun, removed visible zero placeholders from the intake form, and tightened memo/export wording so the public UI stays free of formulas or derivations.
+- Systems involved: `analysis state hook`, `src/app/page.tsx`, `export package generator`, `packages/core/memo.ts`, `packages/core/modelFusion.ts`, `packages/core/valuation.ts`, `UI state tests`, `pipeline tests`, `tests/exportPackage.test.ts`.
 - Technical skills demonstrated: Deterministic UI state gating, zero-state UX design, browser-driven regression repair, evidence-safe export copy, local-only workflow orchestration.
 - Verification performed: `npm run lint`, `npm test`, `npm run build`, browser smoke verification on `http://127.0.0.1:3002` covering initial zero-state, disabled demo loader, valid intake unlock, analysis progression, and desktop/mobile screenshots.
-- Evidence/files: `browser-pce-desktop.png`, `browser-pce-mobile.png`, `src/app/page.tsx`, `hooks/usePceAnalysis.ts`, `ai-engineering/daily-engineering-log.md`.
-- Resume-safe bullet: Built a sealed PCE-V2 review workflow with intake-first zero-state gating, deterministic local analysis, and browser-verified blank-entry UX that hides computed values until a review is run.
+- Evidence/files: `browser-review-desktop.png`, `browser-review-mobile.png`, `src/app/page.tsx`, `analysis state hook`, `ai-engineering/daily-engineering-log.md`.
+- Resume-safe bullet: Built a sealed cross-platform evidence model review workflow with intake-first zero-state gating, deterministic local analysis, and browser-verified blank-entry UX that hides computed values until a review is run.
 
 ## 2026-06-03 — Verified Engineering Work
 
@@ -226,7 +226,7 @@
 ## 2026-06-03 — Verified Engineering Work
 
 - Built/changed: Refactored the KV CompLens workspace into a canonical 5-step intake-to-export flow, added a truthful local-first assistant trace with optional OpenAI-backed drafting, merged the report/export preview into the export screen, regenerated the canonical Review-base export artifacts, and aligned the handoff index with the live bundle.
-- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `lib/tutorial.ts`, `lib/pce/exportPackage.ts`, `tests/assistant.test.ts`, `tests/tutorial.test.ts`, `tests/exportPackage.test.ts`, `ai-engineering/hackathon/kv-complens-final-handoff.md`.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `lib/tutorial.ts`, `export package generator`, `tests/assistant.test.ts`, `tests/tutorial.test.ts`, `tests/exportPackage.test.ts`, `ai-engineering/hackathon/kv-complens-final-handoff.md`.
 - Technical skills demonstrated: Workflow-state refactoring, assistant prompt normalization, local-fallback AI design, export artifact packaging, responsive shell repair, Playwright browser QA, evidence-driven documentation.
 - Verification performed: `npm run lint`, `npm test` (55 tests), `npm run build`, Playwright browser smoke on `http://127.0.0.1:3002` at desktop 1440x900 and mobile 390x844, with zero console/page errors and no horizontal overflow; verified the path `Use Example Property -> Run Analysis -> Review Homes -> Adjustments -> Confirm and Lock -> Export preview`.
 - Evidence/files: `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Property_Review_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Home_List.csv`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Adjustment_Notes.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Review_Summary.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Activity_Log.txt`, `artifacts/exports/12345_109_St_NW_Review_2026-06-01_Review_Package.zip`, `src/app/page.tsx`, `src/app/globals.css`, `lib/assistant.ts`, `src/app/api/assistant/route.ts`, `tests/exportPackage.test.ts`.
@@ -244,10 +244,10 @@
 ## 2026-06-03 — Verified Engineering Work
 
 - Built/changed: Completed the readability/onboarding pass by adding tooltip affordances across navigation, workflow, status, form, and action controls; revised tutorial copy for first-run property review; fixed tooltip pseudo-element collisions in action and nav buttons; wrapped workflow cards on mobile/tablet; and repaired default comparable selection so review sets do not collapse after selected-comparable input handling.
-- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/tutorial.ts`, `lib/pce/runPcePipeline.ts`, `packages/core/scoring.ts`, `packages/core/agent.ts`, `scale-fonts.js`, `upgrade-ui.js`.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `lib/tutorial.ts`, `review snapshot pipeline`, `packages/core/scoring.ts`, `packages/core/agent.ts`, `scale-fonts.js`, `upgrade-ui.js`.
 - Technical skills demonstrated: Responsive UI containment, tooltip accessibility, onboarding UX, CSS cascade debugging, deterministic comparable-selection regression repair, production-build verification, Playwright visual QA.
 - Verification performed: `npm run lint` passed with 9 existing warnings and 0 errors; `npm test` passed 53 tests across 18 files; `npm run build` passed; `git diff --check` passed. Playwright/Chrome production-browser audit passed at 390x844, 768x1024, 1280x800, 1440x900, 1536x864, and 1920x1080 with zero geometry issues, zero body overflow, 24 tooltip targets on intake, tutorial presence confirmed, nav pseudo-elements hidden until hover, and Edit Property tooltip visibly rendered. A second Playwright flow audit passed the example-property path through intake, source scan, review, adjustments, and export at 1440x900 and 390x844 with zero geometry issues and zero body overflow. Scoped security sanity checked touched UI/domain files for DOM injection, eval, browser storage, cookie, and env access patterns; only existing local `/api/assistant` and `/api/export` fetches were present.
-- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `lib/tutorial.ts`, `lib/pce/runPcePipeline.ts`, `packages/core/scoring.ts`, `packages/core/agent.ts`, `qa-screenshots/readability-mobile-390.png`, `qa-screenshots/readability-tablet-768.png`, `qa-screenshots/readability-desktop-1280.png`, `qa-screenshots/readability-desktop-1440.png`, `qa-screenshots/readability-desktop-1536.png`, `qa-screenshots/readability-desktop-1920.png`, `qa-screenshots/tooltip-edit-property-1440.png`, `qa-screenshots/desktop-flow-1440-post-analysis.png`, `qa-screenshots/desktop-flow-1440-export.png`, `qa-screenshots/mobile-flow-390-sources.png`, `qa-screenshots/mobile-flow-390-export.png`.
+- Evidence/files: `src/app/page.tsx`, `src/app/globals.css`, `lib/tutorial.ts`, `review snapshot pipeline`, `packages/core/scoring.ts`, `packages/core/agent.ts`, `qa-screenshots/readability-mobile-390.png`, `qa-screenshots/readability-tablet-768.png`, `qa-screenshots/readability-desktop-1280.png`, `qa-screenshots/readability-desktop-1440.png`, `qa-screenshots/readability-desktop-1536.png`, `qa-screenshots/readability-desktop-1920.png`, `qa-screenshots/tooltip-edit-property-1440.png`, `qa-screenshots/desktop-flow-1440-post-analysis.png`, `qa-screenshots/desktop-flow-1440-export.png`, `qa-screenshots/mobile-flow-390-sources.png`, `qa-screenshots/mobile-flow-390-export.png`.
 - Resume-safe bullet: Hardened a deterministic property-review workspace with browser-verified responsive readability, tooltip coverage across core controls, first-run tutorial guidance, and regression-tested comparable selection behavior.
 
 ## 2026-06-03 — Verified Engineering Work
@@ -258,3 +258,30 @@
 - Verification performed: `npm run lint` passed with 9 existing warnings and 0 errors; `npm test` passed 53 tests across 18 files; `npm run build` passed locally and on Vercel; `git diff --check` passed with Windows line-ending warnings only; `vercel --prod --yes` deployed production `dpl_9SrGE92Yp7gQdcerHhPJH2KwbPey`; Playwright verified `https://kv-complens.vercel.app` at 1440x900 and 390x844 across intake, source scan, sources, review, adjust, and export with zero body overflow, zero right-rail/stage intersections, zero visible viewport overflow, and zero console/page errors.
 - Evidence/files: `.gitignore`, `.vercelignore`, `src/app/page.tsx`, `src/app/globals.css`, `ai-engineering/daily-engineering-log.md`, `https://kv-complens.vercel.app`, `https://vercel.com/zrt219s-projects/kv-complens/9SrGE92Yp7gQdcerHhPJH2KwbPey`, `C:\Users\Zhane\AppData\Local\Temp\kv-complens-prod-qa\desktop-export.png`, `C:\Users\Zhane\AppData\Local\Temp\kv-complens-prod-qa\mobile-adjust.png`.
 - Resume-safe bullet: Deployed a Vercel production release of a deterministic property-review app after removing unrelated heavy artifacts from the deploy path and verifying desktop/mobile review flows with automated overlap, overflow, and console-health checks.
+
+## 2026-06-04 — Verified Engineering Work
+
+- Built/changed: Completed a desktop-only button, motion, contrast, and Review Evidence Board polish pass using the `impeccable`, `frontend-ui-ux`, and `build-web-apps:frontend-app-builder` guidance. Standardized visible action hover/disabled states, removed production action shimmer, fixed the workflow primary CTA labels, improved dark-card/right-rail/empty-thumbnail contrast, removed the center Evidence Board `Find Candidates` button, and wired Board/Table, zoom, and Auto Arrange controls.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoard.tsx`, `src/components/evidence-board/EvidenceBoardCanvas.tsx`, `eslint.config.mjs`, compile-only fixes for untracked `src/components/views/*` files.
+- Technical skills demonstrated: Desktop product UI polish, accessible button-state design, CSS cascade repair, deterministic workflow routing, local UI state integration, Playwright/Puppeteer visual QA, lint/build hygiene.
+- Verification performed: `npm run lint` passed with 30 warnings and 0 errors; `npm test` passed 53 tests across 18 files; `npm run build` passed; `git diff --check` passed. Puppeteer desktop QA passed at 1881x1280, 1440x900, and 1280x800 with zero body overflow, zero clipped buttons, zero Evidence Board card overlaps, zero toast/Evidence Board overlap, right rail fitting the viewport, stage/rail separation intact, Board/Table controls working, and the center `Find Candidates` button absent.
+- Evidence/files: `qa-screenshots/desktop-polish/01-intake-1881x1280.png`, `qa-screenshots/desktop-polish/02-sources-1440x900.png`, `qa-screenshots/desktop-polish/03-review-1440x900.png`, `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoard.tsx`, `src/components/evidence-board/EvidenceBoardCanvas.tsx`.
+- Resume-safe bullet: Polished a desktop property-review workflow by standardizing high-use button states, wiring Evidence Board controls, improving contrast across review surfaces, and verifying zero overlap or clipped controls across three desktop viewport sizes.
+
+## 2026-06-04 - Verified Engineering Work
+
+- Built/changed: Added an Intake reset action, restored constrained-desktop comparable discovery through an Evidence Board fallback button, upgraded the right-rail value card with reduced-motion-safe animation, fixed the Adjustment comparable strip so all six desktop cards fit without clipping at 1959x1280, verified Export still reaches an export-ready state, and sanitized reviewer-facing method copy across UI/export/docs.
+- Systems involved: `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoard.tsx`, analysis reducer/export package modules, `.ralphplan/*`, `ai-engineering/daily-engineering-log.md`.
+- Technical skills demonstrated: Desktop UI polish, CSS cascade control, motion accessibility, workflow-state wiring, public-copy/IP hygiene, browser-driven regression QA, deterministic export smoke testing.
+- Verification performed: `npm run lint` passed with 31 existing warnings and 0 errors; `npm test` passed 53 tests across 18 files; `npm run build` passed; `git diff --check` passed with Windows line-ending warnings only; Puppeteer QA passed at 1959x1280 and 1280x800 for reset, source/review/adjust/export flow, value-card animation, adjustment strip sizing, and Evidence Board fallback discovery.
+- Evidence/files: `qa-screenshots/desktop-adjustment-strip-1959.png`, `qa-screenshots/desktop-evidence-find-1280.png`, `qa-screenshots/desktop-export-smoke-1959.png`, `src/app/page.tsx`, `src/app/globals.css`, `src/components/evidence-board/EvidenceBoard.tsx`, `.ralphplan/browser-qa.md`, `.ralphplan/final-verification.md`.
+- Resume-safe bullet: Polished and verified a desktop underwriting-support UI with resettable intake, accessible comparable discovery, reduced-motion-safe value-card animation, non-clipping adjustment comparison cards, export smoke coverage, and reviewer-safe method copy.
+
+## 2026-06-04 - Verified Engineering Work
+
+- Built/changed: Implemented Review Intelligence V2 as a deterministic, verifier-gated review layer; wired `Explain Review Set`, per-comparable `Why this comparable?`, `Add to Memo`, and export attachment behavior into the five-step KV CompLens workflow; refreshed the README, handoff docs, QA notes, and source-of-truth index for the final employer-facing state.
+- Systems involved: `lib/review-intelligence-v2/*`, `hooks/usePceAnalysis.ts`, `lib/pce/exportPackage.ts`, `src/app/api/export/route.ts`, `src/app/page.tsx`, `src/components/review-intelligence-v2/*`, `src/components/evidence-board/*`, `tests/review-intelligence-v2.test.ts`, `.ralphplan/*`, `README.md`, `ai-engineering/source-of-truth.md`.
+- Technical skills demonstrated: deterministic reasoning-layer design, verifier and counterfactual analysis, reducer/state invalidation, export-pipeline integration, browser-driven QA, artifact validation, employer-safe technical documentation.
+- Verification performed: `npm run lint` passed cleanly; `npm test` passed with 64 tests across 19 files; `npm run build` passed; local Puppeteer QA covered Intake, Sources, Review, Adjust, Export, Review Intelligence drawer behavior, six export types, and a mobile export smoke run; visual spot-checks passed on final screenshots; a final smoke run confirmed the favicon request no longer 404s.
+- Evidence/files: `qa-screenshots/2026-06-04-intake.png`, `qa-screenshots/2026-06-04-sources.png`, `qa-screenshots/2026-06-04-review.png`, `qa-screenshots/2026-06-04-review-drawer.png`, `qa-screenshots/2026-06-04-adjust.png`, `qa-screenshots/2026-06-04-export.png`, `qa-screenshots/2026-06-04-mobile-export.png`, `qa-screenshots/2026-06-04-browser-qa.json`, `.ralphplan/browser-qa.md`, `.ralphplan/final-verification.md`, `artifacts/exports/12345_109_St_NW_Review_2026-06-04_Property_Review_Memo.pdf`, `artifacts/exports/12345_109_St_NW_Review_2026-06-04_Review_Package.zip`.
+- Resume-safe bullet: Built and verified a deterministic review-intelligence layer for a property-review workflow, including grounded comparable explanations, counterfactual sensitivity checks, export-ready reasoning summaries, and browser-proven handoff artifacts.
