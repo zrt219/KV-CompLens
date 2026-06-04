@@ -12,3 +12,13 @@ artifacts/
 ChatGPT Image*.png
 Starminer.v*.zip
 *.mp4
+
+# Non-app local artifacts kept out of production deploys.
+/Starminer.v0.33.1.0/
+/UMATTR_Career_Circle_AI_for_Student_Athlete_Success_Documents/
+/UMATTR_Career_Circle_AI_for_Student_Athlete_Success_Word_Docs/
+/UMATTR_Career_Circle_AI_for_Student_Athlete_Success_Documents.zip
+/UMATTR_Career_Circle_AI_for_Student_Athlete_Success_Word_Docs.zip
+/browser-*.png
+/startup.png
+/kv_capital_sam_call_cheat_sheet_zhane.pdf

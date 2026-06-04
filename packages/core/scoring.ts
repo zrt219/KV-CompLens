@@ -309,10 +309,15 @@ export function rankComparables(subject: SubjectProperty, candidatePool: Compara
 }
 
 export function selectTopComparables(scored: ScoredComparable[], count = 5) {
-  return scored
+  const preferred = scored
     .filter((comp) => comp.status !== "rejected")
-    .sort((a, b) => b.totalScore - a.totalScore || b.comparableProbability - a.comparableProbability || b.energyQuality - a.energyQuality || a.distanceKm - b.distanceKm)
-    .slice(0, count);
+    .sort((a, b) => b.totalScore - a.totalScore || b.comparableProbability - a.comparableProbability || b.energyQuality - a.energyQuality || a.distanceKm - b.distanceKm);
+  const preferredIds = new Set(preferred.map((comp) => comp.id));
+  const reviewableFallback = scored
+    .filter((comp) => !preferredIds.has(comp.id) && comp.eligibility.passed)
+    .sort((a, b) => b.totalScore - a.totalScore || b.comparableProbability - a.comparableProbability || b.energyQuality - a.energyQuality || a.distanceKm - b.distanceKm);
+
+  return [...preferred, ...reviewableFallback].slice(0, count);
 }
 
 export function scoreComparableProperties(subject: SubjectProperty, comps: ComparableProperty[]) {

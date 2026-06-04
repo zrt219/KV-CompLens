@@ -3,7 +3,7 @@ import { normalizeSubjectProperty } from "../agent";
 import { generateUnderwritingMemo } from "../memo";
 import { previewCandidateImpact } from "../marginalImpact";
 import { runSourceScan } from "../sourceScan";
-import { rankComparables } from "../scoring";
+import { rankComparables, selectTopComparables } from "../scoring";
 import { adjustComparableValue } from "../adjustments";
 import { compareValuationBeforeAfter, estimateValuationRange } from "../valuation";
 import type {
@@ -153,14 +153,12 @@ export function runPcePipeline(input: PcePipelineInput): PceAnalysisSnapshot {
   const candidates = input.candidates ?? syntheticComparables;
   const generatedAt = input.generatedAt ?? new Date().toISOString();
   const rankedComparables = rankComparables(subject, candidates);
-  const selectedIdSet = input.selectedComparableIds?.length ? new Set(input.selectedComparableIds) : undefined;
+  const selectedIdSet = input.selectedComparableIds ? new Set(input.selectedComparableIds) : undefined;
   const selectedComparables = selectedIdSet
     ? rankedComparables
         .filter((comp) => selectedIdSet.has(comp.id))
         .map((comp) => ({ ...comp, status: "selected" as const, wasSelected: true }))
-    : rankedComparables
-        .filter((comp) => comp.status !== "rejected")
-        .slice(0, 5)
+    : selectTopComparables(rankedComparables, 5)
         .map((comp) => ({ ...comp, status: "selected" as const, wasSelected: true }));
   const selectedIds = new Set(selectedComparables.map((comp) => comp.id));
   const remainingCandidates = rankedComparables

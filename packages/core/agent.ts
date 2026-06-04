@@ -72,7 +72,7 @@ export function runCompAnalysis(input: SubjectProperty, options: { selectedCompa
   const subject = normalizeSubjectProperty(input);
   const candidates = searchComparableProperties(subject);
   const rankedComparables = scoreComparableProperties(subject, candidates);
-  const selectedIdSet = options.selectedComparableIds?.length ? new Set(options.selectedComparableIds) : undefined;
+  const selectedIdSet = options.selectedComparableIds ? new Set(options.selectedComparableIds) : undefined;
   const selectedComparables = selectedIdSet
     ? rankedComparables.filter((comp) => selectedIdSet.has(comp.id)).map((comp) => ({ ...comp, status: "selected" as const, wasSelected: true }))
     : selectInitialComparables(rankedComparables);

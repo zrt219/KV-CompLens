@@ -235,7 +235,7 @@ export default function Home() {
             <p>Property review</p>
           </div>
         </div>
-        <button className="project-picker" type="button" onClick={openSubjectIntake}>
+        <button className="project-picker tooltip-target" type="button" onClick={openSubjectIntake} title="Open the property intake form." data-tooltip="Open the property intake form." data-tooltip-position="right">
           <span>Current Property</span>
           <strong>{subjectDisplayName}</strong>
           <small>{subjectDisplayMeta}</small>
@@ -248,12 +248,14 @@ export default function Home() {
             return (
               <button
                 key={item.id}
-                className={clsx(active && "active", disabled && "disabled")}
+                className={clsx("tooltip-target", active && "active", disabled && "disabled")}
                 aria-current={active ? "page" : undefined}
                 type="button"
                 disabled={disabled}
                 aria-disabled={disabled}
-                title={disabled ? (item.id === "export" ? "Lock the adjustments before opening export." : "Enter subject details and run the initial scan first.") : undefined}
+                title={disabled ? (item.id === "export" ? "Lock the adjustments before opening export." : "Enter subject details and run the initial scan first.") : `Open ${item.label}.`}
+                data-tooltip={disabled ? (item.id === "export" ? "Lock the adjustments before opening export." : "Enter subject details and run the initial scan first.") : `Open ${item.label}.`}
+                data-tooltip-position="right"
                 onClick={() => item.id === "intake" ? openSubjectIntake() : openWorkspaceView(workflowStepToView(item.id))}
               >
                 <Icon size={18} aria-hidden />
@@ -283,7 +285,7 @@ export default function Home() {
             <h2>{titleForView(viewMode, showForm)}</h2>
             {state.analysisStarted && <p>{subject.address || subjectDisplayName} / local demo snapshot</p>}
             <div className="stage-status-row" aria-live="polite">
-              <span className={clsx("status-chip", workflowStatus.tone)}>
+              <span className={clsx("status-chip tooltip-target", workflowStatus.tone)} title={workflowStatus.detail} data-tooltip={workflowStatus.detail}>
                 <StatusIcon size={14} aria-hidden />
                 {workflowStatus.label}
               </span>
@@ -291,12 +293,12 @@ export default function Home() {
             </div>
           </div>
           <div className="actions">
-            <button className="find-action" type="button" onClick={findMoreComparables} disabled={!state.analysisStarted} title={!state.analysisStarted ? "Run the analysis first to find more homes." : undefined}><Search size={17} /> Find More Homes</button>
-            <button className="edit-action" type="button" onClick={() => setShowForm(true)}><SlidersHorizontal size={17} /> Edit Property</button>
-            <button type="button" onClick={prepareReport} disabled={!state.analysisStarted || !adjustmentsLocked} title={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : undefined}><FileDown size={17} /> Export</button>
-            <button className={clsx("icon-action", readabilityMode && "active")} type="button" aria-pressed={readabilityMode} aria-label="Toggle readability mode" onClick={() => setReadabilityMode((value) => !value)}><Eye size={18} /></button>
-            <button className="icon-action" type="button" aria-label="More actions unavailable in demo mode" disabled title="More actions are unavailable in this local demo."><MoreHorizontal size={18} /></button>
-            <button className="primary-action" type="button" onClick={goToNextStep} disabled={!canRunAnalysis && !state.analysisStarted} title={!canRunAnalysis && !state.analysisStarted ? "Fill in the property details first." : undefined}>
+            <button className="find-action tooltip-target" type="button" onClick={findMoreComparables} disabled={!state.analysisStarted} title={!state.analysisStarted ? "Run the analysis first to find more homes." : "Surface another candidate home for review."} data-tooltip={!state.analysisStarted ? "Run the analysis first to find more homes." : "Surface another candidate home for review."}><Search size={17} /> Find More Homes</button>
+            <button className="edit-action tooltip-target" type="button" onClick={() => setShowForm(true)} title="Return to intake and edit the current property details." data-tooltip="Return to intake and edit the current property details."><SlidersHorizontal size={17} /> Edit Property</button>
+            <button className="tooltip-target" type="button" onClick={prepareReport} disabled={!state.analysisStarted || !adjustmentsLocked} title={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : "Open the local export package screen."} data-tooltip={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : "Open the local export package screen."}><FileDown size={17} /> Export</button>
+            <button className={clsx("icon-action tooltip-target", readabilityMode && "active")} type="button" aria-pressed={readabilityMode} aria-label="Toggle readability mode" title="Toggle higher-contrast readability mode." data-tooltip="Toggle higher-contrast readability mode." onClick={() => setReadabilityMode((value) => !value)}><Eye size={18} /></button>
+            <button className="icon-action tooltip-target" type="button" aria-label="More actions unavailable in demo mode" disabled title="More actions are unavailable in this local demo." data-tooltip="More actions are unavailable in this local demo."><MoreHorizontal size={18} /></button>
+            <button className="primary-action tooltip-target" type="button" onClick={goToNextStep} disabled={!canRunAnalysis && !state.analysisStarted} title={!canRunAnalysis && !state.analysisStarted ? "Fill in the property details first." : state.analysisStarted ? "Move to the next review step." : "Run the local property analysis."} data-tooltip={!canRunAnalysis && !state.analysisStarted ? "Fill in the property details first." : state.analysisStarted ? "Move to the next review step." : "Run the local property analysis."}>
               {!state.analysisStarted ? <RefreshCw size={17} /> : <ChevronRight size={17} />}
               {state.analysisStarted ? "Next Step" : "Run Analysis"}
             </button>
@@ -536,10 +538,12 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
             <p>{tutorialIntro}</p>
           </div>
           <button
-            className="tutorial-toggle"
+            className="tutorial-toggle tooltip-target"
             type="button"
             aria-expanded={tutorialOpen}
             aria-controls="tutorial-steps"
+            title={tutorialOpen ? "Hide the tutorial cards." : "Show the full tutorial walkthrough."}
+            data-tooltip={tutorialOpen ? "Hide the tutorial cards." : "Show the full tutorial walkthrough."}
             onClick={onToggleTutorial}
           >
             {tutorialOpen ? "Hide walkthrough" : "Show walkthrough"}
@@ -582,7 +586,11 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
               <h3>Property Details</h3>
               <p>All fields stay local. Run the analysis once the required property details are in place.</p>
             </div>
-            <span className={clsx("status-chip", dirty ? "review" : canRunAnalysis ? "confirmed" : "review")}>
+            <span
+              className={clsx("status-chip tooltip-target", dirty ? "review" : canRunAnalysis ? "confirmed" : "review")}
+              title={dirty ? "Property details changed after the last analysis." : canRunAnalysis ? "Required fields are complete." : "Complete the required property fields before running analysis."}
+              data-tooltip={dirty ? "Property details changed after the last analysis." : canRunAnalysis ? "Required fields are complete." : "Complete the required property fields before running analysis."}
+            >
               {dirty ? <Info size={14} /> : canRunAnalysis ? <CheckCircle2 size={14} /> : <Info size={14} />}
               {dirty ? "Changes need review" : canRunAnalysis ? "Ready for source scan" : "Waiting for details"}
             </span>
@@ -608,15 +616,15 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
             <Field label="Longitude" type="number" step="0.0001" value={numberFieldValue(subject.longitude)} onChange={(value) => update("longitude", Number(value))} />
           </div>
           <div className="form-actions subject-actions">
-            <button type="button" onClick={() => { update("address", "12345 109 St NW"); update("propertyType", "Detached"); update("city", "Edmonton"); loadExample(); }}>Use Example Property</button>
-            <button className="primary-action" type="submit" disabled={!canRunAnalysis} title={!canRunAnalysis ? "Enter the property details first." : undefined}>Run Analysis</button>
+            <button className="tooltip-target" type="button" title="Load a complete demo property so you can review the full workflow." data-tooltip="Load a complete demo property so you can review the full workflow." onClick={() => { update("address", "12345 109 St NW"); update("propertyType", "Detached"); update("city", "Edmonton"); loadExample(); }}>Use Example Property</button>
+            <button className="primary-action tooltip-target" type="submit" disabled={!canRunAnalysis} title={!canRunAnalysis ? "Enter the property details first." : "Run the local source scan and home review."} data-tooltip={!canRunAnalysis ? "Enter the property details first." : "Run the local source scan and home review."}>Run Analysis</button>
           </div>
         </form>
         <aside className="subject-preview-stack">
           <section className="subject-preview-card">
             <div className="panel-head-row">
               <h3>Property Preview</h3>
-              <span className={clsx("status-chip", canRunAnalysis ? "confirmed" : "review")}><HomeIcon size={14} /> {canRunAnalysis ? "Ready for source scan" : "Waiting for details"}</span>
+              <span className={clsx("status-chip tooltip-target", canRunAnalysis ? "confirmed" : "review")} title={canRunAnalysis ? "The preview has enough details for analysis." : "The preview updates after required fields are complete."} data-tooltip={canRunAnalysis ? "The preview has enough details for analysis." : "The preview updates after required fields are complete."}><HomeIcon size={14} /> {canRunAnalysis ? "Ready for source scan" : "Waiting for details"}</span>
             </div>
             <PropertyThumbnail propertyType={subject.propertyType} seed={subject.address} isSubject />
             <h4>{subjectTitle}</h4>
@@ -631,7 +639,7 @@ function SubjectForm({ subject, dirty, canRunAnalysis, analysisStarted, tutorial
           <section className="subject-preview-card parcel-card">
             <div className="panel-head-row">
               <h3>Parcel Snapshot</h3>
-              <span className="status-chip review"><Info size={14} /> {canRunAnalysis ? "Demo only" : "Waiting for details"}</span>
+              <span className="status-chip review tooltip-target" title={canRunAnalysis ? "Parcel details are local demo context only." : "Parcel details appear after intake is complete."} data-tooltip={canRunAnalysis ? "Parcel details are local demo context only." : "Parcel details appear after intake is complete."}><Info size={14} /> {canRunAnalysis ? "Demo only" : "Waiting for details"}</span>
             </div>
             <div className="parcel-diagram" aria-hidden="true">
               <span />
@@ -703,7 +711,7 @@ function WorkflowProgress({
   return (
     <section className="workflow-strip" style={{ "--workflow-cols": steps.length } as CSSProperties} aria-label="Review workflow">
       {steps.map(({ label, short, value, state: stepState }, index) => (
-        <div key={label} className={clsx("workflow-step", stepState)}>
+        <div key={label} className={clsx("workflow-step tooltip-target", stepState)} title={`${label}: ${value}`} data-tooltip={`${label}: ${value}`}>
           <span>{index + 1}</span>
           <strong><b className="step-full">{label}</b><b className="step-short">{short}</b></strong>
           <small>{value}</small>
