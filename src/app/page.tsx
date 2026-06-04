@@ -1643,8 +1643,8 @@ function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
         {toast.delta ? (
           <div className="gameplay-stats">
             <p>Information gain: {(toast.delta.marginalInformationGain ?? 0) > 0 ? "+" : ""}{(toast.delta.marginalInformationGain ?? 0).toFixed(1)}</p>
-            <p>Confidence: {(toast.delta.confidenceDelta ?? 0) > 0 ? "+" : ""}{toast.delta.confidenceDelta ?? 0} pts</p>
-            <p>Effective comps: {(toast.delta.effectiveSampleSizeDelta ?? 0) > 0 ? "+" : ""}{toast.delta.effectiveSampleSizeDelta ?? 0}</p>
+            <p>Confidence: {(toast.delta.confidenceDelta ?? 0) > 0 ? "+" : ""}{(toast.delta.confidenceDelta ?? 0).toFixed(1)} pts</p>
+            <p>Effective comps: {(toast.delta.effectiveSampleSizeDelta ?? 0) > 0 ? "+" : ""}{(toast.delta.effectiveSampleSizeDelta ?? 0).toFixed(1)}</p>
             <p>Range width: {(toast.delta.rangeWidthDelta ?? 0) < 0 ? "-" : "+"}${Math.abs(toast.delta.rangeWidthDelta ?? 0).toLocaleString()}</p>
             <p>Risk: {(toast.delta.riskSeverityDelta ?? 0) === 0 ? "unchanged" : ((toast.delta.riskSeverityDelta ?? 0) > 0 ? "+" : "") + (toast.delta.riskSeverityDelta ?? 0)}</p>
           </div>
