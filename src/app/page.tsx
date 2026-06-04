@@ -1048,6 +1048,30 @@ function SourceScanView({ snapshot, onRunAnalysis }: { snapshot: PceAnalysisSnap
             </tbody>
           </table>
         </div>
+        <div className="source-mobile-list" aria-label="Source details compact">
+          {sources.map((source) => {
+            const Icon = source.icon;
+            return (
+              <article className="source-mobile-card" key={source.name}>
+                <header>
+                  <Icon size={18} />
+                  <div>
+                    <strong>{source.name}</strong>
+                    <span>{source.source}</span>
+                  </div>
+                </header>
+                <dl>
+                  <div><dt>Records</dt><dd>{source.records.toLocaleString()}</dd></div>
+                  <div><dt>Standardized</dt><dd>{source.normalized.toLocaleString()}</dd></div>
+                  <div><dt>Distinct</dt><dd>{source.unique.toLocaleString()}</dd></div>
+                  <div><dt>Reliability</dt><dd>{source.reliability}</dd></div>
+                  <div><dt>Recency</dt><dd>{source.freshness}</dd></div>
+                  <div><dt>Status</dt><dd><span className="status-chip confirmed"><CheckCircle2 size={13} /> Completed</span></dd></div>
+                </dl>
+              </article>
+            );
+          })}
+        </div>
       </section>
       <div className="source-bottom-grid">
         <section className="insight-card source-quality-card">
@@ -1168,6 +1192,51 @@ function AdjustmentView({ viewModel, adjustmentsLocked, onSelect, onExclude, onL
               </div>
             );
           })}
+        </div>
+        <div className="adjustment-mobile-list" aria-label="Comparable adjustments compact">
+          <article className="adjustment-mobile-card subject">
+            <header>
+              <div>
+                <span>Subject</span>
+                <strong>{viewModel.subject.address}</strong>
+              </div>
+            </header>
+            <dl>
+              {rows.map(({ label, subjectValue }) => (
+                <div key={label}>
+                  <dt>{label}</dt>
+                  <dd>{subjectValue}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+          {comps.map((comp, index) => (
+            <article className={clsx("adjustment-mobile-card", viewModel.activeComparableId === comp.id && "selected", viewModel.newCandidateId === comp.id && "new-column")} key={comp.id}>
+              <header>
+                <button type="button" onClick={() => onSelect(comp.id)}>
+                  <span>{viewModel.newCandidateId === comp.id ? "New home" : `Home ${index + 1}`}</span>
+                  <strong>{comp.address}</strong>
+                </button>
+                <button className="table-action" type="button" onClick={() => onExclude(comp.id)} disabled={adjustmentsLocked} title={adjustmentsLocked ? "Unlock the review set before removing a home." : undefined}>Exclude</button>
+              </header>
+              <dl>
+                {rows.map(({ label, compValue }) => {
+                  const raw = adjustmentRawGetters[label]?.(comp);
+                  return (
+                    <div key={label}>
+                      <dt>{label}</dt>
+                      <dd className={clsx(
+                        raw !== undefined && raw < 0 && "adj-negative",
+                        raw !== undefined && raw > 0 && "adj-positive"
+                      )}>
+                        {raw !== undefined && raw > 0 ? `+${compValue(comp)}` : compValue(comp)}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </dl>
+            </article>
+          ))}
         </div>
       </div>
       <ImpactPanel delta={viewModel.valuationDelta} valuation={viewModel.valuation} locked={adjustmentsLocked} onLock={onLock} />
