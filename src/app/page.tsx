@@ -281,7 +281,7 @@ export default function Home() {
         <header className="stage-header">
           <div className="stage-title-copy">
             <h2>{titleForView(viewMode, showForm)}</h2>
-            <p>{state.analysisStarted ? `${subject.address || subjectDisplayName} / local demo snapshot` : canRunAnalysis ? "The property details are ready. Run the analysis to move into the source scan." : "Enter the property details to unlock the source scan."}</p>
+            {state.analysisStarted && <p>{subject.address || subjectDisplayName} / local demo snapshot</p>}
             <div className="stage-status-row" aria-live="polite">
               <span className={clsx("status-chip", workflowStatus.tone)}>
                 <StatusIcon size={14} aria-hidden />
@@ -790,8 +790,7 @@ function InsightsRail({
           <section className="insight-card value-card">
             <span className="card-label">Value range</span>
             <strong>Awaiting analysis</strong>
-            <p>Enter the property details and run the analysis to see the value range.</p>
-            <div className="zero-state-note">No value estimate appears until the subject is reviewed.</div>
+            <div className="zero-state-note" style={{ marginTop: 12 }}>No value estimate appears until the subject is reviewed.</div>
           </section>
           <section className="insight-card confidence-card">
             <span className="card-label">Confidence</span>
@@ -838,7 +837,7 @@ function InsightsRail({
       <section className="insight-card confidence-card">
         <span className="card-label">Confidence</span>
         <div className="confidence-row">
-          <div className="ring" style={{ "--score": `${viewModel.confidenceScore * 3.6}deg` } as CSSProperties}>{viewModel.confidenceScore}%</div>
+          <div className="ring" style={{ "--score": `${Math.round(viewModel.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(viewModel.confidenceScore)}%</div>
           <div>
             <strong>{analysisStarted ? `${viewModel.confidenceLevel} confidence` : "Waiting for property details"}</strong>
             <p>{viewModel.confidenceRationale}</p>
@@ -1196,7 +1195,7 @@ function ValuationSummary({ snapshot, newCompId }: { snapshot: PceAnalysisSnapsh
           <p>Derived from adjusted home sales, not a guess.</p>
         </div>
         <div className="confidence-row">
-          <div className="ring" style={{ "--score": `${snapshot.valuation.confidenceScore * 3.6}deg` } as CSSProperties}>{snapshot.valuation.confidenceScore}%</div>
+          <div className="ring" style={{ "--score": `${Math.round(snapshot.valuation.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(snapshot.valuation.confidenceScore)}%</div>
           <div><h3>{formatConfidenceLevel(snapshot.valuation.confidenceLevel)} confidence</h3><p>{snapshot.valuation.confidenceRationale}</p></div>
         </div>
       </div>
