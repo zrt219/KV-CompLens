@@ -79,7 +79,7 @@ export function generatePdfArrayBuffer(packet: ExportPacket) {
         finalY = riY;
       }
       doc.setFontSize(13);
-      doc.text("Review Intelligence V2", 14, finalY);
+      doc.text("Review Intelligence", 14, finalY);
       doc.setFontSize(9);
       doc.text(doc.splitTextToSize(packet.reviewIntelligence.memoReadySummary, 180), 14, finalY + 6);
     }

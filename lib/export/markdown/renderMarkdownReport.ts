@@ -38,7 +38,7 @@ export function renderMarkdownReport(packet: ExportPacket) {
     ),
     ...(packet.reviewIntelligence ? [
       "",
-      "## Review Intelligence V2",
+      "## Review Intelligence",
       `- Title: ${packet.reviewIntelligence.title}`,
       `- Verdict: ${packet.reviewIntelligence.verdict}`,
       `- Strongest comparable: ${packet.reviewIntelligence.strongestComparable}`,

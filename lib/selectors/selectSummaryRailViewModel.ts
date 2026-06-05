@@ -269,7 +269,7 @@ function buildDetails(
     },
     {
       id: "review-intelligence",
-      label: "Review Intelligence V2",
+      label: "Review Intelligence",
       count: state.reviewIntelligenceAttachment ? "Attached" : options.reviewIntelligenceAvailable ? "Ready" : "Not attached",
       rows: [
         { label: "Status", value: state.reviewIntelligenceAttachment ? "Attached to memo/export" : options.reviewIntelligenceAvailable ? "Ready to inspect" : "Run analysis first", tone: state.reviewIntelligenceAttachment ? "confirmed" : options.reviewIntelligenceAvailable ? "ready" : "locked" },

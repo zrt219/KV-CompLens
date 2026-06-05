@@ -88,7 +88,7 @@ function adjustmentsSection(packet: ExportPacket) {
 
 function reviewIntelligenceSection(packet: ExportPacket) {
   if (!packet.reviewIntelligence) return "";
-  return `<section><h2>Review Intelligence V2</h2>
+  return `<section><h2>Review Intelligence</h2>
     <p><strong>Title:</strong> ${escapeHtml(packet.reviewIntelligence.title)}</p>
     <p><strong>Verdict:</strong> ${escapeHtml(packet.reviewIntelligence.verdict)}</p>
     <p><strong>Strongest comparable:</strong> ${escapeHtml(packet.reviewIntelligence.strongestComparable)}</p>

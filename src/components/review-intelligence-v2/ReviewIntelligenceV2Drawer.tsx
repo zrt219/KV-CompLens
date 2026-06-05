@@ -41,9 +41,9 @@ export function ReviewIntelligenceV2Drawer({
         <motion.section className="review-intelligence-drawer" initial={{ x: 420 }} animate={{ x: 0 }} exit={{ x: 420 }} transition={{ duration: 0.22 }}>
           <div className="review-intelligence-head">
             <div>
-              <span className="status-chip confirmed">Review Intelligence V2</span>
-              <h3>Verified from PCE-V2 evidence pack</h3>
-              <p>No retrieved fact, no claim. Deterministic valuation remains the source of truth.</p>
+              <span className="status-chip confirmed">Review Intelligence</span>
+              <h3>Verified from the current analysis snapshot</h3>
+              <p>Every explanation is grounded in the current analysis snapshot. Deterministic valuation remains the source of truth.</p>
             </div>
             <button aria-label="Close Review Intelligence drawer" type="button" onClick={onClose}>
               <X size={20} />
@@ -183,7 +183,7 @@ export function ReviewIntelligenceV2Drawer({
             <section className="ri-card ri-fallback">
               <div className="ri-card-head">
                 <div>
-                  <span className="ri-kicker">Review Intelligence V2</span>
+                  <span className="ri-kicker">Review Intelligence</span>
                   <h3>Verified insight withheld</h3>
                 </div>
               </div>

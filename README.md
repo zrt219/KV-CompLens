@@ -4,7 +4,7 @@
 
 KV CompLens is not a valuation chatbot. It is a deterministic comparable-evidence workflow that helps an analyst build, review, explain, and export a residential comp-analysis packet.
 
-KV CompLens is an underwriting-support workflow for residential comparable-sales analysis. Instead of asking AI to determine property value, the platform treats comparable properties as evidence. A deterministic analysis engine ranks, adjusts, and reconciles comparable sales, while Review Intelligence V2 converts verified evidence into analyst-readable summaries, export packages, and audit-friendly outputs.
+KV CompLens is an underwriting-support workflow for residential comparable-sales analysis. Instead of asking AI to determine property value, the platform treats comparable properties as evidence. A deterministic comparable-evidence engine ranks, adjusts, and reconciles comparable sales, while Review Intelligence converts verified evidence into analyst-readable summaries, export packages, and audit-friendly outputs.
 
 - Public app: [kv-complens.vercel.app](https://kv-complens.vercel.app)
 - Demo mode: [kv-complens.vercel.app/?demo=1](https://kv-complens.vercel.app/?demo=1)
@@ -45,17 +45,17 @@ KV CompLens focuses on workflow quality, evidence traceability, and reviewer tru
 
 ```txt
 Property Intake
-        ↓
+        ->
 Source Scan
-        ↓
+        ->
 Candidate Ranking
-        ↓
-Deterministic Analysis Engine
-        ↓
-Review Intelligence V2
-        ↓
+        ->
+Deterministic Comparable-Evidence Engine
+        ->
+Review Intelligence
+        ->
 Adjustments
-        ↓
+        ->
 Export Package
 ```
 
@@ -76,11 +76,11 @@ The platform:
 
 The system does not ask an LLM what a property is worth.
 
-The deterministic analysis engine computes the evidence. Review Intelligence V2 explains verified evidence.
+The deterministic analysis engine computes the evidence. Review Intelligence explains verified evidence.
 
-## Review Intelligence V2
+## Review Intelligence
 
-Review Intelligence V2 is the strongest differentiator in the product.
+Review Intelligence is the strongest differentiator in the product.
 
 It is:
 
@@ -99,7 +99,7 @@ It does not:
 - claim credit-decision authority
 - replace analyst review
 
-Required rule: `No retrieved fact, no claim.`
+Every explanation is grounded in the current analysis snapshot.
 
 ## Screenshots
 
@@ -161,9 +161,9 @@ Core implementation surfaces:
 - `packages/core/*` contains the deterministic ranking, scoring, adjustment, valuation, and confidence logic
 - `tests/*` and `packages/core/*.test.ts` cover UI state, export behavior, and deterministic model behavior
 
-## Deterministic Analysis Engine
+## Deterministic Comparable-Evidence Engine
 
-Internally, the product uses the PCE-V2 engine as the deterministic analysis layer.
+The product uses a deterministic comparable-evidence engine as the analysis layer.
 
 That layer is responsible for:
 
@@ -172,7 +172,7 @@ That layer is responsible for:
 - applying deterministic adjustment logic
 - estimating low, midpoint, and high value ranges
 - computing confidence and risk flags
-- producing the canonical snapshot that drives the UI, exports, and Review Intelligence V2
+- producing the canonical snapshot that drives the UI, exports, and Review Intelligence
 
 The LLM layer does not determine value. It explains verified deterministic evidence.
 

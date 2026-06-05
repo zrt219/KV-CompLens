@@ -93,7 +93,7 @@ export function generateDeterministicZrtReviewInsight(context: RetrievedContext)
   const nextAction = buildNextAction(context.intent, weakestComparable?.address);
   const memoReadySummary = clampWordCount(
     [
-      `Review Intelligence V2 marks the packet as ${humanizeVerdict(verdict)} around ${formatCurrency(numericValue(lookup.midpointEstimate))} with ${comparables.length} selected comparables and ${Math.round(confidenceScore)}% confidence.`,
+      `Review Intelligence marks the packet as ${humanizeVerdict(verdict)} around ${formatCurrency(numericValue(lookup.midpointEstimate))} with ${comparables.length} selected comparables and ${Math.round(confidenceScore)}% confidence.`,
       strongestComparable ? `${strongestComparable.address} is the strongest anchor.` : undefined,
       weakestComparable ? `${weakestComparable.address} should be checked before finalizing the memo.` : undefined,
       `Synthetic/public-style demo data is not live MLS, not an appraisal, and not a credit decision. Analyst review remains required.`

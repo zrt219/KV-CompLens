@@ -200,7 +200,7 @@ export default function Home() {
         type: "review_evidence_pack_built",
         source: "RAG evidence pack",
         status: "confirmed",
-        summary: "Review evidence pack built from the current PCE-V2 snapshot."
+        summary: "Review evidence pack built from the current deterministic analysis snapshot."
       }
     });
     dispatch({
@@ -262,7 +262,7 @@ export default function Home() {
                 id: `review-insight-fallback-used-${lifecycleKey}`,
                 timestamp: new Date().toISOString(),
                 type: "review_insight_fallback_used",
-                source: "Review Intelligence V2",
+                source: "Review Intelligence",
                 status: "review",
                 summary: `Optional review-intelligence enhancer returned ${response.status}. Deterministic fallback remained active.`
               }
@@ -299,7 +299,7 @@ export default function Home() {
               id: `review-insight-fallback-used-${lifecycleKey}`,
               timestamp: new Date().toISOString(),
               type: "review_insight_fallback_used",
-              source: "Review Intelligence V2",
+              source: "Review Intelligence",
               status: "review",
               summary: "Optional LLM narrative failed verification or was unavailable. Deterministic fallback remained active."
             }
@@ -313,7 +313,7 @@ export default function Home() {
               id: `review-insight-fallback-used-${lifecycleKey}`,
               timestamp: new Date().toISOString(),
               type: "review_insight_fallback_used",
-              source: "Review Intelligence V2",
+              source: "Review Intelligence",
               status: "review",
               summary: "Optional LLM narrative request failed. Deterministic fallback remained active."
             }
@@ -1520,7 +1520,7 @@ function ReportReady({
     "Comparable Summary",
     "Adjustment Grid",
     "Value Reconciliation",
-    "Review Intelligence V2",
+    "Review Intelligence",
     "Review Activity",
     "Assumptions and Limits"
   ];
@@ -1795,7 +1795,7 @@ function ReportReady({
         )}
       </section>
       <section className="insight-card audit-packet-card">
-        <h3>Review Intelligence V2</h3>
+        <h3>Review Intelligence</h3>
         {activeReviewIntelligence ? (
           <>
             <div className="review-intel-highlight-grid">
@@ -1855,7 +1855,7 @@ function ExportMemoSnapshot({ packet }: { packet: ExportPacket }) {
     `Estimated range is ${formatCurrency(valuation.lowEstimate)} to ${formatCurrency(valuation.highEstimate)} with current estimate ${formatCurrency(valuation.midpointEstimate)} and ${Math.round(valuation.confidenceScore)}% ${valuation.confidenceLabel} confidence.`,
     `${sourceScan.sourcesChecked} sources, ${sourceScan.recordsFound ?? 0} demo records, ${sourceScan.comparablesRanked ?? packet.comparables.length} candidates ranked, and ${sourceScan.comparablesSelected} comparables selected for review.`,
     compactReviewSummary
-      ? `Review Intelligence V2: ${compactReviewSummary}`
+      ? `Review Intelligence: ${compactReviewSummary}`
       : "Review support only: not live MLS, not an appraisal, not a credit decision, and analyst review required."
   ].map((bullet) => bullet.replace(/\s+/g, " ").trim());
 

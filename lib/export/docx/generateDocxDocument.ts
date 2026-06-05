@@ -17,7 +17,7 @@ export function generateDocxDocument(packet: ExportPacket) {
     ...packet.comparables.map((comp) => paragraph(`${comp.rank}. ${comp.address}: ${formatCurrency(comp.adjustedValue)} adjusted value; ${comp.distanceKm.toFixed(1)} km; ${comp.comparableProbability}% comparable probability.`)),
     heading("Adjustment Summary"),
     ...packet.adjustments.map((adjustment) => paragraph(`${adjustment.address}: ${formatCurrency(adjustment.totalAdjustment)} net adjustment; ${formatCurrency(adjustment.adjustedValue)} adjusted value.`)),
-    ...(packet.reviewIntelligence ? [heading("Review Intelligence V2"), paragraph(packet.reviewIntelligence.memoReadySummary)] : []),
+    ...(packet.reviewIntelligence ? [heading("Review Intelligence"), paragraph(packet.reviewIntelligence.memoReadySummary)] : []),
     heading("Limitations"),
     ...packet.limitations.map(paragraph),
     heading("Audit Summary"),

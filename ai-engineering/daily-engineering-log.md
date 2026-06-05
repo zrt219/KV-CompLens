@@ -393,3 +393,12 @@
 - Verification performed: `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed; Puppeteer verified the `Print view` button opens `http://localhost:3000/export/print` with a populated report iframe and no unavailable fallback state.
 - Evidence/files: `README.md`, `lib/export/html/openPrintReport.ts`, `components/export/PrintReportView.tsx`.
 - Resume-safe bullet: Reframed a deterministic property-review demo for reviewer-speed and stabilized its print-ready export route with shared-storage fallback handling and hydration-safe client rendering.
+
+## 2026-06-05 - Verified Engineering Work
+
+- Built/changed: Removed private framework naming from the public KV CompLens README and user-facing app/export copy, replacing internal engine terminology with generic deterministic comparable-analysis language and renaming public surfaces from `Review Intelligence V2` to `Review Intelligence`.
+- Systems involved: `README.md`, `src/app/page.tsx`, `src/app/layout.tsx`, `src/components/review-intelligence-v2/ReviewIntelligenceV2Drawer.tsx`, `src/components/evidence-board/EvidenceComparableCard.tsx`, `lib/export/*`, `lib/review-intelligence/generateZrtReviewInsight.ts`, `lib/selectors/selectSummaryRailViewModel.ts`, `lib/rag/sourceRegistry.ts`, `tests/review-intelligence-v2.test.ts`.
+- Technical skills demonstrated: public-surface terminology review, product-copy hardening, export/report copy normalization, metadata cleanup, and verification-safe refactoring across UI and generated artifact layers.
+- Verification performed: repo search showed no remaining public-surface matches for `PCE-V2`, `Probabilistic Comparable Evidence`, `Ralphplan`, `Ralphlan`, `ZRT RAG`, `Evidence Court`, `Review Intelligence V2`, or `No retrieved fact, no claim`; `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed.
+- Evidence/files: `README.md`, `src/app/page.tsx`, `src/components/review-intelligence-v2/ReviewIntelligenceV2Drawer.tsx`, `lib/export/html/renderReportHtml.ts`, `lib/export/pdf/generatePdfBlob.ts`.
+- Resume-safe bullet: Sanitized a public-facing underwriting prototype by removing private framework terminology from documentation, UI copy, and generated export artifacts while preserving deterministic-analysis credibility.

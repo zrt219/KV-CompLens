@@ -106,7 +106,7 @@ export function EvidenceComparableCard({ comp, rank, active, isNew, counterfactu
             </div>
             <div>
               <small>Counterfactual impact</small>
-              <p>{counterfactual?.interpretation ?? "Open Review Intelligence V2 to inspect removal sensitivity for this comparable."}</p>
+              <p>{counterfactual?.interpretation ?? "Open Review Intelligence to inspect removal sensitivity for this comparable."}</p>
             </div>
           </div>
         )}

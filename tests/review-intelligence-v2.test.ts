@@ -194,7 +194,7 @@ describe("review intelligence v2", () => {
     });
     const content = artifact.content as string;
 
-    expect(content).toContain("Review Intelligence V2");
+    expect(content).toContain("Review Intelligence");
     expect(content).not.toContain("Agent Reasoning Trace");
     expect(content).not.toContain("chain-of-thought");
   });

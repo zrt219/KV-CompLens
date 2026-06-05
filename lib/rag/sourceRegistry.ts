@@ -31,9 +31,9 @@ export const REVIEW_LIMITATIONS = [
 ] as const;
 
 export const REVIEW_METHODOLOGY = [
-  "PCE-V2 computes valuation, confidence, and comparable selection.",
-  "Review Intelligence V2 explains verified PCE-V2 evidence only.",
-  "No retrieved fact, no claim."
+  "The deterministic analysis engine computes valuation, confidence, and comparable selection.",
+  "Review Intelligence explains verified deterministic evidence only.",
+  "Every explanation is grounded in the current analysis snapshot."
 ] as const;
 
 export const factId = {

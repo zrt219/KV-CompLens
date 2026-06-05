@@ -13,7 +13,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "KV CompLens | AI Comparable Property Valuation",
   description:
-    "Deterministic 5-step comparable-property review workflow with source scan, comparable review, adjustments, export, and verified Review Intelligence V2 artifacts.",
+    "Deterministic 5-step comparable-property review workflow with source scan, comparable review, adjustments, export, and verified Review Intelligence artifacts.",
   keywords: ["property valuation", "comparable analysis", "real estate", "comp review", "KV Capital"],
   icons: {
     icon: "/favicon.svg",
