@@ -233,6 +233,14 @@ The export surface converts the current review set into resilient report artifac
 
 <img width="2560" height="1279" alt="chrome_gh1m66Fx0k" src="https://github.com/user-attachments/assets/fb3cd85a-1993-4f7a-98a4-0d9dc0465044" />
 
+### PDF Report
+
+The primary report path packages the current review snapshot into a structured report with the estimate range, comparable set, limitations, and audit summary.
+
+### Export Artifacts
+
+Export artifacts are generated from the same canonical packet: PDF, DOCX, print-ready HTML, Word-compatible fallback, Markdown, JSON, CSV, ZIP, and copyable report text.
+
 ### Print-Ready Report
 
 The print-ready viewer turns the same export packet into a clean browser document that can be opened directly or saved as PDF when primary export formats fail.
@@ -254,12 +262,12 @@ Video walkthrough: [Watch KV CompLens on YouTube](https://youtu.be/gXPEFDbuXZg)
 Core implementation surfaces:
 
 - `src/app/page.tsx` drives the main underwriting workspace
-- `hooks/usePceAnalysis.ts` manages reducer-backed UI state, workflow transitions, and demo hydration
-- `lib/pce/runPcePipeline.ts` produces the canonical deterministic snapshot
-- `lib/review-intelligence-v2/*` builds and verifies the reviewer-facing explanation layer
+- analysis state hooks manage reducer-backed UI state, workflow transitions, and demo hydration
+- deterministic analysis modules produce the canonical review snapshot
+- reviewer-facing explanation modules build and verify grounded Review Intelligence outputs
 - `lib/export/*` generates packet-driven export artifacts and fallbacks
 - `src/components/evidence-board/*` powers the comparable-review surface
-- `src/components/review-intelligence-v2/*` powers the explanation drawer and memo attachment path
+- Review Intelligence drawer components power the explanation and memo attachment path
 - `packages/core/*` contains the deterministic ranking, scoring, adjustment, valuation, and confidence logic
 - `tests/*` and `packages/core/*.test.ts` cover UI state, export behavior, and deterministic model behavior
 

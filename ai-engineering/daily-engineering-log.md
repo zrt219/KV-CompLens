@@ -411,3 +411,12 @@
 - Verification performed: `git diff --check -- README.md` passed; README search confirmed no banned private terminology matches; generated GIF asset size verified at 612,318 bytes; README-only change pushed to `origin/main`.
 - Evidence/files: `README.md`, `docs/readme/kv-complens-workflow.gif`, `qa-screenshots/2026-06-04-intake.png`, `qa-screenshots/2026-06-04-sources.png`, `qa-screenshots/2026-06-04-review.png`, `qa-screenshots/2026-06-04-adjust.png`, `qa-screenshots/2026-06-04-export.png`.
 - Resume-safe bullet: Created reviewer-speed documentation for a deterministic property-review prototype using Mermaid workflow diagrams and an animated screenshot-based product preview to explain the intake-to-export workflow.
+
+## 2026-06-05 - Verified Engineering Work
+
+- Built/changed: Cleaned the public KV CompLens README by removing internal analysis-path naming from architecture bullets and normalizing export proof headings into `Export Package`, `PDF Report`, `Export Artifacts`, and `Print-Ready Report`.
+- Systems involved: `README.md`, GitHub publishing workflow.
+- Technical skills demonstrated: public documentation hardening, architecture abstraction, employer-facing terminology control, README heading hierarchy cleanup, and scoped git publishing.
+- Verification performed: README search showed no remaining matches for private path/name exposure terms; `git diff --check -- README.md` passed; changes pushed to `origin/main`.
+- Evidence/files: `README.md`.
+- Resume-safe bullet: Hardened public project documentation by replacing internal implementation-path exposure with generic architecture language and improving export-section hierarchy for reviewer readability.
