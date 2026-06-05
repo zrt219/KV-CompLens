@@ -203,6 +203,10 @@ The Evidence Board centers the subject property, selected comparables, and revie
 
 <img width="2560" height="1279" alt="chrome_aXvhMIv74e" src="https://github.com/user-attachments/assets/f2e43d65-ddea-4cdb-a69b-301be1e45ae7" />
 
+### Comparable Impact Preview
+
+<img width="2560" height="1279" alt="chrome_kOIyRkNRXX" src="https://github.com/user-attachments/assets/1ec8adf5-1d25-44d5-bc31-293552e5f750" />
+
 ### Adjustments
 
 The adjustments step makes the review logic explicit through line-level changes and visible range impact.
@@ -221,6 +225,11 @@ The PDF report packages the current review snapshot into a clean, shareable unde
 
 <img width="2560" height="1279" alt="chrome_sSC5Kbrx74" src="https://github.com/user-attachments/assets/1ef77ca2-5423-452c-83a7-efcd232fad45" />
 
+### Export Package
+
+The export surface converts the current review set into resilient report artifacts with PDF, DOCX, print, ZIP, JSON, CSV, and copyable fallback paths.
+
+<img width="2560" height="1279" alt="chrome_gh1m66Fx0k" src="https://github.com/user-attachments/assets/fb3cd85a-1993-4f7a-98a4-0d9dc0465044" />
 
 ### Print-Ready Report
 
