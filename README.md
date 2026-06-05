@@ -1,5 +1,7 @@
 # KV CompLens
 
+<img width="1024" height="1024" alt="kv_complens_banner_1780644632429" src="https://github.com/user-attachments/assets/f1f95e29-6db1-43bf-b4d8-b88133781004" />
+
 KV CompLens is a deterministic underwriting-support prototype for Alberta residential comparable-property analysis, built for the KV Capital AI Engineer Hackathon.
 
 It is not a real-estate chatbot, appraisal engine, credit decision system, MLS ingestion product, or production underwriting platform. It is a reviewer-facing AI product surface that demonstrates how comparable evidence can be retrieved, scored, adjusted, reconciled, documented, and exported with transparent deterministic logic.
