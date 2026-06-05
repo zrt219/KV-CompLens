@@ -215,7 +215,7 @@ The adjustments step makes the review logic explicit through line-level changes 
 
 ![Adjustments](qa-screenshots/2026-06-04-adjust.png)
 
-### Additional Export Package
+### Export Package
 
 The export surface converts the current review set into resilient report artifacts with PDF, DOCX, print, ZIP, JSON, CSV, and copyable fallback paths.
 
@@ -226,16 +226,6 @@ The export surface converts the current review set into resilient report artifac
 The PDF report packages the current review snapshot into a clean, shareable underwriting-support document with subject details, selected comparables, adjustment logic, value range, confidence indicators, limitations, and audit-ready review notes.
 
 <img width="2560" height="1279" alt="chrome_sSC5Kbrx74" src="https://github.com/user-attachments/assets/1ef77ca2-5423-452c-83a7-efcd232fad45" />
-
-### Export Package
-
-The export surface converts the current review set into resilient report artifacts with PDF, DOCX, print, ZIP, JSON, CSV, and copyable fallback paths.
-
-<img width="2560" height="1279" alt="chrome_gh1m66Fx0k" src="https://github.com/user-attachments/assets/fb3cd85a-1993-4f7a-98a4-0d9dc0465044" />
-
-### PDF Report
-
-The primary report path packages the current review snapshot into a structured report with the estimate range, comparable set, limitations, and audit summary.
 
 ### Export Artifacts
 
