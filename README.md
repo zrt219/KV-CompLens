@@ -215,7 +215,7 @@ The adjustments step makes the review logic explicit through line-level changes 
 
 ![Adjustments](qa-screenshots/2026-06-04-adjust.png)
 
-### Export Package
+### Additional Export Package
 
 The export surface converts the current review set into resilient report artifacts with PDF, DOCX, print, ZIP, JSON, CSV, and copyable fallback paths.
 
