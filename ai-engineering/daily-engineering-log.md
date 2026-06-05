@@ -402,3 +402,12 @@
 - Verification performed: repo search showed no remaining public-surface matches for `PCE-V2`, `Probabilistic Comparable Evidence`, `Ralphplan`, `Ralphlan`, `ZRT RAG`, `Evidence Court`, `Review Intelligence V2`, or `No retrieved fact, no claim`; `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed.
 - Evidence/files: `README.md`, `src/app/page.tsx`, `src/components/review-intelligence-v2/ReviewIntelligenceV2Drawer.tsx`, `lib/export/html/renderReportHtml.ts`, `lib/export/pdf/generatePdfBlob.ts`.
 - Resume-safe bullet: Sanitized a public-facing underwriting prototype by removing private framework terminology from documentation, UI copy, and generated export artifacts while preserving deterministic-analysis credibility.
+
+## 2026-06-05 - Verified Engineering Work
+
+- Built/changed: Added a reviewer-facing visual explanation layer to the KV CompLens README with four Mermaid workflow diagrams and a compact animated workflow GIF built from verified product screenshots.
+- Systems involved: `README.md`, `docs/readme/kv-complens-workflow.gif`, existing QA screenshot assets.
+- Technical skills demonstrated: documentation information architecture, GitHub Markdown/Mermaid diagramming, reviewer-speed storytelling, deterministic screenshot-to-GIF asset generation, and public terminology hygiene.
+- Verification performed: `git diff --check -- README.md` passed; README search confirmed no banned private terminology matches; generated GIF asset size verified at 612,318 bytes; README-only change pushed to `origin/main`.
+- Evidence/files: `README.md`, `docs/readme/kv-complens-workflow.gif`, `qa-screenshots/2026-06-04-intake.png`, `qa-screenshots/2026-06-04-sources.png`, `qa-screenshots/2026-06-04-review.png`, `qa-screenshots/2026-06-04-adjust.png`, `qa-screenshots/2026-06-04-export.png`.
+- Resume-safe bullet: Created reviewer-speed documentation for a deterministic property-review prototype using Mermaid workflow diagrams and an animated screenshot-based product preview to explain the intake-to-export workflow.
