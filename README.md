@@ -205,6 +205,8 @@ The Evidence Board centers the subject property, selected comparables, and revie
 
 ### Comparable Impact Preview
 
+Before a new comparable is added, KV CompLens previews the expected impact on the review packet so the analyst can decide whether the candidate improves the evidence set or adds unnecessary risk.
+
 <img width="2560" height="1279" alt="chrome_kOIyRkNRXX" src="https://github.com/user-attachments/assets/1ec8adf5-1d25-44d5-bc31-293552e5f750" />
 
 ### Adjustments
