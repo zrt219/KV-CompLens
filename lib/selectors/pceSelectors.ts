@@ -103,7 +103,8 @@ export function selectMemoViewModel(state: PceAnalysisState) {
     memo: state.snapshot.memo,
     auditEvents: [...state.snapshot.auditEvents, ...state.uiAuditEvents],
     generatedAt: state.snapshot.generatedAt,
-    reviewIntelligenceAttached: state.reviewIntelligenceAttached
+    reviewIntelligenceAttached: Boolean(state.reviewIntelligenceAttachment),
+    reviewIntelligenceAttachment: state.reviewIntelligenceAttachment
   };
 }
 
@@ -117,7 +118,8 @@ export function selectExportViewModel(state: PceAnalysisState) {
       adjustedComparables: [],
       newCandidateId: state.newCandidateId,
       auditEvents: [],
-      reviewIntelligenceAttached: false
+      reviewIntelligenceAttached: false,
+      reviewIntelligenceAttachment: undefined
     };
   }
   return {
@@ -128,7 +130,8 @@ export function selectExportViewModel(state: PceAnalysisState) {
     adjustedComparables: state.snapshot.valuation.adjustedComparables,
     newCandidateId: state.newCandidateId,
     auditEvents: [...state.snapshot.auditEvents, ...state.uiAuditEvents],
-    reviewIntelligenceAttached: state.reviewIntelligenceAttached
+    reviewIntelligenceAttached: Boolean(state.reviewIntelligenceAttachment),
+    reviewIntelligenceAttachment: state.reviewIntelligenceAttachment
   };
 }
 

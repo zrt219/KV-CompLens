@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { buildExportArtifact, isExportReady, type ExportArtifactType } from "../../../../lib/pce/exportPackage";
 import type { PceAnalysisSnapshot, PceAuditEvent } from "../../../../lib/pce/runPcePipeline";
+import type { ReviewIntelligenceAttachment } from "../../../../lib/review-intelligence/types";
 import type { SubjectProperty } from "../../../../lib/types";
 
 export const runtime = "nodejs";
@@ -11,6 +12,7 @@ type ExportRequestBody = {
   subject: SubjectProperty;
   snapshot: PceAnalysisSnapshot;
   reviewIntelligenceAttached?: boolean;
+  reviewIntelligenceAttachment?: ReviewIntelligenceAttachment;
   auditEvents?: PceAuditEvent[];
 };
 
@@ -29,11 +31,15 @@ export async function POST(request: Request) {
 
   const artifact = buildExportArtifact(body.type, body.subject, snapshot, {
     includeReviewIntelligence: body.reviewIntelligenceAttached,
+    reviewIntelligenceAttachment: body.reviewIntelligenceAttachment,
     auditEvents: body.auditEvents
   });
+
   const bytes = typeof artifact.content === "string"
     ? new TextEncoder().encode(artifact.content)
-    : artifact.content;
+    : artifact.content instanceof ArrayBuffer
+      ? new Uint8Array(artifact.content)
+      : artifact.content;
 
   const artifactDirectory = join(process.cwd(), "artifacts", "exports");
   await mkdir(artifactDirectory, { recursive: true });

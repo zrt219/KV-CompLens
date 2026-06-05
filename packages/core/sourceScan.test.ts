@@ -20,7 +20,7 @@ const subject: SubjectProperty = {
 };
 
 describe("source scan", () => {
-  it("derives source scan summary from dataset and never claims MLS sold-data provenance", () => {
+  it("derives source scan summary from dataset using the consumer-facing demo boundary note", () => {
     const summary = runSourceScan(subject, syntheticComparables, 18, 5);
 
     expect(summary.syntheticRecentSalesScanned).toBe(syntheticComparables.length);
@@ -29,7 +29,6 @@ describe("source scan", () => {
     expect(summary.selectedCompCount).toBe(5);
     expect(summary.sourcesConsolidated).toBe(5);
     expect(summary.estimatedManualTimeSavedHours).toBeGreaterThan(0);
-    expect(summary.dataBoundaryNote.toLowerCase()).toContain("synthetic");
-    expect(summary.dataBoundaryNote.toLowerCase()).toContain("not live mls");
+    expect(summary.dataBoundaryNote).toBe("Synthetic/public-style demo data.");
   });
 });

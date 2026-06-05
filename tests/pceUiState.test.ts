@@ -13,6 +13,7 @@ import {
   selectMemoViewModel
 } from "../lib/selectors/pceSelectors";
 import { syntheticComparables } from "../lib/mockData";
+import { runEvidenceCourt } from "../lib/review-intelligence-v2/runEvidenceCourt";
 import type { SubjectProperty } from "../lib/types";
 
 const subject: SubjectProperty = {
@@ -179,14 +180,21 @@ describe("review UI state reducer", () => {
 
   it("ATTACH_REVIEW_INTELLIGENCE stores a verified memo attachment event", () => {
     const state = createInitialPceState(subject, syntheticComparables, "2026-06-01T00:00:00.000Z");
+    const result = runEvidenceCourt(state.snapshot);
     const attached = pceAnalysisReducer(state, {
       type: "ATTACH_REVIEW_INTELLIGENCE",
-      generatedAt: "2026-06-01T04:00:00.000Z"
+      attachment: {
+        attachedAt: "2026-06-01T04:00:00.000Z",
+        context: result.context,
+        insight: result.insight,
+        source: result.source,
+        verification: result.verification
+      }
     });
     const memo = selectMemoViewModel(attached);
     const exportView = selectExportViewModel(attached);
 
-    expect(attached.reviewIntelligenceAttached).toBe(true);
+    expect(attached.reviewIntelligenceAttachment?.insight.memoReadySummary).toBe(result.memoReadySummary);
     expect(memo.reviewIntelligenceAttached).toBe(true);
     expect(exportView.reviewIntelligenceAttached).toBe(true);
     expect(memo.auditEvents.some((event) => event.type === "review_intelligence_v2_added_to_memo")).toBe(true);

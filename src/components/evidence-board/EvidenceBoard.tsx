@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Minus, Plus, Search } from "lucide-react";
 import { formatCurrency } from "../../../lib/agent";
 import type { AdjustedComparable, ScoredComparable, SubjectProperty, ValuationRange } from "../../../lib/types";
-import type { CounterfactualCheck } from "../../../lib/review-intelligence-v2/types";
+import type { CounterfactualCheck, EvidenceCourtPacket } from "../../../lib/review-intelligence-v2/types";
 import { EvidenceBoardCanvas } from "./EvidenceBoardCanvas";
 import { EvidenceBoardLegend } from "./EvidenceBoardLegend";
 import { EvidenceBoardEmptyState } from "./EvidenceBoardEmptyState";
@@ -17,17 +17,22 @@ export type EvidenceBoardProps = {
   activeComparableId?: string;
   newCandidateId?: string;
   valuation: ValuationRange;
+  reviewEvidencePacket?: EvidenceCourtPacket;
   counterfactualsByComparableId?: Record<string, CounterfactualCheck | undefined>;
   onSelectComparable: (id: string) => void;
   onFindCandidate: () => void;
+  onAddCandidate?: () => void;
   onRunAnalysis: () => void;
 };
+
+export type EvidenceBoardFocus = "all" | "subject" | "selected" | "new";
 
 export function EvidenceBoard(props: EvidenceBoardProps) {
   const { selectedComparables, onFindCandidate, onRunAnalysis } = props;
   const [boardMode, setBoardMode] = useState<"board" | "table">("board");
   const [autoArrange, setAutoArrange] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(100);
+  const [legendFocus, setLegendFocus] = useState<EvidenceBoardFocus>("all");
 
   return (
     <section className="evidence-board" aria-label="Selected comparables board">
@@ -59,12 +64,12 @@ export function EvidenceBoard(props: EvidenceBoardProps) {
             <button type="button" className={clsx(boardMode === "board" && "active")} aria-pressed={boardMode === "board"} onClick={() => setBoardMode("board")}>Board</button>
             <button type="button" className={clsx(boardMode === "table" && "active")} aria-pressed={boardMode === "table"} onClick={() => setBoardMode("table")}>Table</button>
           </div>
-          <EvidenceBoardLegend />
+          <EvidenceBoardLegend focus={legendFocus} onFocusChange={setLegendFocus} />
         </div>
       </div>
       {selectedComparables.length ? (
         boardMode === "board" ? (
-          <EvidenceBoardCanvas {...props} autoArrange={autoArrange} zoomLevel={zoomLevel} />
+          <EvidenceBoardCanvas {...props} autoArrange={autoArrange} zoomLevel={zoomLevel} legendFocus={legendFocus} />
         ) : (
           <EvidenceBoardTable selectedComparables={selectedComparables} activeComparableId={props.activeComparableId} onSelectComparable={props.onSelectComparable} />
         )

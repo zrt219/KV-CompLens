@@ -15,6 +15,15 @@ It is not a real-estate chatbot, appraisal engine, credit decision system, MLS i
 - Engineering source of truth: [ai-engineering/source-of-truth.md](ai-engineering/source-of-truth.md)
 - Stack: `Next.js`, `React`, `TypeScript`, `Vitest`
 
+## Builder / Proof of Work
+
+Built by ZRT / Zhane Grey.
+
+- GitHub: [github.com/zrt219](https://github.com/zrt219)
+- Live demo: [kv-complens.vercel.app](https://kv-complens.vercel.app)
+- LinkedIn: [zhane-grey-987258395](https://www.linkedin.com/in/zhane-grey-987258395)
+- Portfolio: TODO
+
 ## Reviewer Summary
 
 KV CompLens separates deterministic valuation from reviewer-facing explanation. A cross-platform evidence model ranks comparable sales from structured inputs and source reliability, while Review Intelligence V2 converts only verified snapshot facts into a public reasoning layer that can be attached to export artifacts.
@@ -70,6 +79,12 @@ subject + candidates
 ## Review Intelligence V2
 
 Review Intelligence V2 is a deterministic, verifier-gated reasoning layer built from `PceAnalysisSnapshot` only.
+
+No retrieved fact, no claim.
+
+The LLM layer does not determine value. It explains verified PCE-V2 evidence.
+
+Review Intelligence exposes public reasoning artifacts, not raw chain-of-thought.
 
 It provides:
 
@@ -144,7 +159,24 @@ The export step turns snapshot facts into structured analyst-readable sections:
 7. confidence and risk
 8. limitations
 
-When attached, export artifacts also include a `Review Intelligence Summary` with verdict, strongest and weakest comparable, memo-ready summary, limitations, audit state, and claim-ledger appendix.
+When attached, export artifacts also include a `Review Intelligence Summary` with verdict, strongest and weakest comparable, memo-ready summary, limitations, and audit state. Raw agent reasoning traces and chain-of-thought are excluded from export artifacts.
+
+## Export Resilience Layer
+
+KV CompLens uses a layered export strategy so the Export Package page does not become a dead end if one renderer or browser download path fails.
+
+1. Native PDF and DOCX generation from the canonical `ExportPacket`.
+2. Print-ready HTML and Word-compatible HTML/RTF fallbacks.
+3. Full evidence package ZIP containing HTML, Markdown, JSON, CSV, audit, and limitations files.
+4. Copy-report fallback if browser downloads are blocked.
+
+Browser downloads can vary by environment. If native PDF generation fails, the app opens a print-ready report that can be saved as PDF from the browser print dialog. If DOCX generation fails, the app generates a Word-compatible `.doc` or `.rtf` fallback. The ZIP evidence package preserves the review data even when binary renderers fail.
+
+Local/demo failure simulation flags:
+
+- `?failPdf=1` forces native PDF failure and verifies print fallback.
+- `?failDocx=1` forces native DOCX failure and verifies Word-compatible fallback.
+- `?failDownloads=1` simulates blocked browser downloads and verifies copy/report fallback.
 
 ## Audit And Provenance
 
@@ -189,8 +221,8 @@ npm run build
 
 Latest verified status:
 
-- `npm run lint` passed cleanly
-- `npm test` passed with 64 tests across 19 files
+- `npm run lint` passed with legacy unused-helper warnings only
+- `npm test` passed with 73 tests across 22 files
 - `npm run build` passed
 - local browser QA captured `qa-screenshots/2026-06-04-*`
 - export artifacts regenerated under `artifacts/exports/*2026-06-04*`

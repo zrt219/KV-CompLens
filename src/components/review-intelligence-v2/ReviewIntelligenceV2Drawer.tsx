@@ -1,16 +1,10 @@
 "use client"
 
-import { useMemo, useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
-import { Clipboard, ListChecks, X } from "lucide-react"
-import type { EvidenceCourtPacket, EvidenceCourtResult } from "../../../lib/review-intelligence-v2/types"
-import { AnalystQuestions } from "./AnalystQuestions"
-import { ClaimLedger } from "./ClaimLedger"
-import { CounterfactualChecks } from "./CounterfactualChecks"
-import { EvidenceVerdictCard } from "./EvidenceVerdictCard"
-import { MemoReadySummary } from "./MemoReadySummary"
-import { SignalAnalystCard } from "./SignalAnalystCard"
-import { SkepticAnalystCard } from "./SkepticAnalystCard"
+import { AnimatePresence, motion } from "framer-motion";
+import { Clipboard, ListChecks, ShieldCheck, X } from "lucide-react";
+import { useMemo, useState } from "react";
+import type { EvidenceCourtPacket, EvidenceCourtResult } from "../../../lib/review-intelligence-v2/types";
+import { ClaimLedger } from "./ClaimLedger";
 
 export function ReviewIntelligenceV2Drawer({
   packet,
@@ -19,27 +13,26 @@ export function ReviewIntelligenceV2Drawer({
   onAddToMemo,
   onClose
 }: {
-  packet: EvidenceCourtPacket
-  result: EvidenceCourtResult
-  attached: boolean
-  onAddToMemo: () => void
-  onClose: () => void
+  packet: EvidenceCourtPacket;
+  result: EvidenceCourtResult;
+  attached: boolean;
+  onAddToMemo: () => void;
+  onClose: () => void;
 }) {
-  const [ledgerOpen, setLedgerOpen] = useState(false)
-  const [copied, setCopied] = useState(false)
-
+  const [copied, setCopied] = useState(false);
+  const [ledgerOpen, setLedgerOpen] = useState(false);
   const claims = useMemo(
     () => [...result.signalAnalyst.strongestEvidence, ...result.skepticAnalyst.concerns],
     [result.signalAnalyst.strongestEvidence, result.skepticAnalyst.concerns]
-  )
+  );
 
   async function handleCopy() {
     if (!result.verification.ok || typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
-      return
+      return;
     }
-    await navigator.clipboard.writeText(result.memoReadySummary)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1200)
+    await navigator.clipboard.writeText(result.memoReadySummary);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1200);
   }
 
   return (
@@ -49,8 +42,8 @@ export function ReviewIntelligenceV2Drawer({
           <div className="review-intelligence-head">
             <div>
               <span className="status-chip confirmed">Review Intelligence V2</span>
-              <h3>Verified from PCE-V2 snapshot</h3>
-              <p>Public reasoning artifacts only. Deterministic valuation remains the source of truth.</p>
+              <h3>Verified from PCE-V2 evidence pack</h3>
+              <p>No retrieved fact, no claim. Deterministic valuation remains the source of truth.</p>
             </div>
             <button aria-label="Close Review Intelligence drawer" type="button" onClick={onClose}>
               <X size={20} />
@@ -59,12 +52,131 @@ export function ReviewIntelligenceV2Drawer({
 
           {result.verification.ok ? (
             <div className="review-intelligence-content">
-              <EvidenceVerdictCard verdict={result.verdict} verification={result.verification} attached={attached} />
-              <SignalAnalystCard strongestComparable={result.strongestComparable} signalAnalyst={result.signalAnalyst} />
-              <SkepticAnalystCard weakestComparable={result.weakestSelectedComparable} skepticAnalyst={result.skepticAnalyst} />
-              <CounterfactualChecks checks={result.counterfactuals} />
-              <AnalystQuestions questions={result.analystQuestions} />
-              <MemoReadySummary summary={result.memoReadySummary} limitations={result.limitations} attached={attached} />
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Verdict</span>
+                    <h3>{result.verdict.label}</h3>
+                  </div>
+                  <span className="status-chip confirmed">{result.source === "llm_verified" ? "LLM verified" : "Deterministic"}</span>
+                </div>
+                <p>{result.verdict.summary}</p>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Strongest Comparable</span>
+                    <h3>{result.strongestComparable?.address ?? "Unavailable"}</h3>
+                  </div>
+                </div>
+                <p>{result.strongestComparable?.reason ?? "No strongest comparable is available."}</p>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Weakest Comparable</span>
+                    <h3>{result.weakestSelectedComparable?.address ?? "Unavailable"}</h3>
+                  </div>
+                </div>
+                <p>{result.weakestSelectedComparable?.reason ?? "No weakest comparable is available."}</p>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Confidence Rationale</span>
+                    <h3>{result.insight.confidenceRationale.label}</h3>
+                  </div>
+                </div>
+                <p>{result.insight.confidenceRationale.explanation}</p>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Key Evidence</span>
+                    <h3>Verified support points</h3>
+                  </div>
+                </div>
+                <ul className="ri-list">
+                  {result.insight.keyEvidence.map((item) => (
+                    <li key={item.point}>{item.point}</li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Key Risks</span>
+                    <h3>Review before export</h3>
+                  </div>
+                </div>
+                <ul className="ri-list">
+                  {result.insight.keyRisks.map((item) => (
+                    <li key={item.risk}>
+                      <strong>{item.severity.toUpperCase()}</strong> {item.risk}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Analyst Questions</span>
+                    <h3>Open review items</h3>
+                  </div>
+                </div>
+                <ul className="ri-list">
+                  {result.analystQuestions.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Next Action</span>
+                    <h3>Recommended step</h3>
+                  </div>
+                </div>
+                <p>{result.nextAction}</p>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Memo-Ready Summary</span>
+                    <h3>Export-safe summary</h3>
+                  </div>
+                  {attached && (
+                    <span className="status-chip confirmed">
+                      <ShieldCheck size={14} aria-hidden />
+                      Attached
+                    </span>
+                  )}
+                </div>
+                <p>{result.memoReadySummary}</p>
+              </section>
+
+              <section className="ri-card">
+                <div className="ri-card-head">
+                  <div>
+                    <span className="ri-kicker">Limitations</span>
+                    <h3>Required boundaries</h3>
+                  </div>
+                </div>
+                <ul className="ri-list">
+                  {result.limitations.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+
               <ClaimLedger claims={claims} facts={packet.facts} open={ledgerOpen} />
             </div>
           ) : (
@@ -72,20 +184,16 @@ export function ReviewIntelligenceV2Drawer({
               <div className="ri-card-head">
                 <div>
                   <span className="ri-kicker">Review Intelligence V2</span>
-                  <h3>Review set needs analyst review</h3>
+                  <h3>Verified insight withheld</h3>
                 </div>
               </div>
-              <p>The review result did not pass verifier checks, so unsafe reasoning has been withheld from the normal UI.</p>
-              <MemoReadySummary summary={result.memoReadySummary} limitations={result.limitations} attached={attached} />
-              {process.env.NODE_ENV !== "production" && (
-                <div className="ri-dev-diagnostics">
-                  <strong>Verifier diagnostics</strong>
-                  <ul>
-                    {result.verification.errors.map((error) => <li key={error}>{error}</li>)}
-                    {result.verification.warnings.map((warning) => <li key={warning}>{warning}</li>)}
-                  </ul>
-                </div>
-              )}
+              <p>The current narrative did not pass verifier checks, so only the safe summary remains visible.</p>
+              <p>{result.memoReadySummary}</p>
+              <ul className="ri-list">
+                {result.limitations.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </section>
           )}
 
@@ -109,5 +217,5 @@ export function ReviewIntelligenceV2Drawer({
         </motion.section>
       </motion.aside>
     </AnimatePresence>
-  )
+  );
 }

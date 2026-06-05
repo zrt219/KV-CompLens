@@ -1,21 +1,22 @@
 "use client";
 
 import clsx from "clsx";
-import type { AdjustedComparable } from "../../../lib/types";
-
 type EvidenceLinkLayerProps = {
-  comps: AdjustedComparable[];
+  comps: Array<{ id: string; slot: EvidenceLinkSlot }>;
   activeComparableId?: string;
   newCandidateId?: string;
 };
 
-const paths = [
-  "M 500 330 C 380 260, 300 180, 195 126",
-  "M 500 330 C 370 326, 286 326, 178 330",
-  "M 500 330 C 380 410, 302 496, 196 548",
-  "M 500 330 C 620 260, 696 180, 805 126",
-  "M 500 330 C 620 416, 696 512, 805 548"
-] as const;
+export type EvidenceLinkSlot = "top-left" | "mid-left" | "bottom-left" | "top-right" | "mid-right" | "bottom-right";
+
+const paths: Record<EvidenceLinkSlot, string> = {
+  "top-left": "M 500 330 C 380 260, 300 180, 195 126",
+  "mid-left": "M 500 330 C 370 326, 286 326, 178 330",
+  "bottom-left": "M 500 330 C 380 410, 302 496, 196 548",
+  "top-right": "M 500 330 C 620 260, 696 180, 805 126",
+  "mid-right": "M 500 330 C 626 326, 710 326, 822 330",
+  "bottom-right": "M 500 330 C 620 416, 696 512, 805 548"
+};
 
 export function EvidenceLinkLayer({ comps, activeComparableId, newCandidateId }: EvidenceLinkLayerProps) {
   return (
@@ -33,14 +34,14 @@ export function EvidenceLinkLayer({ comps, activeComparableId, newCandidateId }:
           <stop offset="1" stopColor="currentColor" stopOpacity="0.16" />
         </linearGradient>
       </defs>
-      {comps.map((comp, index) => {
+      {comps.map((comp) => {
         const isActive = comp.id === activeComparableId;
         const isNew = comp.id === newCandidateId;
 
         return (
           <path
             className={clsx("evidence-link", isActive && "active", isNew && "new")}
-            d={paths[index]}
+            d={paths[comp.slot]}
             key={comp.id}
             fill="none"
             stroke="url(#evidence-link-gradient)"

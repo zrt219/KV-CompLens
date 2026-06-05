@@ -14,10 +14,11 @@ type EvidenceComparableCardProps = {
   active: boolean;
   isNew?: boolean;
   counterfactual?: CounterfactualCheck;
+  onAddCandidate?: () => void;
   onSelect: () => void;
 };
 
-export function EvidenceComparableCard({ comp, rank, active, isNew, counterfactual, onSelect }: EvidenceComparableCardProps) {
+export function EvidenceComparableCard({ comp, rank, active, isNew, counterfactual, onAddCandidate, onSelect }: EvidenceComparableCardProps) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const evidenceWeight = Math.round((comp.normalizedEvidenceWeight ?? comp.evidenceWeight) * 100);
   const topReasons = (comp.reasons ?? [comp.matchReason]).slice(0, 3);
@@ -66,6 +67,11 @@ export function EvidenceComparableCard({ comp, rank, active, isNew, counterfactu
           </span>
         </span>
         <span className="evidence-card-footer">{Math.round(comp.totalScore)} Match / {evidenceWeight}% strength</span>
+        {isNew && onAddCandidate && (
+          <button className="primary-action" type="button" onClick={onAddCandidate} style={{ width: "100%", marginTop: "10px", position: "relative", zIndex: 10 }}>
+            Add new home to comparison
+          </button>
+        )}
         <button className="evidence-why-toggle" type="button" onClick={() => setDetailsOpen((value) => !value)} aria-expanded={detailsOpen}>
           <span>Why this comparable?</span>
           <ChevronDown size={14} aria-hidden className={clsx(detailsOpen && "open")} />

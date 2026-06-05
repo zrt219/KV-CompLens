@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { ComponentType, CSSProperties } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import type { ComponentType, CSSProperties, FocusEvent, MutableRefObject } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import clsx from "clsx";
 import {
   BarChart3,
@@ -19,6 +19,7 @@ import {
   Info,
   Eye,
   PackageCheck,
+  Printer,
   Layers3,
   ListChecks,
   Lock,
@@ -35,20 +36,29 @@ import {
 } from "lucide-react";
 import { PropertyThumbnail } from "../components/PropertyThumbnail";
 import { EvidenceBoard } from "../components/evidence-board/EvidenceBoard";
+import { SummaryRail } from "../components/right-rail/SummaryRail";
+import { QuickAnswersPanel } from "../components/quick-answers/QuickAnswersPanel";
 import { ReviewIntelligenceV2Button } from "../components/review-intelligence-v2/ReviewIntelligenceV2Button";
 import { ReviewIntelligenceV2Drawer } from "../components/review-intelligence-v2/ReviewIntelligenceV2Drawer";
 import { formatCurrency } from "../../lib/agent";
 import { buildEvidenceCourtPacket } from "../../lib/review-intelligence-v2/buildEvidenceCourtPacket";
 import { runEvidenceCourt } from "../../lib/review-intelligence-v2/runEvidenceCourt";
 import { dataProvenanceLabel, publicAssessmentSources } from "../../lib/provenance";
-import { buildExportArtifact, downloadExportArtifact, exportArtifactOptions, type ExportArtifactType } from "../../lib/pce/exportPackage";
+import { buildExportPacket } from "../../lib/export/buildExportPacket";
+import { createExportFileNames } from "../../lib/export/fileNaming";
+import { runExport } from "../../lib/export/runExport";
+import { openPrintReport } from "../../lib/export/html/openPrintReport";
+import { CopyReportFallback } from "../../components/export/CopyReportFallback";
+import { BuilderAttribution } from "../../components/social/BuilderAttribution";
+import type { ExportOptions, ExportPacket, ExportRunResult } from "../../lib/export/types";
+import type { ReviewIntelligenceAttachment } from "../../lib/review-intelligence/types";
 import {
   selectAdjustmentGridViewModel,
   selectCivicGridViewModel,
-  selectExportViewModel,
-  selectInsightsViewModel,
-  selectMemoViewModel
+  selectExportViewModel
 } from "../../lib/selectors/pceSelectors";
+import { selectSummaryRailViewModel, type SummaryRailActionId } from "../../lib/selectors/selectSummaryRailViewModel";
+import { selectQuickAnswers } from "../../lib/selectors/selectQuickAnswers";
 import {
   createBlankSubjectProperty,
   isSubjectReadyForAnalysis,
@@ -56,13 +66,18 @@ import {
   type PceToast,
   type PceViewMode
 } from "../../hooks/usePceAnalysis";
-import type { PceAnalysisSnapshot, PceAuditEvent } from "../../lib/pce/runPcePipeline";
+import type { PceAnalysisSnapshot } from "../../lib/pce/runPcePipeline";
 import type { AdjustedComparable, CandidateImpact, PropertyCondition, PropertyType, ScoredComparable, SubjectProperty, ValuationDelta, ValuationRange } from "../../lib/types";
 import type { CounterfactualCheck, EvidenceCourtPacket, EvidenceCourtResult } from "../../lib/review-intelligence-v2/types";
 
 type ViewMode = PceViewMode;
 type ToastState = PceToast;
 type WorkflowStepId = "intake" | "sources" | "review" | "adjust" | "export";
+type ReviewIntelligenceApiResponse = {
+  result: EvidenceCourtResult;
+  fallbackUsed: boolean;
+  warnings: string[];
+};
 
 import { defaultMockSubject, propertyTypes, conditions, cities } from "../../lib/mockData";
 
@@ -81,8 +96,10 @@ export default function Home() {
   const [adjustmentsLocked, setAdjustmentsLocked] = useState(false);
   const [readabilityMode, setReadabilityMode] = useState(false);
   const [reviewIntelligenceOpen, setReviewIntelligenceOpen] = useState(false);
+  const [enhancedReviewIntelligenceState, setEnhancedReviewIntelligenceState] = useState<{ packetId: string; result: EvidenceCourtResult }>();
   const [workflowPulse, setWorkflowPulse] = useState<string>();
   const workflowPulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const primaryExportActionRef = useRef<(() => void) | null>(null);
   const subject = state.subject;
   const canRunAnalysis = isSubjectReadyForAnalysis(subject);
   const subjectDisplayName = subject.address.trim() || "No property entered";
@@ -91,19 +108,23 @@ export default function Home() {
     : "Enter property details to unlock the source scan";
   const viewMode = state.activeView;
   const civicGrid = selectCivicGridViewModel(state);
-  const insights = selectInsightsViewModel(state);
   const adjustmentGrid = selectAdjustmentGridViewModel(state);
-  const memoView = selectMemoViewModel(state);
   const exportView = selectExportViewModel(state);
   const candidate = civicGrid.candidate;
   const reviewIntelligencePacket = useMemo<EvidenceCourtPacket | undefined>(
     () => state.analysisStarted ? buildEvidenceCourtPacket(state.snapshot) : undefined,
     [state.analysisStarted, state.snapshot]
   );
-  const reviewIntelligenceResult = useMemo<EvidenceCourtResult | undefined>(
+  const deterministicReviewIntelligenceResult = useMemo<EvidenceCourtResult | undefined>(
     () => state.analysisStarted ? runEvidenceCourt(state.snapshot) : undefined,
     [state.analysisStarted, state.snapshot]
   );
+  const activeEnhancedReviewIntelligence = enhancedReviewIntelligenceState?.packetId === reviewIntelligencePacket?.packetId
+    ? enhancedReviewIntelligenceState?.result
+    : undefined;
+  const reviewIntelligenceResult = activeEnhancedReviewIntelligence
+    ? activeEnhancedReviewIntelligence
+    : deterministicReviewIntelligenceResult;
   const counterfactualsByComparableId = useMemo<Record<string, CounterfactualCheck | undefined>>(
     () => Object.fromEntries((reviewIntelligenceResult?.counterfactuals ?? [])
       .filter((check) => Boolean(check.comparableId))
@@ -115,7 +136,7 @@ export default function Home() {
     && state.analysisStarted
     && workflowStep === "review"
     && Boolean(reviewIntelligencePacket)
-    && Boolean(reviewIntelligenceResult);
+    && Boolean(deterministicReviewIntelligenceResult);
   const activeNavId = workflowStep;
   const candidateDrawerVisible = state.analysisStarted && !showForm && (viewMode === "network" || viewMode === "discovery") && Boolean(state.newCandidateId) && Boolean(candidate);
   const subjectDirty = useMemo(
@@ -132,12 +153,176 @@ export default function Home() {
     workflowStep
   });
   const StatusIcon = workflowStatus.icon;
+  const summaryRail = selectSummaryRailViewModel(state, {
+    page: workflowStep,
+    canRunAnalysis,
+    adjustmentsLocked,
+    reportPrepared,
+    subjectDirty,
+    reviewIntelligenceAvailable: Boolean(reviewIntelligenceResult)
+  });
+  const quickAnswers = selectQuickAnswers(state, {
+    page: workflowStep,
+    canRunAnalysis,
+    adjustmentsLocked,
+    reportPrepared,
+    subjectDirty
+  });
 
   useEffect(() => () => {
     if (workflowPulseTimer.current) {
       clearTimeout(workflowPulseTimer.current);
     }
   }, []);
+
+  useEffect(() => {
+    if (!reviewIntelligenceDrawerVisible || !reviewIntelligencePacket || !deterministicReviewIntelligenceResult) {
+      return;
+    }
+
+    const lifecycleKey = reviewIntelligencePacket.packetId;
+    dispatch({
+      type: "APPEND_UI_AUDIT_EVENT",
+      event: {
+        id: `review-evidence-pack-built-${lifecycleKey}`,
+        timestamp: reviewIntelligencePacket.generatedAt,
+        type: "review_evidence_pack_built",
+        source: "RAG evidence pack",
+        status: "confirmed",
+        summary: "Review evidence pack built from the current PCE-V2 snapshot."
+      }
+    });
+    dispatch({
+      type: "APPEND_UI_AUDIT_EVENT",
+      event: {
+        id: `review-context-retrieved-${lifecycleKey}`,
+        timestamp: reviewIntelligencePacket.generatedAt,
+        type: "review_context_retrieved",
+        source: "RAG retriever",
+        status: "confirmed",
+        summary: "Retrieved focused review-set context from canonical packet facts."
+      }
+    });
+    dispatch({
+      type: "APPEND_UI_AUDIT_EVENT",
+      event: {
+        id: `review-insight-generated-${lifecycleKey}`,
+        timestamp: reviewIntelligencePacket.generatedAt,
+        type: "review_insight_generated",
+        source: "Deterministic review intelligence",
+        status: "ready",
+        summary: "Generated a deterministic review insight from retrieved facts."
+      }
+    });
+    dispatch({
+      type: "APPEND_UI_AUDIT_EVENT",
+      event: {
+        id: `review-insight-verified-${lifecycleKey}`,
+        timestamp: reviewIntelligencePacket.generatedAt,
+        type: "review_insight_verified",
+        source: "Verifier",
+        status: deterministicReviewIntelligenceResult.verification.ok ? "confirmed" : "review",
+        summary: deterministicReviewIntelligenceResult.verification.ok
+          ? "Verified deterministic review insight against retrieved facts."
+          : "Deterministic review insight raised verifier warnings."
+      }
+    });
+
+    let cancelled = false;
+
+    async function enhanceReviewIntelligence() {
+      try {
+        const response = await fetch("/api/review-intelligence", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            snapshot: state.snapshot,
+            intent: "review_set_summary"
+          })
+        });
+
+        if (!response.ok) {
+          if (!cancelled) {
+            dispatch({
+              type: "APPEND_UI_AUDIT_EVENT",
+              event: {
+                id: `review-insight-fallback-used-${lifecycleKey}`,
+                timestamp: new Date().toISOString(),
+                type: "review_insight_fallback_used",
+                source: "Review Intelligence V2",
+                status: "review",
+                summary: `Optional review-intelligence enhancer returned ${response.status}. Deterministic fallback remained active.`
+              }
+            });
+          }
+          return;
+        }
+
+        const payload = await response.json() as ReviewIntelligenceApiResponse;
+        if (cancelled) {
+          return;
+        }
+        if (payload.result?.source === "llm_verified") {
+          setEnhancedReviewIntelligenceState({
+            packetId: lifecycleKey,
+            result: payload.result
+          });
+          dispatch({
+            type: "APPEND_UI_AUDIT_EVENT",
+            event: {
+              id: `review-insight-verified-llm-${lifecycleKey}`,
+              timestamp: new Date().toISOString(),
+              type: "review_insight_verified",
+              source: "OpenAI enhancer",
+              status: "confirmed",
+              summary: "Optional LLM narrative passed verification and replaced the deterministic summary copy."
+            }
+          });
+        }
+        if (payload.fallbackUsed) {
+          dispatch({
+            type: "APPEND_UI_AUDIT_EVENT",
+            event: {
+              id: `review-insight-fallback-used-${lifecycleKey}`,
+              timestamp: new Date().toISOString(),
+              type: "review_insight_fallback_used",
+              source: "Review Intelligence V2",
+              status: "review",
+              summary: "Optional LLM narrative failed verification or was unavailable. Deterministic fallback remained active."
+            }
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          dispatch({
+            type: "APPEND_UI_AUDIT_EVENT",
+            event: {
+              id: `review-insight-fallback-used-${lifecycleKey}`,
+              timestamp: new Date().toISOString(),
+              type: "review_insight_fallback_used",
+              source: "Review Intelligence V2",
+              status: "review",
+              summary: "Optional LLM narrative request failed. Deterministic fallback remained active."
+            }
+          });
+        }
+      }
+    }
+
+    void enhanceReviewIntelligence();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    deterministicReviewIntelligenceResult,
+    dispatch,
+    reviewIntelligenceDrawerVisible,
+    reviewIntelligencePacket,
+    state.snapshot
+  ]);
 
   function update<K extends keyof SubjectProperty>(key: K, value: SubjectProperty[K]) {
     dispatch({ type: "UPDATE_SUBJECT", key, value });
@@ -180,8 +365,12 @@ export default function Home() {
       return;
     }
     if (workflowStep === "export") {
-      setReportPrepared(true);
-      pulseWorkflowStatus("Export package generated");
+      if (primaryExportActionRef.current) {
+        primaryExportActionRef.current();
+      } else {
+        setReportPrepared(true);
+        pulseWorkflowStatus("Export package generated");
+      }
       return;
     }
     const nextStep: Record<WorkflowStepId, ViewMode> = {
@@ -241,6 +430,59 @@ export default function Home() {
     dispatch({ type: "SET_VIEW", view: "report" });
   }
 
+  function handleSummaryRailAction(actionId: SummaryRailActionId) {
+    switch (actionId) {
+      case "run-analysis":
+        runAnalysis();
+        return;
+      case "open-sources":
+        openWorkspaceView("table");
+        return;
+      case "open-review":
+        openWorkspaceView("network");
+        return;
+      case "explain-review-set":
+        if (reviewIntelligenceResult) {
+          setShowForm(false);
+          dispatch({ type: "SET_VIEW", view: "network" });
+          setReviewIntelligenceOpen(true);
+        } else {
+          openWorkspaceView("network");
+        }
+        return;
+      case "open-adjustments":
+        openWorkspaceView("adjustments");
+        return;
+      case "lock-adjustments":
+        if (state.analysisStarted) {
+          setAdjustmentsLocked(true);
+          pulseWorkflowStatus("Adjustments locked");
+        }
+        return;
+      case "open-export":
+        prepareReport();
+        return;
+      case "generate-export":
+        if (subjectDirty) {
+          openSubjectIntake();
+          return;
+        }
+        if (!adjustmentsLocked) {
+          openWorkspaceView("adjustments");
+          return;
+        }
+        setShowForm(false);
+        dispatch({ type: "SET_VIEW", view: "report" });
+        if (primaryExportActionRef.current) {
+          primaryExportActionRef.current();
+        } else {
+          setReportPrepared(true);
+          pulseWorkflowStatus("Export package generated");
+        }
+        return;
+    }
+  }
+
   function loadExampleSubject() {
     dispatch({ type: "LOAD_SUBJECT", subject: defaultMockSubject });
     setReportPrepared(false);
@@ -257,7 +499,7 @@ export default function Home() {
   }
 
   return (
-    <main className={clsx("app-shell", readabilityMode && "readability-mode")}>
+    <main className={clsx("app-shell", readabilityMode && "readability-mode", state.toast && "has-toast")}>
       <aside className="left-rail" aria-label="Workspace navigation">
         <div className="brand-lockup">
           <div className="brand-icon" aria-hidden="true">
@@ -302,13 +544,7 @@ export default function Home() {
           <span className="data-chip">SIMULATED HOME SALES</span>
           <small>{dataProvenanceLabel}</small>
           <small><Database size={13} /> {publicAssessmentSources.length} public assessment references documented.</small>
-          <a className="github-link" href="https://github.com/zrt219/KV-CompLens" target="_blank" rel="noreferrer">
-            <FileText size={14} aria-hidden />
-            <span className="github-link-copy">
-              <small>Repository</small>
-              <strong>zrt219/KV-CompLens</strong>
-            </span>
-          </a>
+          <BuilderAttribution />
         </div>
       </aside>
 
@@ -329,7 +565,7 @@ export default function Home() {
             <button className="find-action tooltip-target" type="button" onClick={findMoreComparables} disabled={!state.analysisStarted} title={!state.analysisStarted ? "Run the analysis first to find more comparable candidates." : "Surface another comparable candidate for analyst review."} data-tooltip={!state.analysisStarted ? "Run the analysis first to find more comparable candidates." : "Surface another comparable candidate for analyst review."}><Search size={17} /> Find More Comparables</button>
             {state.analysisStarted && workflowStep === "review" && reviewIntelligenceResult && (
               <ReviewIntelligenceV2Button
-                attached={state.reviewIntelligenceAttached}
+                attached={Boolean(state.reviewIntelligenceAttachment)}
                 onClick={() => setReviewIntelligenceOpen(true)}
               />
             )}
@@ -337,7 +573,7 @@ export default function Home() {
             <button className="tooltip-target" type="button" onClick={prepareReport} disabled={!state.analysisStarted || !adjustmentsLocked} title={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : "Open the local export package screen."} data-tooltip={!state.analysisStarted ? "Enter the property details and run the analysis first." : !adjustmentsLocked ? "Confirm the adjustments before exporting." : "Open the local export package screen."}><FileDown size={17} /> Export</button>
             <button className={clsx("icon-action tooltip-target", readabilityMode && "active")} type="button" aria-pressed={readabilityMode} aria-label="Toggle readability mode" title="Toggle higher-contrast readability mode." data-tooltip="Toggle higher-contrast readability mode." onClick={() => setReadabilityMode((value) => !value)}><Eye size={18} /></button>
             <button className="icon-action tooltip-target" type="button" aria-label="More actions unavailable in demo mode" disabled title="More actions are unavailable in this local demo." data-tooltip="More actions are unavailable in this local demo."><MoreHorizontal size={18} /></button>
-            <button className="primary-action tooltip-target" type="button" onClick={goToNextStep} disabled={!canRunAnalysis && !state.analysisStarted} title={primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).tooltip} data-tooltip={primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).tooltip}>
+            <button className="primary-action tooltip-target" type="button" onClick={goToNextStep} disabled={(!canRunAnalysis && !state.analysisStarted) || (workflowStep === "adjust" && !adjustmentsLocked)} title={primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).tooltip} data-tooltip={primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).tooltip}>
               {!state.analysisStarted ? <RefreshCw size={17} /> : <ChevronRight size={17} />}
               {primaryActionCopy(workflowStep, state.analysisStarted, canRunAnalysis, adjustmentsLocked).label}
             </button>
@@ -345,6 +581,7 @@ export default function Home() {
         </header>
 
         <WorkflowProgress viewModel={civicGrid.workflow} workflowStep={workflowStep} analysisStarted={state.analysisStarted} />
+        <QuickAnswersPanel viewModel={quickAnswers} />
         {showForm ? (
           <SubjectForm
             subject={subject}
@@ -366,6 +603,7 @@ export default function Home() {
                 activeComparableId={civicGrid.activeComparableId}
                 newCandidateId={state.newCandidateId}
                 valuation={state.snapshot.valuation}
+                reviewEvidencePacket={reviewIntelligencePacket}
                 counterfactualsByComparableId={counterfactualsByComparableId}
                 onSelectComparable={(id) => dispatch({ type: "SELECT_COMPARABLE", id })}
                 onFindCandidate={findMoreComparables}
@@ -376,7 +614,7 @@ export default function Home() {
             {viewMode === "table" && <SourceScanView snapshot={state.snapshot} onRunAnalysis={runAnalysis} />}
             {viewMode === "adjustments" && <AdjustmentView viewModel={adjustmentGrid} adjustmentsLocked={adjustmentsLocked} onSelect={(id) => dispatch({ type: "SELECT_COMPARABLE", id })} onExclude={(id) => { dispatch({ type: "EXCLUDE_COMPARABLE", id }); setReportPrepared(false); setAdjustmentsLocked(false); }} onLock={() => { setAdjustmentsLocked(true); }} />}
             {viewMode === "valuation" && <ValuationSummary snapshot={state.snapshot} newCompId={state.newCandidateId} />}
-            {viewMode === "report" && <ReportReady viewModel={exportView} memoView={memoView} subject={state.snapshot.subject} snapshot={state.snapshot} reportPrepared={reportPrepared} subjectDirty={subjectDirty} adjustmentsLocked={adjustmentsLocked} reviewIntelligenceResult={reviewIntelligenceResult} onOpenIntake={openSubjectIntake} onOpenAdjustments={() => openWorkspaceView("adjustments")} onGenerate={() => { setReportPrepared(true); pulseWorkflowStatus("Export package generated"); }} />}
+            {viewMode === "report" && <ReportReady viewModel={exportView} subject={state.snapshot.subject} snapshot={state.snapshot} reportPrepared={reportPrepared} subjectDirty={subjectDirty} adjustmentsLocked={adjustmentsLocked} reviewIntelligenceResult={reviewIntelligenceResult} primaryExportActionRef={primaryExportActionRef} onOpenIntake={openSubjectIntake} onOpenAdjustments={() => openWorkspaceView("adjustments")} onGenerate={() => { setReportPrepared(true); pulseWorkflowStatus("Export package generated"); }} />}
           </>
         )}
 
@@ -392,7 +630,13 @@ export default function Home() {
         </AnimatePresence>
 
         <AnimatePresence>
-          {state.toast && <Toast toast={state.toast} onClose={() => dispatch({ type: "CLEAR_TOAST" })} />}
+          {state.toast && (
+            <Toast
+              key={`${state.toast.tone}-${state.toast.title}-${state.toast.detail}-${state.toast.delta ? "delta" : "simple"}`}
+              toast={state.toast}
+              onClose={() => dispatch({ type: "CLEAR_TOAST" })}
+            />
+          )}
         </AnimatePresence>
 
         <AnimatePresence>
@@ -400,8 +644,17 @@ export default function Home() {
             <ReviewIntelligenceV2Drawer
               packet={reviewIntelligencePacket}
               result={reviewIntelligenceResult}
-              attached={state.reviewIntelligenceAttached}
-              onAddToMemo={() => dispatch({ type: "ATTACH_REVIEW_INTELLIGENCE" })}
+              attached={Boolean(state.reviewIntelligenceAttachment)}
+              onAddToMemo={() => {
+                const attachment: ReviewIntelligenceAttachment = {
+                  attachedAt: new Date().toISOString(),
+                  context: reviewIntelligenceResult.context,
+                  insight: reviewIntelligenceResult.insight,
+                  source: reviewIntelligenceResult.source,
+                  verification: reviewIntelligenceResult.verification
+                };
+                dispatch({ type: "ATTACH_REVIEW_INTELLIGENCE", attachment });
+              }}
               onClose={() => setReviewIntelligenceOpen(false)}
             />
           )}
@@ -409,11 +662,7 @@ export default function Home() {
 
       </section>
 
-      <InsightsRail
-        viewModel={insights}
-        analysisStarted={state.analysisStarted}
-        onReport={() => { setShowForm(false); dispatch({ type: "SET_VIEW", view: "report" }); }}
-      />
+      <SummaryRail viewModel={summaryRail} onAction={handleSummaryRailAction} />
     </main>
   );
 }
@@ -580,6 +829,12 @@ function getWorkflowStatus({
 
 function formatConfidenceLevel(level: string) {
   return level === "Review Required" ? "Review needed" : level;
+}
+
+function verdictLabelFromCode(value: "usable_with_review" | "needs_review" | "weak_packet") {
+  if (value === "usable_with_review") return "Review set is usable";
+  if (value === "weak_packet") return "Review set is weak";
+  return "Review set needs analyst review";
 }
 
 function confidenceRingClass(score: number) {
@@ -806,143 +1061,6 @@ function ComparableDrawer({ candidate, impact, onClose, onAdd }: { candidate: Sc
         </div>
       </motion.section>
     </motion.aside>
-  );
-}
-
-function InsightsRail({
-  viewModel,
-  analysisStarted,
-  onReport
-}: {
-  viewModel: ReturnType<typeof selectInsightsViewModel>;
-  analysisStarted: boolean;
-  onReport: () => void;
-}) {
-  const selectedComp = viewModel.selectedComparable;
-  return (
-    <aside className="insights-rail" aria-label="Valuation insights">
-      <div className="insights-head">
-        <h2>Review Summary</h2>
-        <span>{analysisStarted ? "LOCAL ONLY" : "WAITING FOR DETAILS"}</span>
-      </div>
-      {!analysisStarted ? (
-        <>
-          <section className="insight-card value-card">
-            <span className="card-label">Value range</span>
-            <strong>Awaiting analysis</strong>
-            <div className="zero-state-note" style={{ marginTop: 12 }}>No value estimate appears until the subject is reviewed.</div>
-          </section>
-          <section className="insight-card confidence-card">
-            <span className="card-label">Confidence</span>
-            <div className="confidence-row">
-              <div className="ring confidence-waiting-ring" style={{ "--score": "0deg" } as CSSProperties}>N/A</div>
-              <div>
-                <strong>Waiting for property details</strong>
-                <p>Confidence appears after the review set is built.</p>
-              </div>
-            </div>
-          </section>
-          <section className="insight-card selected-card">
-            <span className="card-label">Selected comparable</span>
-            <div className="zero-state-note">No comparable selected yet. Run the analysis to populate the review set.</div>
-          </section>
-          <section className="insight-card">
-            <span className="card-label">Why these comparables fit</span>
-            <div className="zero-state-note">Run the analysis to see how the selected comparables compare.</div>
-          </section>
-          <section className="insight-card">
-            <span className="card-label">Source check summary</span>
-            <div className="zero-state-note">Source counts appear after the analysis runs.</div>
-            <small>{viewModel.sourceScan.dataBoundaryNote}</small>
-          </section>
-          <section className="insight-card">
-            <span className="card-label">Review flags</span>
-            <div className="zero-state-note">No review flags yet. They appear after the analysis runs.</div>
-          </section>
-          <section className="insight-card recent-updates-card">
-            <span className="card-label">Recent updates</span>
-            <ActivityTimeline items={[]} emptyMessage="Waiting for the analysis to start." />
-            <button className="rail-action" type="button" onClick={onReport} disabled title="Run the analysis first to open the export preview."><FileDown size={16} /> Open export preview</button>
-          </section>
-        </>
-      ) : (
-        <>
-      <section className="insight-card value-card">
-        <span className="card-label">{analysisStarted ? "Estimated value range" : "Waiting for property details"}</span>
-        <strong>{viewModel.valueRange}</strong>
-        <p>{analysisStarted ? <>Current estimate <b>{viewModel.pointEstimate}</b></> : "Enter the property details and run the analysis to see the value range."}</p>
-        <div className="range-track"><i /></div>
-        <div className="range-labels"><span>{viewModel.lowEstimate}</span><span>{viewModel.highEstimate}</span></div>
-        <small className="rail-method-note">Cross-platform evidence model, local demo data.</small>
-      </section>
-      <section className="insight-card confidence-card">
-        <span className="card-label">Confidence</span>
-        <div className="confidence-row">
-          <div className={clsx("ring", confidenceRingClass(viewModel.confidenceScore))} style={{ "--score": `${Math.round(viewModel.confidenceScore * 3.6)}deg` } as CSSProperties}>{Math.round(viewModel.confidenceScore)}%</div>
-          <div>
-            <strong>{analysisStarted ? `${viewModel.confidenceLevel} confidence` : "Waiting for property details"}</strong>
-            <p>{viewModel.confidenceRationale}</p>
-          </div>
-        </div>
-        <small className="rail-method-note">Snapshot-driven from review depth, evidence spread, source reliability, and review flags.</small>
-      </section>
-      <section className="insight-card selected-card">
-        <span className="card-label">Selected comparable</span>
-        {selectedComp && (
-          <>
-            <strong>{selectedComp.address}</strong>
-            <p>{selectedComp.city} / {selectedComp.neighbourhood}</p>
-            <div className="selected-risk"><Info size={15} /> {selectedComp.riskFlags[0] ?? "No major review flags for this comparable."}</div>
-            <div className="selected-metrics">
-              <Metric label="Score" value={`${selectedComp.totalScore}/100`} />
-              <Metric label="Adjusted" value={formatCurrency(selectedComp.adjustedValue)} />
-              <Metric label="Distance" value={`${selectedComp.distanceKm.toFixed(1)} km`} />
-              <Metric label="Comparable probability" value={`${selectedComp.comparableProbabilityPercent}%`} />
-            </div>
-          </>
-        )}
-        {!selectedComp && (
-          <div className="zero-state-note">
-            No comparable selected yet. Run the analysis to populate the review set.
-          </div>
-        )}
-      </section>
-      <section className="insight-card">
-        <span className="card-label">Why these comparables fit</span>
-        <Factor label="Location fit" value={viewModel.distanceRange} state={analysisStarted ? "High" : "Review"} />
-        <Factor label="Average Match" value={viewModel.averageMatch} state={analysisStarted && (viewModel.confidenceSupportsReview || viewModel.averageScore >= viewModel.valuation.averageSimilarity) ? "High" : "Review"} />
-        <Factor label="Comparable probability" value={viewModel.averageComparableProbability} state={analysisStarted && viewModel.valuation.normalizedRiskSeverity === 0 ? "High" : "Review"} />
-        <Factor label="Review size" value={viewModel.effectiveSampleSize} state={analysisStarted && !viewModel.valuationRiskFlags.has("Not enough comparables selected.") ? "High" : "Review"} />
-        <Factor label="Source quality" value={viewModel.averageSourceReliability} state={analysisStarted && viewModel.valuation.averageSourceReliability >= viewModel.valuation.averageComparableProbability ? "High" : "Review"} />
-        <Factor label="Value range width" value={viewModel.valueSpread} state={analysisStarted && !viewModel.valuationRiskFlags.has("Wide adjusted-value spread") ? "High" : "Review"} />
-      </section>
-      <section className="insight-card">
-        <span className="card-label">Source check summary</span>
-        <Metric label="Comparables scanned" value={`${viewModel.sourceScan.syntheticRecentSalesScanned} simulated records`} />
-        <Metric label="Public records matched" value={`${viewModel.sourceScan.municipalAssessmentReferences} matched`} />
-        <Metric label="Comparables to review" value={`${viewModel.sourceScan.candidatePoolCount} ranked / ${viewModel.sourceScan.rejectedCount} lower-ranked`} />
-        <Metric label="Estimated time saved" value={`${viewModel.sourceScan.estimatedManualTimeSavedHours} hrs`} />
-        <small className="rail-method-note">{viewModel.sourceScan.dataBoundaryNote}</small>
-      </section>
-      <section className="insight-card">
-        <span className="card-label">Review flags</span>
-        {viewModel.riskFlags.length ? viewModel.riskFlags.slice(0, 4).map((flag) => (
-          <Factor key={flag} label={flag} value="Analyst review" state="Review" />
-        )) : (
-          <div className="zero-state-note">No review flags yet. They appear after the analysis runs.</div>
-        )}
-      </section>
-      <section className="insight-card recent-updates-card">
-        <span className="card-label">Recent updates</span>
-        <ActivityTimeline
-          items={viewModel.auditEvents.slice(0, 6)}
-          emptyMessage={analysisStarted ? "No recent updates yet." : "Waiting for the analysis to start."}
-        />
-        <button className="rail-action" type="button" onClick={onReport} disabled={!analysisStarted} title={!analysisStarted ? "Run the analysis first to open the export preview." : undefined}><FileDown size={16} /> Open export preview</button>
-      </section>
-        </>
-      )}
-    </aside>
   );
 }
 
@@ -1350,50 +1468,59 @@ function ValuationSummary({ snapshot, newCompId }: { snapshot: PceAnalysisSnapsh
   );
 }
 
+type ExportActionId = "full-report" | "pdf" | "docx" | "csv" | "json" | "zip" | "print" | "copy";
+
 function ReportReady({
   viewModel,
-  memoView,
   subject,
   snapshot,
   reportPrepared,
   subjectDirty,
   adjustmentsLocked,
   reviewIntelligenceResult,
+  primaryExportActionRef,
   onOpenIntake,
   onOpenAdjustments,
   onGenerate
 }: {
   viewModel: ReturnType<typeof selectExportViewModel>;
-  memoView: ReturnType<typeof selectMemoViewModel>;
   subject: SubjectProperty;
   snapshot: PceAnalysisSnapshot;
   reportPrepared: boolean;
   subjectDirty: boolean;
   adjustmentsLocked: boolean;
   reviewIntelligenceResult?: EvidenceCourtResult;
+  primaryExportActionRef: MutableRefObject<(() => void) | null>;
   onOpenIntake: () => void;
   onOpenAdjustments: () => void;
   onGenerate: () => void;
 }) {
-  const [selectedExportType, setSelectedExportType] = useState<ExportArtifactType>("memo-pdf");
   const [isGenerating, setIsGenerating] = useState(false);
   const [exportError, setExportError] = useState<string>();
+  const [exportProgress, setExportProgress] = useState<string[]>([]);
+  const [exportRunResult, setExportRunResult] = useState<ExportRunResult>();
+  const [activeExportAction, setActiveExportAction] = useState<ExportActionId>();
+  const [showCopyFallback, setShowCopyFallback] = useState(false);
   const sections = [
     "Executive Summary",
     "Comparable Summary",
     "Adjustment Grid",
     "Value Reconciliation",
-    "Review Intelligence Summary",
+    "Review Intelligence V2",
     "Review Activity",
     "Assumptions and Limits"
   ];
-  const artifact = useMemo(
-    () => buildExportArtifact(selectedExportType, subject, snapshot, {
-      includeReviewIntelligence: viewModel.reviewIntelligenceAttached,
-      auditEvents: viewModel.auditEvents
+  const activeReviewIntelligence = viewModel.reviewIntelligenceAttachment?.insight ?? reviewIntelligenceResult?.insight;
+  const activeReviewIntelligenceSource = viewModel.reviewIntelligenceAttachment?.source ?? reviewIntelligenceResult?.source;
+  const exportPacket = useMemo(
+    () => buildExportPacket(snapshot, {
+      reviewIntelligenceAttachment: viewModel.reviewIntelligenceAttachment,
+      auditEvents: viewModel.auditEvents,
+      preparedBy: subject.analystName
     }),
-    [selectedExportType, snapshot, subject, viewModel.auditEvents, viewModel.reviewIntelligenceAttached]
+    [snapshot, subject.analystName, viewModel.auditEvents, viewModel.reviewIntelligenceAttachment]
   );
+  const fileNames = createExportFileNames(exportPacket);
   const heading = subjectDirty
     ? "Review update required"
     : adjustmentsLocked
@@ -1410,7 +1537,25 @@ function ReportReady({
       ? (reportPrepared ? "Regenerate export" : "Generate export")
       : "Go to Adjustments";
 
-  async function handleGenerate() {
+  const runnableExportActions: Record<Exclude<ExportActionId, "print" | "copy">, { requested: ExportOptions["requested"]; includeFallbacks: boolean; label: string }> = {
+    "full-report": { requested: ["pdf", "docx"], includeFallbacks: true, label: "full report package" },
+    pdf: { requested: ["pdf"], includeFallbacks: false, label: "PDF report" },
+    docx: { requested: ["docx"], includeFallbacks: false, label: "Word DOCX" },
+    csv: { requested: ["csv"], includeFallbacks: false, label: "CSV comparable set" },
+    json: { requested: ["json"], includeFallbacks: false, label: "audit JSON" },
+    zip: { requested: ["zip"], includeFallbacks: false, label: "full evidence ZIP" }
+  };
+
+  function simulationFlags() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      failPdf: process.env.NODE_ENV !== "production" && params.get("failPdf") === "1",
+      failDocx: process.env.NODE_ENV !== "production" && params.get("failDocx") === "1",
+      failDownloads: process.env.NODE_ENV !== "production" && params.get("failDownloads") === "1"
+    };
+  }
+
+  async function handleGenerate(action: ExportActionId = "full-report") {
     if (subjectDirty) {
       onOpenIntake();
       return;
@@ -1421,37 +1566,88 @@ function ReportReady({
     }
     try {
       setIsGenerating(true);
+      setActiveExportAction(action);
       setExportError(undefined);
+      setExportRunResult(undefined);
+      setShowCopyFallback(action === "copy");
+      setExportProgress([]);
 
-        const response = await fetch("/api/export", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: selectedExportType,
-            subject,
-            snapshot,
-            reviewIntelligenceAttached: viewModel.reviewIntelligenceAttached,
-            auditEvents: viewModel.auditEvents
-          })
-        });
-
-      if (!response.ok) {
-        throw new Error(`Export failed with status ${response.status}.`);
+      if (action === "copy") {
+        setExportProgress(["Copy report fallback opened"]);
+        onGenerate();
+        return;
       }
 
-      const bytes = new Uint8Array(await response.arrayBuffer());
-      downloadExportArtifact({
-        fileName: artifact.fileName,
-        mimeType: response.headers.get("content-type") ?? artifact.mimeType,
-        content: bytes
+      if (action === "print") {
+        setExportProgress(["Opening print-ready report"]);
+        const printResult = openPrintReport(exportPacket);
+        setExportRunResult({
+          ok: printResult.ok,
+          requested: ["html"],
+          completed: printResult.ok ? [printResult] : [],
+          failed: printResult.ok ? [] : [printResult],
+          fallbackUsed: true,
+          recommendedNextAction: printResult.ok ? "none" : "retry"
+        });
+        if (!printResult.ok) {
+          throw new Error(printResult.error ?? "Print view could not be opened.");
+        }
+        onGenerate();
+        return;
+      }
+
+      const actionConfig = runnableExportActions[action];
+      setExportProgress([`Starting ${actionConfig.label}`]);
+      const result = await runExport(exportPacket, {
+        requested: actionConfig.requested,
+        includeFallbacks: actionConfig.includeFallbacks,
+        simulate: simulationFlags(),
+        onProgress: (message) => setExportProgress((current) => [...current, message])
       });
+      setExportRunResult(result);
+      if (!result.ok) {
+        setShowCopyFallback(true);
+        throw new Error("Automatic downloads were blocked. Use the copy report fallback below.");
+      }
       onGenerate();
     } catch (error) {
       setExportError(error instanceof Error ? error.message : "Export failed.");
     } finally {
       setIsGenerating(false);
+      setActiveExportAction(undefined);
     }
   }
+
+  useEffect(() => {
+    primaryExportActionRef.current = () => {
+      void handleGenerate("full-report");
+    };
+
+    return () => {
+      if (primaryExportActionRef.current) {
+        primaryExportActionRef.current = null;
+      }
+    };
+  });
+
+  const exportFormatCards: Array<{
+    id: ExportActionId;
+    icon: ComponentType<{ size?: number; "aria-hidden"?: boolean }>;
+    title: string;
+    detail: string;
+  }> = [
+    { id: "pdf", icon: FileText, title: "PDF Report", detail: "Primary renderer with print fallback" },
+    { id: "docx", icon: FileText, title: "Word DOCX", detail: "DOCX with .doc/.rtf fallback" },
+    { id: "csv", icon: FileSpreadsheet, title: "CSV comparable set", detail: "Selected comparables and adjustments" },
+    { id: "json", icon: Database, title: "Audit JSON", detail: "Packet facts and audit events" },
+    { id: "zip", icon: FolderArchive, title: "Full evidence ZIP", detail: "HTML, Markdown, JSON, CSV, audit" },
+    { id: "copy", icon: ClipboardCheck, title: "Copy report fallback", detail: "Markdown text if downloads are blocked" }
+  ];
+  const exportDisabledReason = subjectDirty
+    ? "Return to Property Details before exporting."
+    : !adjustmentsLocked
+      ? "Confirm the adjustments before exporting."
+      : undefined;
 
   return (
     <section className="report-ready-view export-workspace">
@@ -1465,13 +1661,112 @@ function ReportReady({
         <Metric label="Confidence" value={viewModel.confidence} />
         <Metric label="Comparables included" value={viewModel.includedCompCount} />
       </div>
+      <section className="insight-card export-control-card export-control-card-primary" aria-label="Export actions">
+        <div className="export-command-header">
+          <div>
+            <span className="section-eyebrow">Export formats</span>
+            <h3>Generate usable report artifacts</h3>
+            <p>Choose one direct format or run the full resilient package. PDF/DOCX failures fall through to print, Word-compatible, ZIP, JSON, CSV, and copyable report paths.</p>
+          </div>
+          <div className="export-command-actions">
+            <button
+              className="primary-action export-primary-button"
+              type="button"
+              onClick={() => handleGenerate("full-report")}
+              disabled={isGenerating}
+              title={exportDisabledReason}
+            >
+              <PackageCheck size={18} /> {isGenerating && activeExportAction === "full-report" ? "Generating..." : ctaLabel}
+            </button>
+            <button
+              className="export-link-button"
+              type="button"
+              onClick={() => handleGenerate("print")}
+              disabled={isGenerating || Boolean(exportDisabledReason)}
+            >
+              <Printer size={16} /> Print view
+            </button>
+          </div>
+        </div>
+        {exportDisabledReason && (
+          <div className="export-blocked-note">
+            <Lock size={15} aria-hidden />
+            <span>{exportDisabledReason}</span>
+          </div>
+        )}
+        <div className="export-format-grid export-format-grid-compact">
+          {exportFormatCards.map((card) => (
+            <ExportFormatCard
+              key={card.id}
+              icon={card.icon}
+              title={card.title}
+              detail={card.detail}
+              active={activeExportAction === card.id}
+              disabled={isGenerating || Boolean(exportDisabledReason)}
+              onClick={() => handleGenerate(card.id)}
+            />
+          ))}
+        </div>
+        {(exportProgress.length > 0 || exportRunResult || exportError) && (
+          <div className="export-status-panel" aria-live="polite">
+            <div className="export-progress-list export-progress-list-compact">
+              {exportProgress.slice(-4).map((step, index) => (
+                <div key={`${step}-${index}`}>
+                  <CheckCircle2 size={16} aria-hidden />
+                  <span>{step}</span>
+                </div>
+              ))}
+            </div>
+            {exportRunResult && (
+              <div className="export-result-grid export-result-grid-compact">
+                {exportRunResult.completed.slice(0, 4).map((result) => (
+                  <div className="export-result-row confirmed" key={`${result.method}-${result.filename ?? result.format}`}>
+                    <strong>{result.method}</strong>
+                    <span>{result.filename ?? "Download started"}</span>
+                  </div>
+                ))}
+                {exportRunResult.failed.slice(0, 3).map((result) => (
+                  <div className="export-result-row review" key={`${result.method}-${result.filename ?? result.format}-${result.error}`}>
+                    <strong>{result.method} failed</strong>
+                    <span>{result.error ?? "Fallback used"}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {exportError && <p className="report-note export-error-note">{exportError}</p>}
+          </div>
+        )}
+        <details className="export-supporting-details">
+          <summary>File names and included sections</summary>
+          <div className="export-supporting-grid">
+            <div className="export-section">
+              <h3>File details</h3>
+              <Metric label="PDF" value={fileNames.pdf} />
+              <Metric label="DOCX" value={fileNames.docx} />
+              <Metric label="ZIP" value={fileNames.zip} />
+            </div>
+            <div className="export-section">
+              <h3>Included sections</h3>
+              <div className="export-check-list export-check-list-compact">
+                {sections.map((section) => (
+                  <div key={section}>
+                    <SquareCheck size={16} aria-hidden />
+                    <span>{section}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </details>
+        {(showCopyFallback || exportRunResult?.failed.length) ? <CopyReportFallback packet={exportPacket} /> : null}
+      </section>
       <section className="insight-card">
         <h3>Export notes</h3>
         <DeltaRow label="Use" value="Review support only" />
         <DeltaRow label="Decisioning" value="Not a credit decision" />
         <DeltaRow label="Valuation" value="Not an appraisal" />
         <DeltaRow label="Review" value="Analyst approval required" />
-        <DeltaRow label="Data" value="Simulated home sales" />
+        <DeltaRow label="Data" value="Synthetic/public-style demo data." />
       </section>
       <section className="insight-card">
         <h3>Comparables included</h3>
@@ -1486,16 +1781,33 @@ function ReportReady({
         )}
       </section>
       <section className="insight-card audit-packet-card">
-        <h3>Review Intelligence Summary</h3>
-        {reviewIntelligenceResult ? (
+        <h3>Review Intelligence V2</h3>
+        {activeReviewIntelligence ? (
           <>
-            <DeltaRow label="Verdict" value={reviewIntelligenceResult.verdict.label} />
-            <DeltaRow label="Strongest comp" value={reviewIntelligenceResult.strongestComparable.address} />
-            <DeltaRow label="Weakest comp" value={reviewIntelligenceResult.weakestSelectedComparable.address} />
-            <DeltaRow label="Audit status" value={viewModel.reviewIntelligenceAttached ? "Attached to memo/export" : "Not yet attached"} />
-            <p className="report-note">{reviewIntelligenceResult.memoReadySummary}</p>
+            <div className="review-intel-highlight-grid">
+              <div className="review-intel-highlight verdict">
+                <span>Verdict</span>
+                <strong>{verdictLabelFromCode(activeReviewIntelligence.verdict)}</strong>
+                <small>{viewModel.reviewIntelligenceAttached ? "Attached to memo/export" : "Needs memo attachment"}</small>
+              </div>
+              <div className="review-intel-highlight">
+                <span>Strongest comp</span>
+                <strong>{activeReviewIntelligence.strongestComparable?.address ?? "Unavailable"}</strong>
+                <small>Primary support anchor</small>
+              </div>
+              <div className="review-intel-highlight caution">
+                <span>Weakest comp</span>
+                <strong>{activeReviewIntelligence.weakestComparable?.address ?? "Unavailable"}</strong>
+                <small>Check before export</small>
+              </div>
+            </div>
+            <div className="review-intel-status-strip">
+              <span><CheckCircle2 size={14} aria-hidden /> {viewModel.reviewIntelligenceAttachment ? "Verified and attached" : "Verified summary available"}</span>
+              <span>{activeReviewIntelligenceSource === "llm_verified" ? "Verified LLM narrative" : "Deterministic fallback"}</span>
+            </div>
+            <p className="report-note review-intel-summary">{activeReviewIntelligence.memoReadySummary}</p>
             <div className="report-limitations">
-              {reviewIntelligenceResult.limitations.slice(0, 3).map((limitation) => (
+              {activeReviewIntelligence.limitations.slice(0, 3).map((limitation) => (
                 <div className="report-limitations-item" key={limitation}>
                   <Info size={14} aria-hidden />
                   <span>{limitation}</span>
@@ -1510,136 +1822,72 @@ function ReportReady({
           </>
         )}
       </section>
-      <MemoView
-        viewModel={memoView}
-        embedded
-        reviewIntelligenceSummary={viewModel.reviewIntelligenceAttached ? reviewIntelligenceResult?.memoReadySummary : undefined}
-        reviewIntelligenceLimitations={viewModel.reviewIntelligenceAttached ? reviewIntelligenceResult?.limitations : undefined}
-      />
-      <section className="insight-card export-control-card">
-        <div className="export-section export-section-wide">
-          <h3>Format</h3>
-          <div className="export-type-grid">
-            {exportArtifactOptions.map((option) => (
-              <button
-                className={clsx("export-type-card", selectedExportType === option.id && "selected")}
-                type="button"
-                key={option.id}
-                onClick={() => setSelectedExportType(option.id)}
-              >
-                <FileDown size={17} aria-hidden />
-                <strong>{option.label}</strong>
-                <small>{option.description}</small>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="export-section">
-          <h3>File details</h3>
-          <Metric label="File name" value={artifact.fileName} />
-          <Metric label="Value range" value={viewModel.valueRange} />
-          <Metric label="Confidence" value={viewModel.confidence} />
-          <Metric label="Comparables" value={viewModel.includedCompCount} />
-        </div>
-        <div className="export-section export-section-wide">
-          <h3>Included sections</h3>
-          <div className="export-check-list">
-            {sections.map((section) => (
-              <div key={section}>
-                <SquareCheck size={16} aria-hidden />
-                <span>{section}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="export-section export-section-wide export-generate">
-          <div>
-            <h3>Generate export</h3>
-            <p>This export will be marked local only, simulated data, and analyst review required. Review Intelligence exports only after Add to Memo.</p>
-          </div>
-          <button
-            className="primary-action"
-            type="button"
-            onClick={handleGenerate}
-            disabled={isGenerating}
-          >
-            <PackageCheck size={18} /> {isGenerating ? "Generating..." : ctaLabel}
-          </button>
-          {exportError && <p className="report-note">{exportError}</p>}
-        </div>
-      </section>
+      <ExportMemoSnapshot packet={exportPacket} />
       <p className="report-note">Exports include the review path, selected comparables, adjustments, memo, audit activity, and attached review intelligence when explicitly added to the memo. Local demo only.</p>
     </section>
   );
 }
 
-function MemoView({
-  viewModel,
-  embedded = false,
-  reviewIntelligenceSummary,
-  reviewIntelligenceLimitations
-}: {
-  viewModel: ReturnType<typeof selectMemoViewModel>;
-  embedded?: boolean;
-  reviewIntelligenceSummary?: string;
-  reviewIntelligenceLimitations?: string[];
-}) {
-  const sections = parseMemoSections(viewModel.memo);
+function ExportMemoSnapshot({ packet }: { packet: ExportPacket }) {
+  const subject = packet.subject;
+  const valuation = packet.valuation;
+  const sourceScan = packet.sourceScan;
+  const reviewSummary = packet.reviewIntelligence?.memoReadySummary;
+  const compactReviewSummary = reviewSummary && reviewSummary.length > 210
+    ? `${reviewSummary.slice(0, 207).trim()}...`
+    : reviewSummary;
+  const bullets = [
+    `${subject.address}, ${subject.city}, ${subject.province} is reviewed as a ${subject.propertyType} with ${subject.beds} beds, ${subject.baths} baths, and ${subject.livingAreaSqft.toLocaleString()} sqft.`,
+    `Estimated range is ${formatCurrency(valuation.lowEstimate)} to ${formatCurrency(valuation.highEstimate)} with current estimate ${formatCurrency(valuation.midpointEstimate)} and ${Math.round(valuation.confidenceScore)}% ${valuation.confidenceLabel} confidence.`,
+    `${sourceScan.sourcesChecked} sources, ${sourceScan.recordsFound ?? 0} demo records, ${sourceScan.comparablesRanked ?? packet.comparables.length} candidates ranked, and ${sourceScan.comparablesSelected} comparables selected for review.`,
+    compactReviewSummary
+      ? `Review Intelligence V2: ${compactReviewSummary}`
+      : "Review support only: not live MLS, not an appraisal, not a credit decision, and analyst review required."
+  ].map((bullet) => bullet.replace(/\s+/g, " ").trim());
 
   return (
-    <section className={clsx("memo-workspace", embedded && "memo-workspace-embedded")}>
-      {!embedded && <div className="report-ready"><CheckCircle2 size={38} /><div><h3>Summary ready</h3><p>Built from the current review data only.</p></div></div>}
-      <div className="memo-reader" aria-label="Property review memo">
-        {sections.length ? sections.map((section) => (
-          <article className="memo-section-card" key={section.heading}>
-            <h3>{section.heading}</h3>
-            {section.items.length ? (
-              <ul>
-                {section.items.map((item) => <li key={item}>{item}</li>)}
-              </ul>
-            ) : (
-              section.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)
-            )}
-          </article>
-        )) : (
-          <div className="empty-state">Run the analysis to generate the summary.</div>
-        )}
-        {reviewIntelligenceSummary && (
-          <article className="memo-section-card">
-            <h3>Review Intelligence Summary</h3>
-            <p>{reviewIntelligenceSummary}</p>
-            {reviewIntelligenceLimitations?.length ? (
-              <ul>
-                {reviewIntelligenceLimitations.map((limitation) => <li key={limitation}>{limitation}</li>)}
-              </ul>
-            ) : null}
-          </article>
-        )}
+    <section className="export-memo-snapshot" aria-label="Property review memo snapshot">
+      <div>
+        <span className="section-eyebrow">Memo snapshot</span>
+        <h3>Property review memo</h3>
       </div>
+      <ul>
+        {bullets.map((bullet) => (
+          <li key={bullet}>{bullet}</li>
+        ))}
+      </ul>
     </section>
   );
 }
 
-function parseMemoSections(memo: string) {
-  const blocks = memo.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
-  const sections: Array<{ heading: string; paragraphs: string[]; items: string[] }> = [];
-
-  for (let index = 0; index < blocks.length; index += 2) {
-    const heading = blocks[index] ?? `Memo Section ${Math.floor(index / 2) + 1}`;
-    const body = blocks[index + 1] ?? "";
-    const lines = body.split("\n").map((line) => line.trim()).filter(Boolean);
-    const items = lines
-      .filter((line) => /^-\s+|^\d+\.\s+/.test(line))
-      .map((line) => line.replace(/^(?:-\s+|\d+\.\s+)/, ""));
-
-    sections.push({
-      heading,
-      paragraphs: items.length ? [] : [body],
-      items
-    });
-  }
-
-  return sections;
+function ExportFormatCard({
+  icon: Icon,
+  title,
+  detail,
+  active,
+  disabled,
+  onClick
+}: {
+  icon: ComponentType<{ size?: number; "aria-hidden"?: boolean }>;
+  title: string;
+  detail: string;
+  active?: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      className={clsx("export-format-card", active && "active")}
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={`${title}: ${detail}`}
+    >
+      <Icon size={17} aria-hidden />
+      <strong>{title}</strong>
+      <small>{detail}</small>
+    </button>
+  );
 }
 
 function BrandMark() {
@@ -1670,33 +1918,83 @@ function BrandMark() {
   );
 }
 
-function ActivityTimeline({ items, emptyMessage = "No activity yet." }: { items: PceAuditEvent[]; emptyMessage?: string }) {
-  if (!items.length) {
-    return <div className="activity-empty">{emptyMessage}</div>;
-  }
-  return (
-    <div className="activity-list">
-      {items.map((item) => (
-        <div className={clsx("activity-item", item.status)} key={item.id}>
-          <span>{item.status === "confirmed" ? "Confirmed" : item.status === "ready" ? "Ready" : "Review"}</span>
-          <div><strong>{formatAuditEventType(item.type)}</strong><small>{item.summary}</small></div>
-          <em>{new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</em>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function formatAuditEventType(value: PceAuditEvent["type"]) {
-  return value.replace(/_/g, " ");
-}
-
 function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
+  const shouldReduceMotion = useReducedMotion();
+  const durationMs = toast.delta ? 7600 : toast.tone === "review" ? 6400 : 5400;
+  const [paused, setPaused] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const remainingMsRef = useRef(durationMs);
+  const startedAtRef = useRef(0);
+  const onCloseRef = useRef(onClose);
+  const Icon = toast.delta ? Target : toast.tone === "review" ? Info : CheckCircle2;
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  useEffect(() => {
+    remainingMsRef.current = durationMs;
+    startedAtRef.current = Date.now();
+    timeoutRef.current = setTimeout(() => onCloseRef.current(), durationMs);
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [durationMs, toast.detail, toast.title, toast.tone, toast.delta]);
+
+  function clearAutoDismiss() {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }
+
+  function pauseAutoDismiss() {
+    if (paused) return;
+    clearAutoDismiss();
+    remainingMsRef.current = Math.max(0, remainingMsRef.current - (Date.now() - startedAtRef.current));
+    setPaused(true);
+  }
+
+  function resumeAutoDismiss() {
+    if (!paused) return;
+    setPaused(false);
+    startedAtRef.current = Date.now();
+    timeoutRef.current = setTimeout(() => onCloseRef.current(), remainingMsRef.current);
+  }
+
+  function handleBlur(event: FocusEvent<HTMLDivElement>) {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      resumeAutoDismiss();
+    }
+  }
+
   return (
-    <motion.div className={clsx("toast", toast.tone, toast.delta && "gameplay-toast")} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}>
-      {!toast.delta && <CheckCircle2 size={24} />}
-      <div>
-        <strong>{toast.title}</strong>
+    <motion.div
+      className={clsx("toast", toast.tone, toast.delta && "gameplay-toast", paused && "is-paused")}
+      data-tone={toast.tone}
+      role="status"
+      aria-live="polite"
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.98, filter: "blur(3px)" }}
+      animate={shouldReduceMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.985, filter: "blur(2px)" }}
+      transition={{ duration: shouldReduceMotion ? 0.01 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+      onMouseEnter={pauseAutoDismiss}
+      onMouseLeave={resumeAutoDismiss}
+      onFocus={pauseAutoDismiss}
+      onBlur={handleBlur}
+      style={{ "--toast-duration": `${durationMs}ms` } as CSSProperties}
+    >
+      <span className="toast-icon" aria-hidden>
+        <Icon size={19} />
+      </span>
+      <div className="toast-copy">
+        <div className="toast-heading-row">
+          <strong>{toast.title}</strong>
+          <span className="toast-lifetime">{paused ? "Paused" : "Auto-dismiss"}</span>
+        </div>
         {toast.delta ? (
           <div className="gameplay-stats">
             <p>Review impact: {formatReviewImpact(toast.delta.marginalInformationGain ?? 0)}</p>
@@ -1710,6 +2008,7 @@ function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
         )}
       </div>
       <button aria-label="Dismiss notification" type="button" onClick={onClose}><X size={18} /></button>
+      <span className="toast-progress" aria-hidden><span /></span>
     </motion.div>
   );
 }

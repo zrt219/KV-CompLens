@@ -20,7 +20,18 @@ import type {
 export type PceAuditEvent = {
   id: string;
   timestamp: string;
-  type: "source_scan" | "ranking" | "selection" | "valuation" | "memo" | "review_intelligence_v2_added_to_memo";
+  type:
+    | "source_scan"
+    | "ranking"
+    | "selection"
+    | "valuation"
+    | "memo"
+    | "review_intelligence_v2_added_to_memo"
+    | "review_evidence_pack_built"
+    | "review_context_retrieved"
+    | "review_insight_generated"
+    | "review_insight_verified"
+    | "review_insight_fallback_used";
   source: string;
   status: "confirmed" | "review" | "ready";
   summary: string;

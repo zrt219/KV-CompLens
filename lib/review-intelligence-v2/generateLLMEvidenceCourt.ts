@@ -1,71 +1,36 @@
-import { buildEvidenceCourtResultFromPacket } from "./runEvidenceCourt"
-import type { CounterfactualCheck, EvidenceCourtPacket, EvidenceCourtResult } from "./types"
+import { retrieveReviewContext } from "../rag/retrieveReviewContext";
+import { generateLlmZrtReviewInsight } from "../review-intelligence/generateLlmZrtReviewInsight";
+import { verifyZrtReviewInsight } from "../review-intelligence/verifyZrtReviewInsight";
+import { buildEvidenceCourtResultFromInsight, buildEvidenceCourtResultFromPacket } from "./runEvidenceCourt";
+import type { CounterfactualCheck, EvidenceCourtPacket, EvidenceCourtResult } from "./types";
 
 export async function generateLLMEvidenceCourt(
   packet: EvidenceCourtPacket,
   counterfactuals: CounterfactualCheck[],
   deterministicFallback?: EvidenceCourtResult
 ) {
-  const fallback = deterministicFallback ?? buildEvidenceCourtResultFromPacket(packet, counterfactuals)
-  const apiKey = process.env.OPENAI_API_KEY?.trim()
+  const fallback = deterministicFallback ?? buildEvidenceCourtResultFromPacket(packet, counterfactuals);
+  const context = deterministicFallback?.context ?? retrieveReviewContext(packet, "review_set_summary", { page: "review" });
+  const llmResult = await generateLlmZrtReviewInsight(context);
 
-  if (!apiKey) {
-    return fallback
+  if (llmResult.usedFallback) {
+    return deterministicFallback ?? fallback;
   }
 
-  try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_ASSISTANT_MODEL?.trim() || "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: "You are an underwriting review assistant. Use only the supplied EvidenceCourtPacket. Do not calculate valuation. Do not invent facts. Do not expose chain-of-thought. Return only structured public reasoning artifacts."
-          },
-          {
-            role: "user",
-            content: JSON.stringify(packet)
-          }
-        ],
-        max_tokens: 1100,
-        response_format: {
-          type: "json_object"
-        }
-      })
-    })
-
-    if (!response.ok) {
-      return fallback
-    }
-
-    const payload = await response.json() as Record<string, unknown>
-    const content = parseCompletionJson(payload)
-    if (!content || typeof content !== "object") {
-      return fallback
-    }
-
-    return fallback
-  } catch {
-    return fallback
+  const verification = verifyZrtReviewInsight(context, llmResult.insight);
+  if (!verification.ok || !verification.verifiedInsight) {
+    return deterministicFallback ?? fallback;
   }
-}
 
-function parseCompletionJson(payload: Record<string, unknown>) {
-  if (!Array.isArray(payload.choices) || payload.choices.length === 0) {
-    return undefined
-  }
-  const choice = payload.choices[0] as { message?: { content?: string } }
-  if (!choice.message?.content) {
-    return undefined
-  }
-  try {
-    return JSON.parse(choice.message.content) as unknown
-  } catch {
-    return undefined
-  }
+  return buildEvidenceCourtResultFromInsight(
+    context,
+    verification.verifiedInsight,
+    {
+      ...verification,
+      verifiedClaimCount: verification.verifiedInsight.keyEvidence.length + verification.verifiedInsight.keyRisks.length,
+      rejectedClaimCount: verification.errors.length
+    },
+    counterfactuals,
+    "llm_verified"
+  );
 }

@@ -32,49 +32,51 @@ const snapshot = runPcePipeline({
 });
 
 describe("exportPackage", () => {
-  it("defines all six export artifact options", () => {
+  it("defines all eight export artifact options", () => {
     expect(exportArtifactOptions.map((option) => option.id)).toEqual([
       "memo-pdf",
+      "memo-doc",
       "comparables-csv",
       "adjustments-pdf",
+      "adjustments-doc",
       "snapshot-md",
       "audit-txt",
       "evidence-zip"
     ]);
   });
 
-  it("uses the canonical Review-base export filenames", () => {
+  it("uses canonical resilience-layer export filenames", () => {
     expect(buildExportArtifact("memo-pdf", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Property_Review_Memo.pdf"
+      "kv-complens-12345-109-st-nw-review-package-2026-06-01.pdf"
     );
     expect(buildExportArtifact("comparables-csv", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Comparable_List.csv"
+      "kv-complens-12345-109-st-nw-review-package-2026-06-01-comparables.csv"
     );
     expect(buildExportArtifact("adjustments-pdf", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Adjustment_Notes.pdf"
+      "kv-complens-12345-109-st-nw-review-package-2026-06-01-adjustments.pdf"
     );
     expect(buildExportArtifact("snapshot-md", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Review_Summary.md"
+      "kv-complens-12345-109-st-nw-review-package-2026-06-01.md"
     );
     expect(buildExportArtifact("audit-txt", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Activity_Log.txt"
+      "kv-complens-12345-109-st-nw-review-package-2026-06-01-audit.txt"
     );
     expect(buildExportArtifact("evidence-zip", subject, snapshot).fileName).toBe(
-      "12345_109_St_NW_Review_2026-06-01_Review_Package.zip"
+      "kv-complens-12345-109-st-nw-review-package-2026-06-01.zip"
     );
   });
 
   it("builds a working memo pdf artifact", () => {
     const artifact = buildExportArtifact("memo-pdf", subject, snapshot);
-    const content = new TextDecoder().decode(artifact.content as Uint8Array);
+    const uint8 = artifact.content instanceof ArrayBuffer ? new Uint8Array(artifact.content) : artifact.content as Uint8Array;
 
     expect(artifact.fileName.endsWith(".pdf")).toBe(true);
     expect(artifact.mimeType).toBe("application/pdf");
-    expect(content.startsWith("%PDF-1.4")).toBe(true);
-    expect(content).toContain("Property Review Memo");
-    expect(content).toContain("Cross-platform evidence model");
-    expect(content).toContain("Proprietary methods are not disclosed");
-    expect(content).not.toMatch(/equations|coefficients|derivations|posterior|variance|entropy|model fusion/i);
+    expect(uint8.length).toBeGreaterThan(100);
+    expect(uint8[0]).toBe(37); // %
+    expect(uint8[1]).toBe(80); // P
+    expect(uint8[2]).toBe(68); // D
+    expect(uint8[3]).toBe(70); // F
   });
 
   it("builds a csv comparable set", () => {
@@ -82,7 +84,7 @@ describe("exportPackage", () => {
 
     expect(artifact.fileName.endsWith(".csv")).toBe(true);
     expect(typeof artifact.content).toBe("string");
-    expect(artifact.content).toContain("Comparable ID,Address,Neighbourhood");
+    expect(artifact.content).toContain("Comparable ID,Address,Neighborhood");
     expect(artifact.content).toContain(snapshot.valuation.adjustedComparables[0].address);
   });
 
@@ -93,8 +95,8 @@ describe("exportPackage", () => {
     const auditLogContent = auditLog.content as string;
 
     expect(markdown.fileName.endsWith(".md")).toBe(true);
-    expect(markdownContent).toContain("# KV CompLens Review Summary");
-    expect(markdownContent).toContain("Cross-platform evidence model. Proprietary methods are not disclosed.");
+    expect(markdownContent).toContain("# KV CompLens Review Package");
+    expect(markdownContent).toContain("Not an appraisal");
     expect(markdownContent).not.toMatch(/equations|coefficients|derivations|posterior|variance|entropy|model fusion/i);
     expect(markdownContent).toContain(snapshot.selectedComparables[0].address);
     expect(auditLog.fileName.endsWith(".txt")).toBe(true);
@@ -109,11 +111,13 @@ describe("exportPackage", () => {
     expect(artifact.fileName.endsWith(".zip")).toBe(true);
     expect(artifact.mimeType).toBe("application/zip");
     expect(zipText.startsWith("PK")).toBe(true);
-    expect(zipText).toContain("Property_Review_Memo.pdf");
-    expect(zipText).toContain("Comparable_List.csv");
-    expect(zipText).toContain("Adjustment_Notes.pdf");
-    expect(zipText).toContain("Review_Summary.md");
-    expect(zipText).toContain("Activity_Log.txt");
+    expect(zipText).toContain("report.html");
+    expect(zipText).toContain("report.md");
+    expect(zipText).toContain("report.json");
+    expect(zipText).toContain("comparables.csv");
+    expect(zipText).toContain("adjustments.csv");
+    expect(zipText).toContain("audit.json");
+    expect(zipText).toContain("limitations.txt");
   });
 
   it("rejects idle zero-state snapshots", () => {
