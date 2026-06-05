@@ -90,15 +90,16 @@ const workflowNavItems: Array<{ id: WorkflowStepId; label: string; icon: Compone
 ];
 
 export default function Home() {
+  const initialDemoRouteRequested = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "1";
   const [state, dispatch] = usePceAnalysis();
   const [showForm, setShowForm] = useState(true);
   const [reportPrepared, setReportPrepared] = useState(false);
-  const [adjustmentsLocked, setAdjustmentsLocked] = useState(false);
+  const [adjustmentsLocked, setAdjustmentsLocked] = useState(initialDemoRouteRequested);
   const [readabilityMode, setReadabilityMode] = useState(false);
   const [reviewIntelligenceOpen, setReviewIntelligenceOpen] = useState(false);
   const [enhancedReviewIntelligenceState, setEnhancedReviewIntelligenceState] = useState<{ packetId: string; result: EvidenceCourtResult }>();
   const [workflowPulse, setWorkflowPulse] = useState<string>();
-  const [demoRouteRequested, setDemoRouteRequested] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "1");
+  const [demoRouteRequested, setDemoRouteRequested] = useState(initialDemoRouteRequested);
   const workflowPulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const primaryExportActionRef = useRef<(() => void) | null>(null);
   const subject = state.subject;
