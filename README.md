@@ -8,9 +8,12 @@ KV CompLens is an underwriting-support workflow for residential comparable-sales
 
 - Public app: [kv-complens.vercel.app](https://kv-complens.vercel.app)
 - Demo mode: [kv-complens.vercel.app/?demo=1](https://kv-complens.vercel.app/?demo=1)
+- Video walkthrough: [YouTube demo](https://youtu.be/gXPEFDbuXZg)
 - Repository: [zrt219/KV-CompLens](https://github.com/zrt219/KV-CompLens)
 - Build log: [ai-engineering/hackathon/kv-complens-build-log.md](ai-engineering/hackathon/kv-complens-build-log.md)
 - Source of truth: [ai-engineering/source-of-truth.md](ai-engineering/source-of-truth.md)
+
+[![Watch the KV CompLens demo walkthrough](https://img.youtube.com/vi/gXPEFDbuXZg/maxresdefault.jpg)](https://youtu.be/gXPEFDbuXZg)
 
 ## Problem
 
@@ -103,6 +106,12 @@ Every explanation is grounded in the current analysis snapshot.
 
 ## Screenshots
 
+### Video Walkthrough
+
+Watch the full reviewer flow from demo mode through export: [YouTube demo](https://youtu.be/gXPEFDbuXZg).
+
+[![Watch the KV CompLens workflow video](https://img.youtube.com/vi/gXPEFDbuXZg/hqdefault.jpg)](https://youtu.be/gXPEFDbuXZg)
+
 ### Property Intake
 
 The workflow starts with a clean intake surface that frames readiness, required fields, and the review boundary before any analysis runs.
@@ -140,6 +149,8 @@ The print-ready viewer turns the same export packet into a clean browser documen
 ![Print-Ready Report](browser-print-viewer.png)
 
 ## Workflow
+
+Video walkthrough: [Watch KV CompLens on YouTube](https://youtu.be/gXPEFDbuXZg)
 
 1. Intake the subject property and establish whether the review can run.
 2. Scan and summarize local demo evidence sources.
