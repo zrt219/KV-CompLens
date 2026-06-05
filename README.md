@@ -1,3 +1,4 @@
+<img width="2560" height="1279" alt="chrome_aXvhMIv74e" src="https://github.com/user-attachments/assets/17f31924-dd6b-4aa4-811c-546bec104b94" />
 # KV CompLens
 
 <img width="1024" height="1024" alt="kv_complens_banner_1780644632429" src="https://github.com/user-attachments/assets/f1f95e29-6db1-43bf-b4d8-b88133781004" />
@@ -198,8 +199,10 @@ The source scan summarizes evidence quality, record coverage, and candidate read
 ### Review Comparables
 
 The Evidence Board centers the subject property, selected comparables, and reviewer-facing reasoning instead of hiding the workflow inside a black-box model.
+<img width="2560" height="1279" alt="chrome_p9yNnEtr6d" src="https://github.com/user-attachments/assets/13ad8f40-3a8a-4e03-b8d6-e886685ee2f0" />
+<img width="2560" height="1279" alt="chrome_p9yNnEtr6d" src="https://github.com/user-attachments/assets/0ea03f81-96a2-4241-a3cd-95777ae3a3d2" />
 
-![Review Comparables](qa-screenshots/2026-06-04-review.png)
+<img width="2560" height="1279" alt="chrome_aXvhMIv74e" src="https://github.com/user-attachments/assets/f2e43d65-ddea-4cdb-a69b-301be1e45ae7" />
 
 ### Adjustments
 
@@ -211,13 +214,20 @@ The adjustments step makes the review logic explicit through line-level changes 
 
 The export surface converts the current review set into resilient report artifacts with PDF, DOCX, print, ZIP, JSON, CSV, and copyable fallback paths.
 
-![Export Package](qa-screenshots/2026-06-04-export.png)
+<img width="2560" height="1279" alt="chrome_p9yNnEtr6d" src="https://github.com/user-attachments/assets/b00b24c7-5b42-43f7-b22b-cc8f9244638b" />
+
+### PDF Report
+
+The PDF report packages the current review snapshot into a clean, shareable underwriting-support document with subject details, selected comparables, adjustment logic, value range, confidence indicators, limitations, and audit-ready review notes.
+
+<img width="2560" height="1279" alt="chrome_sSC5Kbrx74" src="https://github.com/user-attachments/assets/1ef77ca2-5423-452c-83a7-efcd232fad45" />
+
 
 ### Print-Ready Report
 
 The print-ready viewer turns the same export packet into a clean browser document that can be opened directly or saved as PDF when primary export formats fail.
 
-![Print-Ready Report](browser-print-viewer.png)
+<img width="1780" height="1284" alt="browser-print-viewer" src="https://github.com/user-attachments/assets/877d56b8-90fa-4e07-aa8c-529442ebb357" />
 
 ## Workflow
 
