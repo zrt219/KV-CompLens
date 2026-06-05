@@ -384,3 +384,12 @@
 - Verification performed: `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed; Puppeteer verified `http://localhost:3000/?demo=1` opens with `Review Comparables`, example subject data present, value range visible, and review/export navigation enabled.
 - Evidence/files: `hooks/usePceAnalysis.ts`, `src/app/page.tsx`.
 - Resume-safe bullet: Implemented a deterministic demo-route bootstrap for a property-review app so a shared `?demo=1` URL opens directly into a pre-hydrated analyst workflow instead of an empty intake state.
+
+## 2026-06-05 - Verified Engineering Work
+
+- Built/changed: Rewrote the KV CompLens README into a reviewer-first project brief with faster problem-solution-differentiator framing, screenshot-led product proof, a stronger builder section, and a generic public name for the deterministic analysis engine; also fixed the Export Package `Print view` path by adding cross-tab packet persistence, popup-safe navigation fallback, and hydration-safe print-route rendering.
+- Systems involved: `README.md`, `lib/export/html/openPrintReport.ts`, `components/export/PrintReportView.tsx`, local Puppeteer browser QA.
+- Technical skills demonstrated: hiring-manager-focused technical storytelling, product proof curation, browser storage fallback design, hydration-safe client rendering, export UX recovery, and browser-driven verification.
+- Verification performed: `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed; Puppeteer verified the `Print view` button opens `http://localhost:3000/export/print` with a populated report iframe and no unavailable fallback state.
+- Evidence/files: `README.md`, `lib/export/html/openPrintReport.ts`, `components/export/PrintReportView.tsx`.
+- Resume-safe bullet: Reframed a deterministic property-review demo for reviewer-speed and stabilized its print-ready export route with shared-storage fallback handling and hydration-safe client rendering.
