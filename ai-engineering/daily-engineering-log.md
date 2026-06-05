@@ -375,3 +375,12 @@
 - Verification performed: `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed; Puppeteer verified the normal Intake -> Sources -> Review -> Adjust -> Export flow, clickable CSV export card with download progress, six enabled export format buttons, four memo snapshot bullets, three Review Intelligence highlight tiles, and a compact comparable popover that does not overlap the board search/header.
 - Evidence/files: `qa-screenshots/export-controls-compact-highlighted.png`, `qa-screenshots/review-popover-compact.png`, `src/app/page.tsx`, `src/app/globals.css`, `components/review/WhyComparableButton.tsx`, `lib/export/runExport.ts`, `lib/export/csv/renderCsv.ts`.
 - Resume-safe bullet: Reworked a deterministic property-review export page into a compact, browser-verified action surface with working multi-format exports, concise memo snapshotting, and highlighted review-intelligence decision signals.
+
+## 2026-06-05 - Verified Engineering Work
+
+- Built/changed: Fixed the `?demo=1` route so KV CompLens now auto-hydrates the example subject and opens directly into a completed review state instead of falling back to neutral intake.
+- Systems involved: `hooks/usePceAnalysis.ts`, `src/app/page.tsx`, local Puppeteer browser QA.
+- Technical skills demonstrated: reducer-based demo-state bootstrapping, route-driven UI hydration, React client initialization discipline, and browser-level workflow verification.
+- Verification performed: `npm run lint` passed; `npm test` passed with 91 tests across 26 files; `npm run build` passed; Puppeteer verified `http://localhost:3000/?demo=1` opens with `Review Comparables`, example subject data present, value range visible, and review/export navigation enabled.
+- Evidence/files: `hooks/usePceAnalysis.ts`, `src/app/page.tsx`.
+- Resume-safe bullet: Implemented a deterministic demo-route bootstrap for a property-review app so a shared `?demo=1` URL opens directly into a pre-hydrated analyst workflow instead of an empty intake state.

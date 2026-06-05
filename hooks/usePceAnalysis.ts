@@ -1,7 +1,7 @@
 "use client";
 
 import { useReducer } from "react";
-import { syntheticComparables } from "../lib/mockData";
+import { defaultMockSubject, syntheticComparables } from "../lib/mockData";
 import { runPcePipeline, type PceAnalysisSnapshot } from "../lib/pce/runPcePipeline";
 import type { ReviewIntelligenceAttachment } from "../lib/review-intelligence/types";
 import type { ComparableProperty, SubjectProperty } from "../lib/types";
@@ -28,6 +28,7 @@ export type PceAnalysisState = {
 export type PceAnalysisAction =
   | { type: "UPDATE_SUBJECT"; key: keyof SubjectProperty; value: SubjectProperty[keyof SubjectProperty] }
   | { type: "LOAD_SUBJECT"; subject: SubjectProperty }
+  | { type: "LOAD_DEMO_REVIEW"; generatedAt?: string }
   | { type: "RUN_ANALYSIS"; generatedAt?: string }
   | { type: "FIND_MORE_COMPARABLES"; generatedAt?: string }
   | { type: "ADD_CANDIDATE_TO_ANALYSIS"; generatedAt?: string }
@@ -229,6 +230,17 @@ export function pceAnalysisReducer(state: PceAnalysisState, action: PceAnalysisA
         tone: "review"
       }
     };
+    case "LOAD_DEMO_REVIEW": {
+      const demoState = createInitialPceState(defaultMockSubject, state.candidates, action.generatedAt);
+      return {
+        ...demoState,
+        toast: {
+          title: "Example review loaded",
+          detail: `${demoState.snapshot.valuation.includedCompCount} comparables are ready for review.`,
+          tone: "success"
+        }
+      };
+    }
     case "RUN_ANALYSIS": {
       if (!isSubjectReadyForAnalysis(state.subject)) {
         return {

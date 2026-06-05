@@ -98,6 +98,7 @@ export default function Home() {
   const [reviewIntelligenceOpen, setReviewIntelligenceOpen] = useState(false);
   const [enhancedReviewIntelligenceState, setEnhancedReviewIntelligenceState] = useState<{ packetId: string; result: EvidenceCourtResult }>();
   const [workflowPulse, setWorkflowPulse] = useState<string>();
+  const [demoRouteRequested, setDemoRouteRequested] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("demo") === "1");
   const workflowPulseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const primaryExportActionRef = useRef<(() => void) | null>(null);
   const subject = state.subject;
@@ -125,20 +126,22 @@ export default function Home() {
   const reviewIntelligenceResult = activeEnhancedReviewIntelligence
     ? activeEnhancedReviewIntelligence
     : deterministicReviewIntelligenceResult;
+  const demoAutoReviewVisible = demoRouteRequested && state.analysisStarted;
+  const intakeVisible = showForm && !demoAutoReviewVisible;
   const counterfactualsByComparableId = useMemo<Record<string, CounterfactualCheck | undefined>>(
     () => Object.fromEntries((reviewIntelligenceResult?.counterfactuals ?? [])
       .filter((check) => Boolean(check.comparableId))
       .map((check) => [check.comparableId as string, check])),
     [reviewIntelligenceResult]
   );
-  const workflowStep = getWorkflowStepId(viewMode, showForm, state.analysisStarted);
+  const workflowStep = getWorkflowStepId(viewMode, intakeVisible, state.analysisStarted);
   const reviewIntelligenceDrawerVisible = reviewIntelligenceOpen
     && state.analysisStarted
     && workflowStep === "review"
     && Boolean(reviewIntelligencePacket)
     && Boolean(deterministicReviewIntelligenceResult);
   const activeNavId = workflowStep;
-  const candidateDrawerVisible = state.analysisStarted && !showForm && (viewMode === "network" || viewMode === "discovery") && Boolean(state.newCandidateId) && Boolean(candidate);
+  const candidateDrawerVisible = state.analysisStarted && !intakeVisible && (viewMode === "network" || viewMode === "discovery") && Boolean(state.newCandidateId) && Boolean(candidate);
   const subjectDirty = useMemo(
     () => state.analysisStarted && JSON.stringify(state.subject) !== JSON.stringify(state.snapshot.subject),
     [state.analysisStarted, state.snapshot.subject, state.subject]
@@ -174,6 +177,13 @@ export default function Home() {
       clearTimeout(workflowPulseTimer.current);
     }
   }, []);
+
+  useEffect(() => {
+    if (!demoRouteRequested || state.analysisStarted) {
+      return;
+    }
+    dispatch({ type: "LOAD_DEMO_REVIEW" });
+  }, [demoRouteRequested, dispatch, state.analysisStarted]);
 
   useEffect(() => {
     if (!reviewIntelligenceDrawerVisible || !reviewIntelligencePacket || !deterministicReviewIntelligenceResult) {
@@ -401,6 +411,7 @@ export default function Home() {
   }
 
   function openSubjectIntake() {
+    setDemoRouteRequested(false);
     setShowForm(true);
   }
 
@@ -484,6 +495,7 @@ export default function Home() {
   }
 
   function loadExampleSubject() {
+    setDemoRouteRequested(false);
     dispatch({ type: "LOAD_SUBJECT", subject: defaultMockSubject });
     setReportPrepared(false);
     setAdjustmentsLocked(false);
@@ -491,6 +503,7 @@ export default function Home() {
   }
 
   function resetSubject() {
+    setDemoRouteRequested(false);
     dispatch({ type: "LOAD_SUBJECT", subject: createBlankSubjectProperty() });
     setReportPrepared(false);
     setAdjustmentsLocked(false);
@@ -551,7 +564,7 @@ export default function Home() {
       <section className="main-stage" aria-label="Property review workspace">
         <header className="stage-header">
           <div className="stage-title-copy">
-            <h2>{titleForView(viewMode, showForm)}</h2>
+            <h2>{titleForView(viewMode, intakeVisible)}</h2>
             {state.analysisStarted && <p>{subject.address || subjectDisplayName} / local demo snapshot</p>}
             <div className="stage-status-row" aria-live="polite">
               <span className={clsx("status-chip tooltip-target", workflowStatus.tone)} title={workflowStatus.detail} data-tooltip={workflowStatus.detail}>
@@ -582,7 +595,7 @@ export default function Home() {
 
         <WorkflowProgress viewModel={civicGrid.workflow} workflowStep={workflowStep} analysisStarted={state.analysisStarted} />
         <QuickAnswersPanel viewModel={quickAnswers} />
-        {showForm ? (
+        {intakeVisible ? (
           <SubjectForm
             subject={subject}
             dirty={subjectDirty}
