@@ -15,6 +15,10 @@ KV CompLens is an underwriting-support workflow for residential comparable-sales
 
 [![Watch the KV CompLens demo walkthrough](https://img.youtube.com/vi/gXPEFDbuXZg/maxresdefault.jpg)](https://youtu.be/gXPEFDbuXZg)
 
+Workflow preview: intake, source scan, review comparables, adjustments, and export package.
+
+![Animated KV CompLens workflow preview](docs/readme/kv-complens-workflow.gif)
+
 ## Problem
 
 Comp analysis is one of the most manual steps in residential underwriting.
@@ -46,20 +50,87 @@ KV CompLens focuses on workflow quality, evidence traceability, and reviewer tru
 
 ## Architecture Diagram
 
-```txt
-Property Intake
-        ->
-Source Scan
-        ->
-Candidate Ranking
-        ->
-Deterministic Comparable-Evidence Engine
-        ->
-Review Intelligence
-        ->
-Adjustments
-        ->
-Export Package
+```mermaid
+flowchart TD
+    A["Property Intake"] --> B["Source Scan"]
+    B --> C["Candidate Ranking"]
+    C --> D["Deterministic Comparable-Evidence Engine"]
+    D --> E["Review Intelligence"]
+    E --> F["Adjustments"]
+    F --> G["Export Package"]
+
+    A -. "required fields and review boundary" .-> H["Analyst Readiness"]
+    B -. "source coverage and candidate count" .-> H
+    G -. "memo, audit, CSV, ZIP, print fallback" .-> I["Review-Ready Artifact"]
+```
+
+## Workflow Diagrams
+
+### 1. Analyst Workflow
+
+```mermaid
+flowchart LR
+    A["1. Intake subject property"] --> B["2. Scan local demo sources"]
+    B --> C["3. Rank comparable candidates"]
+    C --> D["4. Review selected comparables"]
+    D --> E["5. Confirm adjustments"]
+    E --> F["6. Export review package"]
+
+    D --> G["Explain Review Set"]
+    D --> H["Why this comparable?"]
+    F --> I["PDF / DOCX / print / ZIP / copy fallback"]
+```
+
+### 2. Evidence-To-Estimate Flow
+
+```mermaid
+flowchart TD
+    A["Subject property details"] --> D["Current analysis snapshot"]
+    B["Source scan summary"] --> D
+    C["Comparable candidates"] --> D
+    D --> E["Evidence-weighted comparable analysis"]
+    E --> F["Selected comparables"]
+    E --> G["Adjusted values"]
+    E --> H["Confidence and risk flags"]
+    E --> I["Estimated value range"]
+    F --> J["Review board"]
+    G --> J
+    H --> K["Summary rail"]
+    I --> K
+    J --> L["Export packet"]
+    K --> L
+```
+
+### 3. Review Intelligence Grounding
+
+```mermaid
+flowchart TD
+    A["Current analysis snapshot"] --> B["Retrieve relevant facts"]
+    B --> C["Generate structured explanation"]
+    C --> D{"Verifier"}
+    D -- "supported by snapshot" --> E["Review Intelligence drawer"]
+    D -- "unsupported claim" --> F["Blocked before UI/export"]
+    E --> G["Add to memo"]
+    G --> H["Export summary"]
+
+    B -. "subject, sources, comparables, adjustments, risks, limitations" .-> C
+```
+
+### 4. Export Resilience
+
+```mermaid
+flowchart TD
+    A["Canonical export packet"] --> B["PDF renderer"]
+    A --> C["DOCX renderer"]
+    B -- "works" --> D["PDF download"]
+    B -- "fails" --> E["Print-ready HTML"]
+    C -- "works" --> F["DOCX download"]
+    C -- "fails" --> G["Word-compatible HTML / RTF"]
+    A --> H["Markdown, JSON, CSV, audit files"]
+    H --> I["Full evidence ZIP"]
+    E --> I
+    G --> I
+    I --> J["Usable review artifact"]
 ```
 
 ## Why KV CompLens Is Different
