@@ -1,4 +1,4 @@
-<img width="2560" height="1279" alt="chrome_aXvhMIv74e" src="https://github.com/user-attachments/assets/17f31924-dd6b-4aa4-811c-546bec104b94" />
+
 
 # KV CompLens
 
@@ -200,8 +200,6 @@ The source scan summarizes evidence quality, record coverage, and candidate read
 ### Review Comparables
 
 The Evidence Board centers the subject property, selected comparables, and reviewer-facing reasoning instead of hiding the workflow inside a black-box model.
-<img width="2560" height="1279" alt="chrome_p9yNnEtr6d" src="https://github.com/user-attachments/assets/13ad8f40-3a8a-4e03-b8d6-e886685ee2f0" />
-<img width="2560" height="1279" alt="chrome_p9yNnEtr6d" src="https://github.com/user-attachments/assets/0ea03f81-96a2-4241-a3cd-95777ae3a3d2" />
 
 <img width="2560" height="1279" alt="chrome_aXvhMIv74e" src="https://github.com/user-attachments/assets/f2e43d65-ddea-4cdb-a69b-301be1e45ae7" />
 
